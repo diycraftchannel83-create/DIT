@@ -3,6 +3,9 @@ package id.ac.darulilmi.portal
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.background
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -89,12 +92,12 @@ private fun PortalApp() {
                 Card(shape = RoundedCornerShape(28.dp), colors = CardDefaults.cardColors(containerColor = Forest), elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)) {
                     Column(Modifier.fillMaxWidth().padding(22.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(Modifier.size(64.dp).background(Color.White, RoundedCornerShape(20.dp)), contentAlignment = Alignment.Center) {
-                                Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                                    Icon(Icons.Default.MenuBook, null, tint = Forest, modifier = Modifier.size(31.dp))
-                                    Text("STIT", color = Forest, fontSize = 8.sp, fontWeight = FontWeight.Black)
-                                }
-                            }
+                            Image(
+                                painter = painterResource(id = R.drawable.stit_logo),
+                                contentDescription = "Logo resmi STIT Darul Ilmi Tasikmalaya",
+                                modifier = Modifier.size(70.dp),
+                                contentScale = ContentScale.Fit
+                            )
                             Spacer(Modifier.width(14.dp))
                             Column {
                                 Text("SEKOLAH TINGGI ILMU TARBIYAH", color = Lime, fontSize = 9.sp, fontWeight = FontWeight.Bold)
