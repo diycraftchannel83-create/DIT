@@ -61,6 +61,54 @@ function saveStudentPhotoUpload(string $field='photo_file'): ?string {
     $name=bin2hex(random_bytes(16)).'.'.$ext;if(!move_uploaded_file($tmp,$dir.'/'.$name))throw new RuntimeException('Foto tidak dapat disimpan.');
     return 'uploads/students/'.$name;
 }
+function auditLog(PDO $pdo, string $action, ?string $entityType=null, ?int $entityId=null, array $metadata=[]): void {
+    try {
+        $actor = user();
+        $q = $pdo->prepare('INSERT INTO audit_logs(user_id,action,entity_type,entity_id,ip_address,user_agent,metadata) VALUES(:uid,:action,:type,:entity,:ip,:agent,:metadata)');
+        $q->execute([
+            'uid' => $actor ? (int)$actor['id'] : null,
+            'action' => substr($action, 0, 100),
+            'type' => $entityType !== null ? substr($entityType, 0, 80) : null,
+            'entity' => $entityId,
+            'ip' => substr((string)($_SERVER['REMOTE_ADDR'] ?? ''), 0, 45) ?: null,
+            'agent' => substr((string)($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 255) ?: null,
+            'metadata' => $metadata ? json_encode($metadata, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE) : null,
+        ]);
+    } catch (Throwable $e) {
+        error_log('[STIT AUDIT] ' . $e->getMessage());
+    }
+}
+function loginRateKey(string $username): string {
+    $ip = (string)($_SERVER['REMOTE_ADDR'] ?? 'unknown');
+    return hash('sha256', strtolower(trim($username)) . '|' . $ip);
+}
+function loginBlockedUntil(PDO $pdo, string $key): ?string {
+    $q = $pdo->prepare('SELECT blocked_until FROM admin_login_attempts WHERE attempt_key=:key LIMIT 1');
+    $q->execute(['key'=>$key]);
+    $until = $q->fetchColumn();
+    return $until && strtotime((string)$until) > time() ? (string)$until : null;
+}
+function recordLoginFailure(PDO $pdo, string $key): void {
+    $pdo->beginTransaction();
+    try {
+        $pdo->prepare('INSERT IGNORE INTO admin_login_attempts(attempt_key,attempts,window_started_at) VALUES(:key,0,UTC_TIMESTAMP())')->execute(['key'=>$key]);
+        $q=$pdo->prepare('SELECT attempts,window_started_at FROM admin_login_attempts WHERE attempt_key=:key FOR UPDATE');
+        $q->execute(['key'=>$key]);$row=$q->fetch();
+        $expired=!$row || strtotime((string)$row['window_started_at']) < time()-900;
+        $attempts=$expired?1:((int)$row['attempts']+1);
+        $blocked=$attempts>=5?gmdate('Y-m-d H:i:s',time()+900):null;
+        $u=$pdo->prepare('UPDATE admin_login_attempts SET attempts=:attempts,window_started_at=IF(:expired=1,UTC_TIMESTAMP(),window_started_at),blocked_until=:blocked WHERE attempt_key=:key');
+        $u->execute(['attempts'=>$attempts,'expired'=>$expired?1:0,'blocked'=>$blocked,'key'=>$key]);
+        $pdo->commit();
+    } catch(Throwable $e) {
+        if($pdo->inTransaction())$pdo->rollBack();
+        error_log('[STIT LOGIN LIMIT] '.$e->getMessage());
+    }
+}
+function clearLoginFailures(PDO $pdo, string $key): void {
+    $q=$pdo->prepare('DELETE FROM admin_login_attempts WHERE attempt_key=:key');
+    $q->execute(['key'=>$key]);
+}
 function tableCount(PDO $pdo, string $table): int {
     $allowed=['users','students','lecturers','study_programs','courses','course_classes','pmb_applicants','tuition_bills','payments','news_posts'];
     if (!in_array($table,$allowed,true)) return 0;
@@ -103,21 +151,32 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
     $action=(string)($_POST['action']??'');
     if ($action==='login') {
         $username=trim((string)($_POST['username']??'')); $password=(string)($_POST['password']??'');
+        $rateKey=loginRateKey($username);
+        if(loginBlockedUntil($pdo,$rateKey)!==null){
+            auditLog($pdo,'admin.login_blocked','user',null,['reason'=>'rate_limit']);
+            flash('Terlalu banyak percobaan login. Coba kembali setelah 15 menit.','error'); go('login');
+        }
         $q=$pdo->prepare('SELECT u.id,u.username,u.full_name,u.email,u.password_hash,u.status,r.name AS role FROM users u JOIN roles r ON r.id=u.role_id WHERE u.username=:username LIMIT 1');
         $q->execute(['username'=>$username]); $u=$q->fetch();
         if (!$u || $u['status']!=='active' || !password_verify($password,$u['password_hash'])) {
+            recordLoginFailure($pdo,$rateKey);
+            auditLog($pdo,'admin.login_failed','user',null,['reason'=>'invalid_credentials']);
             flash('Username atau password tidak valid.','error'); go('login');
         }
         if (!in_array($u['role'],['super_admin','admin_akademik','admin_keuangan','ketua_prodi','ketua_stit','dosen'],true)) {
+            recordLoginFailure($pdo,$rateKey);
+            auditLog($pdo,'admin.login_denied','user',(int)$u['id'],['reason'=>'role_not_allowed']);
             flash('Akun ini tidak memiliki akses ke Admin Web.','error'); go('login');
         }
+        clearLoginFailures($pdo,$rateKey);
         session_regenerate_id(true);
         $_SESSION['admin_user']=['id'=>(int)$u['id'],'username'=>$u['username'],'name'=>$u['full_name'],'role'=>$u['role']];
         $_SESSION['csrf']=bin2hex(random_bytes(32));
         $pdo->prepare('UPDATE users SET last_login_at=UTC_TIMESTAMP() WHERE id=:id')->execute(['id'=>$u['id']]);
+        auditLog($pdo,'admin.login_success','user',(int)$u['id']);
         go('dashboard');
     }
-    if ($action==='logout') { $_SESSION=[]; session_regenerate_id(true); go('login'); }
+    if ($action==='logout') { auditLog($pdo,'admin.logout','user',(int)(user()['id']??0)); $_SESSION=[]; session_regenerate_id(true); go('login'); }
     $u=requireLogin();
     if ($action==='save_campus_profile') {
         allow(['super_admin','admin_akademik']);
