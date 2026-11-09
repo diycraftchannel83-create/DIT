@@ -253,6 +253,15 @@ CREATE TABLE pmb_applicants (
  CONSTRAINT fk_pmb_program FOREIGN KEY(study_program_id) REFERENCES study_programs(id)
 ) ENGINE=InnoDB;
 
+CREATE TABLE admin_login_attempts (
+ attempt_key CHAR(64) NOT NULL PRIMARY KEY,
+ attempts SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+ window_started_at DATETIME NOT NULL,
+ blocked_until DATETIME NULL,
+ updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ INDEX idx_admin_login_blocked(blocked_until)
+) ENGINE=InnoDB;
+
 CREATE TABLE audit_logs (
  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
  user_id BIGINT UNSIGNED NULL,
