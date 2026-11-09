@@ -316,6 +316,7 @@ CREATE TABLE campus_profile (
  website VARCHAR(255) NULL,
  pmb_url VARCHAR(255) NULL,
  hero_image_url VARCHAR(500) NULL,
+ logo_image_url VARCHAR(500) NULL,
  updated_by BIGINT UNSIGNED NULL,
  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
  CONSTRAINT fk_campus_profile_user FOREIGN KEY(updated_by) REFERENCES users(id) ON DELETE SET NULL
