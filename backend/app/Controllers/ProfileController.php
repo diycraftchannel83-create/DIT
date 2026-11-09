@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 namespace App\Controllers;
-use App\Core\\Auth;use App\Core\\Database;use App\Core\\Response;
+use App\Core\Auth;use App\Core\Database;use App\Core\Response;
 final class ProfileController {
  public static function me(): never {
   $u=Auth::requireUser();
