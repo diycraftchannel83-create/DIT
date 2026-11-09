@@ -129,7 +129,7 @@ private fun PortalApp() {
             items(data.news) { title -> SimpleInfoCard(title, "Berita kampus") }
             item { SimpleInfoCard("Lokasi kampus", data.address) }
             if (error != null) item { Text(error!!, color = MaterialTheme.colorScheme.error) }
-            if (message != null) item { Text(message!!, color = Navy) }
+            if (message != null) item { Text(message!!, color = Forest) }
             if (token != null) {
                 item {
                     SectionTitle("Layanan akun $role")
@@ -191,7 +191,7 @@ private fun TopAppBarCompat(title: String, onLogin: () -> Unit, loggedIn: Boolea
 }
 
 @Composable
-private fun SectionTitle(text: String) { Text(text, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Navy) }
+private fun SectionTitle(text: String) { Text(text, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Forest) }
 
 @Composable
 private fun PublicTile(title: String, icon: androidx.compose.ui.graphics.vector.ImageVector, modifier: Modifier) {
