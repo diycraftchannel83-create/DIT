@@ -22,7 +22,7 @@ $about=$campus['about']??'STIT Darul Ilmi Tasikmalaya hadir sebagai lembaga pend
 $hero=$campus['hero_image_url']??'';
 $aboutImage=webContent($pdo,'about_image_url',$hero);
 if ($aboutImage==='') $aboutImage=$hero;
-$logo=($campus['logo_image_url']??'')?:'https://raw.githubusercontent.com/diycraftchannel83-create/DIT/main/app/src/main/res/drawable/stit_logo.jpg';
+$logo=($campus['logo_image_url']??'')?:'assets/stit-darul-ilmi-icon.svg';
 $history=webContent($pdo,'history','');
 $why=json_decode(webContent($pdo,'why_cards','[]'),true); if(!is_array($why)||!$why)$why=[
  ['icon'=>'☪','title'=>'Pendidikan Berbasis Nilai Islam','text'=>'Mengintegrasikan nilai keislaman dalam proses pendidikan dan pembentukan karakter.'],
@@ -75,8 +75,8 @@ footer{background:#245c3a;color:#e9f4e9;padding:54px 0 20px}.foot-grid{display:g
 @media(max-width:780px){.nav{min-height:72px;justify-content:space-between}.hamb{display:block}.nav-cta{margin-left:auto}.links{display:none;position:absolute;left:0;right:0;top:72px;padding:14px 22px 20px;background:#fff;border-bottom:1px solid var(--line);box-shadow:var(--shadow);flex-direction:column;align-items:stretch}.links.open{display:flex}.links a{padding:9px;font-size:13px}.hero-grid,.about-grid{grid-template-columns:1fr;gap:28px}.hero{padding:48px 0 60px}.hero-photo{height:300px}.program-grid,.feature-grid,.news-grid,.quote-grid{grid-template-columns:repeat(2,1fr)}.pmb,.cta{padding:30px;display:block}.pmb .btn,.cta .btn{margin-top:15px}.foot-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:520px){.hero h1 .hero-level{font-size:11px}.hero h1 .hero-institution{font-size:clamp(25px,7vw,34px)}.hero h1 .hero-license{font-size:10px}.container{width:calc(100% - 32px)}.topline .container{justify-content:center}.topline span:nth-child(2){display:none}.brand{min-width:0;gap:8px;max-width:calc(100% - 100px)}.brand img{width:42px;height:42px}.brand .brand-kicker{font-size:7px;letter-spacing:.06em}.brand strong{font-size:10px;white-space:normal}.brand small{font-size:7px;letter-spacing:0}.nav-cta{font-size:10px;padding:9px 10px}.hero h1{font-size:12px;line-height:1.4}.hero-photo{height:240px;border-radius:22px 70px 22px 22px}.stat-grid{grid-template-columns:repeat(2,1fr);padding:10px}.stat:nth-child(3){border-left:0}.stat:nth-child(n+3){border-top:1px solid var(--line)}.stat strong{font-size:22px}.stat span{font-size:11px}.program-grid,.feature-grid,.news-grid,.quote-grid,.gallery-grid{grid-template-columns:1fr}.gallery-grid img{height:230px}.vm{grid-template-columns:1fr}.about-photo{height:250px}section.content{padding:58px 0}.pmb h2,.cta h2{font-size:24px}.foot-grid{grid-template-columns:1fr}}
 </style>
-<link rel="icon" type="image/svg+xml" href="/favicon.svg?v=1">
-<link rel="alternate icon" href="/favicon.svg?v=1">
+<link rel="icon" href="<?=h($logo)?>">
+<link rel="alternate icon" href="<?=h($logo)?>">
 <meta name="theme-color" content="#075b3d">
 </head>
 <body>
