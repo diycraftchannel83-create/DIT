@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+// Mobile-first portal navigation is rendered only for authenticated users.
 
 /**
  * STIT Darul Ilmi - Student & Lecturer Portal
