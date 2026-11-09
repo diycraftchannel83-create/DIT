@@ -2,9 +2,11 @@ package id.ac.darulilmi.portal
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.ActivityNotFoundException
 import android.net.Uri
 import android.os.Bundle
 import android.webkit.WebChromeClient
+import android.webkit.ValueCallback
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceError
 import android.webkit.WebResourceResponse
@@ -12,6 +14,8 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
@@ -41,10 +45,29 @@ private val CampusGreen = Color(0xFF245C3A)
 
 class MainActivity : ComponentActivity() {
     private var campusWebView: WebView? = null
+    private var pendingFileCallback: ValueCallback<Array<Uri>>? = null
+    private lateinit var fileChooserLauncher: ActivityResultLauncher<Intent>
+
+    private fun deliverSelectedFiles(data: Intent?) {
+        val callback = pendingFileCallback ?: return
+        pendingFileCallback = null
+        val results = mutableListOf<Uri>()
+        data?.clipData?.let { clip ->
+            for (index in 0 until clip.itemCount) {
+                results.add(clip.getItemAt(index).uri)
+            }
+        }
+        if (results.isEmpty()) data?.data?.let(results::add)
+        callback.onReceiveValue(results.distinct().takeIf { it.isNotEmpty() }?.toTypedArray())
+    }
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        fileChooserLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) deliverSelectedFiles(result.data)
+            else deliverSelectedFiles(null)
+        }
         window.statusBarColor = android.graphics.Color.rgb(36, 92, 58)
         window.navigationBarColor = android.graphics.Color.rgb(36, 92, 58)
 
@@ -84,6 +107,65 @@ class MainActivity : ComponentActivity() {
                                 webChromeClient = object : WebChromeClient() {
                                     override fun onProgressChanged(view: WebView?, newProgress: Int) {
                                         loading = newProgress < 100
+                                    }
+
+                                    override fun onShowFileChooser(
+                                        webView: WebView?,
+                                        filePathCallback: ValueCallback<Array<Uri>>?,
+                                        fileChooserParams: WebChromeClient.FileChooserParams?
+                                    ): Boolean {
+                                        pendingFileCallback?.onReceiveValue(null)
+                                        pendingFileCallback = filePathCallback ?: return false
+
+                                        val acceptedTypes = fileChooserParams?.acceptTypes
+                                            ?.flatMap { it.split(",") }
+                                            ?.map { it.trim() }
+                                            ?.filter { it.isNotEmpty() && it != "*/*" }
+                                            ?.distinct()
+                                            .orEmpty()
+                                        val mimeTypes = acceptedTypes.mapNotNull { type ->
+                                            when {
+                                                type.startsWith(".") -> when (type.lowercase()) {
+                                                    ".jpg", ".jpeg" -> "image/jpeg"
+                                                    ".png" -> "image/png"
+                                                    ".webp" -> "image/webp"
+                                                    ".pdf" -> "application/pdf"
+                                                    else -> null
+                                                }
+                                                '/' in type -> type
+                                                else -> null
+                                            }
+                                        }.distinct()
+
+                                        val openIntent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                                            addCategory(Intent.CATEGORY_OPENABLE)
+                                            type = if (mimeTypes.size == 1) mimeTypes.first() else "*/*"
+                                            if (mimeTypes.size > 1) putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes.toTypedArray())
+                                            putExtra(Intent.EXTRA_ALLOW_MULTIPLE, fileChooserParams?.mode == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE)
+                                        }
+                                        return try {
+                                            fileChooserLauncher.launch(openIntent)
+                                            true
+                                        } catch (_: ActivityNotFoundException) {
+                                            try {
+                                                val fallback = Intent(Intent.ACTION_GET_CONTENT).apply {
+                                                    addCategory(Intent.CATEGORY_OPENABLE)
+                                                    type = if (mimeTypes.size == 1) mimeTypes.first() else "*/*"
+                                                    if (mimeTypes.size > 1) putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes.toTypedArray())
+                                                    putExtra(Intent.EXTRA_ALLOW_MULTIPLE, fileChooserParams?.mode == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE)
+                                                }
+                                                fileChooserLauncher.launch(fallback)
+                                                true
+                                            } catch (_: Exception) {
+                                                pendingFileCallback?.onReceiveValue(null)
+                                                pendingFileCallback = null
+                                                false
+                                            }
+                                        } catch (_: Exception) {
+                                            pendingFileCallback?.onReceiveValue(null)
+                                            pendingFileCallback = null
+                                            false
+                                        }
                                     }
                                 }
 
@@ -182,6 +264,8 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
+        pendingFileCallback?.onReceiveValue(null)
+        pendingFileCallback = null
         campusWebView?.apply {
             stopLoading()
             webChromeClient = null
