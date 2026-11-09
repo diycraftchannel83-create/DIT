@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -15,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -25,9 +28,13 @@ import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 
-private val Navy = Color(0xFF142B4A)
-private val Gold = Color(0xFFC79B45)
-private val CanvasBg = Color(0xFFF4F6FA)
+private val Forest = Color(0xFF087A4B)
+private val Emerald = Color(0xFF119B62)
+private val Mint = Color(0xFFE8F6EE)
+private val Lime = Color(0xFFB8DE78)
+private val Gold = Color(0xFFD9B64D)
+private val Ink = Color(0xFF173B2B)
+private val CanvasBg = Color(0xFFF5FAF6)
 
 data class CampusData(
     val name: String = "STIT Darul Ilmi Tasikmalaya",
@@ -41,7 +48,7 @@ data class CampusData(
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent { MaterialTheme(colorScheme = lightColorScheme(primary = Navy, secondary = Gold)) { PortalApp() } }
+        setContent { MaterialTheme(colorScheme = lightColorScheme(primary = Forest, secondary = Gold, background = CanvasBg, surface = Color.White)) { PortalApp() } }
     }
 }
 
@@ -79,35 +86,38 @@ private fun PortalApp() {
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             item {
-                Card(shape = RoundedCornerShape(24.dp), colors = CardDefaults.cardColors(containerColor = Navy)) {
+                Card(shape = RoundedCornerShape(28.dp), colors = CardDefaults.cardColors(containerColor = Forest), elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)) {
                     Column(Modifier.fillMaxWidth().padding(22.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(Modifier.size(58.dp).background(Color.White, RoundedCornerShape(18.dp)), contentAlignment = Alignment.Center) {
-                                Text("DI", color = Navy, fontSize = 24.sp, fontWeight = FontWeight.Black)
+                            Box(Modifier.size(64.dp).background(Color.White, RoundedCornerShape(20.dp)), contentAlignment = Alignment.Center) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                                    Icon(Icons.Default.MenuBook, null, tint = Forest, modifier = Modifier.size(31.dp))
+                                    Text("STIT", color = Forest, fontSize = 8.sp, fontWeight = FontWeight.Black)
+                                }
                             }
                             Spacer(Modifier.width(14.dp))
                             Column {
-                                Text("PORTAL AKADEMIK", color = Gold, fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                                Text("STIT DARUL ILMI", color = Color.White, fontSize = 19.sp, fontWeight = FontWeight.Bold)
+                                Text("SEKOLAH TINGGI ILMU TARBIYAH", color = Lime, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                                Text("DARUL ILMI", color = Color.White, fontSize = 21.sp, fontWeight = FontWeight.ExtraBold)
                             }
                         }
-                        Text(data.tagline, color = Color.White, fontSize = 23.sp, fontWeight = FontWeight.Bold)
-                        Text("Informasi kampus dan layanan akademik dalam satu aplikasi.", color = Color.White.copy(alpha = .82f))
-                        Button(onClick = { showLogin = true }, colors = ButtonDefaults.buttonColors(containerColor = Gold)) {
-                            Text(if (token == null) "Login civitas akademika" else "Akun: $userName", color = Navy)
+                        Text(data.tagline, color = Color.White, fontSize = 25.sp, lineHeight = 31.sp, fontWeight = FontWeight.Bold)
+                        Text("Jelajahi informasi kampus, program studi, berita, dan layanan akademik dalam satu aplikasi.", color = Color.White.copy(alpha = .88f), lineHeight = 21.sp)
+                        Button(onClick = { showLogin = true }, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = Lime), contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp)) {
+                            Text(if (token == null) "Login Civitas Akademika" else "Akun: $userName", color = Ink, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
             }
             item {
                 SectionTitle("Layanan publik")
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
                     PublicTile("Profil", Icons.Default.AccountBalance, Modifier.weight(1f))
                     PublicTile("Program Studi", Icons.Default.School, Modifier.weight(1f))
                     PublicTile("PMB", Icons.Default.HowToReg, Modifier.weight(1f))
                 }
             }
-            item { SectionTitle("Tentang kampus"); Text(data.about, color = Color(0xFF475569)) }
+            item { SectionTitle("Tentang kampus"); Text(data.about, color = Color(0xFF52665B), lineHeight = 23.sp) }
             item { SectionTitle("Program studi") }
             items(data.programs) { name -> SimpleInfoCard(name, "Program studi aktif") }
             item { SectionTitle("Berita dan pengumuman") }
@@ -171,8 +181,9 @@ private fun PortalApp() {
 @Composable
 private fun TopAppBarCompat(title: String, onLogin: () -> Unit, loggedIn: Boolean) {
     TopAppBar(
-        title = { Text(title, maxLines = 1, fontWeight = FontWeight.Bold) },
-        actions = { TextButton(onClick = onLogin) { Text(if (loggedIn) "Akun" else "Login") } }
+        title = { Text(title, maxLines = 1, fontWeight = FontWeight.Bold, color = Forest, fontSize = 16.sp) },
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFF5FAF6)),
+        actions = { TextButton(onClick = onLogin) { Text(if (loggedIn) "Akun" else "Login", color = Forest, fontWeight = FontWeight.Bold) } }
     )
 }
 
@@ -181,22 +192,22 @@ private fun SectionTitle(text: String) { Text(text, fontSize = 18.sp, fontWeight
 
 @Composable
 private fun PublicTile(title: String, icon: androidx.compose.ui.graphics.vector.ImageVector, modifier: Modifier) {
-    Card(modifier, shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = Color.White)) {
+    Card(modifier, shape = RoundedCornerShape(18.dp), colors = CardDefaults.cardColors(containerColor = Color.White), border = BorderStroke(1.dp, Color(0xFFE1EEE5)), elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)) {
         Column(Modifier.fillMaxWidth().padding(vertical = 15.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(icon, null, tint = Gold)
+            Icon(icon, null, tint = Forest, modifier = Modifier.size(25.dp))
             Spacer(Modifier.height(6.dp))
-            Text(title, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+            Text(title, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = Ink)
         }
     }
 }
 
 @Composable
 private fun SimpleInfoCard(title: String, subtitle: String) {
-    Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = Color.White)) {
+    Card(shape = RoundedCornerShape(18.dp), colors = CardDefaults.cardColors(containerColor = Color.White), border = BorderStroke(1.dp, Color(0xFFE1EEE5)), elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)) {
         Column(Modifier.fillMaxWidth().padding(16.dp)) {
-            Text(title, fontWeight = FontWeight.Bold, color = Navy)
+            Text(title, fontWeight = FontWeight.Bold, color = Ink)
             Spacer(Modifier.height(4.dp))
-            Text(subtitle, color = Color(0xFF64748B), fontSize = 13.sp)
+            Text(subtitle, color = Color(0xFF66796D), fontSize = 13.sp)
         }
     }
 }
