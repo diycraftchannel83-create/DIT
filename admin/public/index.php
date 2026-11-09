@@ -5,7 +5,7 @@ declare(strict_types=1);
  * STIT Darul Ilmi Academic Portal - Admin Web
  * PHP 8+, PDO MySQL. Deploy this directory as a separate web root/subdomain.
  */
-$backend = dirname(__DIR__, 2) . '/../backend';
+$backend = dirname(__DIR__, 2) . '/backend';
 $configFile = $backend . '/config/database.local.php';
 if (!is_file($configFile)) {
     http_response_code(503);
