@@ -1,8 +1,8 @@
 <?php
 declare(strict_types=1);
-namespace App\\Controllers;
-use App\\Core\\Database;
-use App\\Core\\Response;
+namespace App\Controllers;
+use App\Core\Database;
+use App\Core\Response;
 final class PublicContentController {
  public static function home(): never {
   $db=Database::connection();
