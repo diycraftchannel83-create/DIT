@@ -36,7 +36,7 @@ Portal akademik terpadu STIT Darul Ilmi Tasikmalaya.
 
 ## Setup
 1. Create a MySQL database in the hosting panel.
-2. Import `backend/database/schema.sql`.
+2. Import `backend/database/schema.sql` once. It creates all core academic tables plus the campus homepage and news tables; no separate SQL migration is required for a fresh database.
 3. Copy `backend/config/database.example.php` to `backend/config/database.local.php` and fill credentials.
 4. Keep secrets outside the public web root; never commit credentials.
 5. Enable HTTPS. Deploy Admin Web with document root pointing to `admin/public`.
@@ -49,5 +49,5 @@ This is an evolving development foundation, not yet a complete production SIS. T
 - Public homepage in `website/index.php`: campus profile, vision/mission, active study programs, published news, contact, and PMB link.
 - Admin dashboard can update campus profile; the Berita menu supports draft, edit, publish, and unpublish.
 - Public endpoint: `GET /api/v1/public/home` (no login required; returns only public campus content).
-- Apply database migration `backend/database/migrations/2026_11_09_campus_profile_and_news.sql` once before using these features.
+- The complete initial database file `backend/database/schema.sql` already includes campus profile and news tables. For a new installation, import this file once; no separate migration import is needed.
 - Setup and deployment notes: `docs/PHASE5A_CAMPUS_HOMEPAGE_NEWS.md`.
