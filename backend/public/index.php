@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 spl_autoload_register(static function(string $class): void {$prefix='App\\';if(!str_starts_with($class,$prefix))return;$relative=substr($class,strlen($prefix));$file=dirname(__DIR__).'/app/'.str_replace('\\','/',$relative).'.php';if(is_file($file))require $file;});
-use App\Controllers\AuthController;use App\Controllers\ProfileController;use App\Core\Database;use App\Core\Response;
+use App\Controllers\AuthController;use App\Controllers\ProfileController;use App\Controllers\PublicContentController;use App\Core\Database;use App\Core\Response;
 $cfgPath=dirname(__DIR__).'/config/database.local.php';if(!is_file($cfgPath))Response::json(['success'=>false,'message'=>'Server belum dikonfigurasi.'],503);$cfg=require $cfgPath;
 $origin=$_SERVER['HTTP_ORIGIN']??'';if($origin&&in_array($origin,$cfg['allowed_origins']??[],true)){header('Access-Control-Allow-Origin: '.$origin);header('Vary: Origin');}
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');header('Access-Control-Allow-Headers: Content-Type, Authorization');header('X-Content-Type-Options: nosniff');if(($_SERVER['REQUEST_METHOD']??'GET')==='OPTIONS'){http_response_code(204);exit;}
