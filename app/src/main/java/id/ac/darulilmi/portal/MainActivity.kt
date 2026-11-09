@@ -198,7 +198,7 @@ private fun PortalApp() {
                 item { SimpleInfoCard("Belum ada berita", "Berita yang dipublikasikan Admin akan tampil di sini.") }
             } else {
                 items(data.news) { title ->
-                    Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 5.dp).clip(RoundedCornerShape(18.dp)).background(Color.White).borderStroke(), verticalAlignment = Alignment.CenterVertically) {
+                    Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 5.dp).clip(RoundedCornerShape(18.dp)).background(Color.White).border(BorderStroke(1.dp, Color(0xFFE1EEE5)), RoundedCornerShape(18.dp)), verticalAlignment = Alignment.CenterVertically) {
                         Box(Modifier.padding(10.dp).size(92.dp, 78.dp).clip(RoundedCornerShape(12.dp)).background(Mint), contentAlignment = Alignment.Center) {
                             Icon(Icons.Default.Article, null, tint = Forest, modifier = Modifier.size(34.dp))
                         }
