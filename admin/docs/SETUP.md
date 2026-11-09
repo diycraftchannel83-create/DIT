@@ -10,7 +10,7 @@
 1. Upload repository ke hosting.
 2. Buat database MySQL melalui panel hosting.
 3. Untuk database baru yang kosong, import `backend/database/schema.sql` satu kali.
-4. Untuk database lama, backup terlebih dahulu dan jalankan hanya migration yang belum diterapkan. Perluasan profil mahasiswa menggunakan `backend/database/migrations/2026_11_09_expand_student_profile.sql`; jalankan satu kali hanya jika kolom tambahan belum tersedia.
+4. Untuk database lama, backup terlebih dahulu dan jalankan hanya migration yang belum diterapkan. Perluasan profil mahasiswa menggunakan `backend/database/migrations/2026_11_09_expand_student_profile.sql`; tabel pembatasan login menggunakan `backend/database/migrations/2026_11_09_admin_login_attempts.sql`. Jalankan masing-masing satu kali hanya jika perubahan tersebut belum tersedia.
 5. Salin `backend/config/database.example.php` menjadi `backend/config/database.local.php`, lalu isi host, database, username, password, dan URL aplikasi.
 6. Pastikan folder konfigurasi tidak dapat diakses publik. Arahkan document root admin ke `admin/public`.
 7. Aktifkan HTTPS, buat akun super admin mengikuti `backend/docs/ADMIN_SETUP.md`, lalu uji login dan akses per role.
@@ -20,6 +20,8 @@ Jangan mengimpor ulang schema penuh ke database aktif karena dapat menimbulkan k
 ## Fitur yang tersedia
 - Login berbasis tabel `users` dan `password_hash`, session cookie HttpOnly/SameSite serta Secure saat HTTPS terdeteksi.
 - CSRF token untuk form POST dan regenerasi session ID setelah login.
+- Pembatasan login Admin Web: maksimal 5 kegagalan per kombinasi username dan alamat IP dalam jendela 15 menit; percobaan berikutnya diblokir selama 15 menit.
+- Audit log autentikasi: login berhasil, gagal, diblokir, ditolak karena role, dan logout dicatat pada tabel `audit_logs`.
 - Dashboard ringkasan data kampus.
 - Pengelolaan profil kampus dan berita publik (draft/publikasi).
 - Pengelolaan program studi, tahun akademik, semester, mahasiswa, dosen, akun operasional, mata kuliah, kelas dan jadwal.
@@ -28,8 +30,8 @@ Jangan mengimpor ulang schema penuh ke database aktif karena dapat menimbulkan k
 
 ## Batasan dan keamanan yang masih perlu dituntaskan
 - Belum ada pengujian end-to-end pada hosting/ByetHost atau verifikasi database produksi.
-- Login belum memiliki rate limiting atau proteksi brute-force bawaan.
-- Audit log belum terhubung ke seluruh aksi admin.
+- Rate limiting login saat ini menggunakan kombinasi username dan IP pada database. Tetap pasang WAF/proteksi hosting dan pantau penyalahgunaan; ini bukan pengganti MFA.
+- Audit log baru mencatat aktivitas autentikasi; aksi perubahan data akademik dan administrasi perlu ditambahkan secara bertahap.
 - Belum semua modul memiliki edit/hapus, pagination, impor massal atau pencarian.
 - Validasi KRS belum mencakup seluruh aturan akademik seperti batas SKS, prasyarat, bentrok jadwal dan kapasitas kelas.
 - Kebijakan IPK untuk mata kuliah yang diulang harus disahkan kampus.
