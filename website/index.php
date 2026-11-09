@@ -84,7 +84,7 @@ footer{background:#245c3a;color:#e9f4e9;padding:54px 0 20px}.foot-grid{display:g
 </div></header>
 <main>
 <section class="hero" id="beranda"><div class="container hero-grid">
-<div class="reveal"><span class="eyebrow">SEKOLAH TINGGI ILMU TARBIYAH</span><h1>Selamat Datang di <span>STIT Darul Ilmi</span> Tasikmalaya</h1><p><?=h($tagline)?> <?=h($about)?></p><div class="actions"><a class="btn btn-green" href="<?=h($pmbUrl?:'#pmb')?>">Daftar Sekarang ↗</a><a class="btn btn-outline" href="#profil">Jelajahi Kampus ↓</a></div></div>
+<div class="reveal"><span class="eyebrow">SELAMAT DATANG</span><h1>SEKOLAH TINGGI ILMU TARBIYAH <span>STIT DARUL ILMI TASIKMALAYA</span> SK MENTERI AGAMA RI NO. 536 TAHUN 2026</h1><p><?=h($tagline)?> <?=h($about)?></p><div class="actions"><a class="btn btn-green" href="<?=h($pmbUrl?:'#pmb')?>">Daftar Sekarang ↗</a><a class="btn btn-outline" href="#profil">Jelajahi Kampus ↓</a></div></div>
 <div class="hero-photo reveal"><?php if($hero):?><img src="<?=h($hero)?>" alt="Gedung kampus STIT Darul Ilmi Tasikmalaya" fetchpriority="high"><?php else:?><div class="photo-fallback" role="img" aria-label="Foto gedung kampus belum diunggah">STIT</div><?php endif;?><div class="photo-label">STIT Darul Ilmi · Tasikmalaya</div></div>
 </div></section>
 <?php if($stats):?><section class="stats container" aria-label="Statistik kampus"><div class="stat-grid"><?php foreach($stats as $st):if(!is_array($st))continue;?><div class="stat"><strong data-count="<?=h($st['value']??'')?>"><?=h($st['value']??'—')?></strong><span><?=h($st['label']??'Statistik')?></span></div><?php endforeach;?></div></section><?php endif;?>
