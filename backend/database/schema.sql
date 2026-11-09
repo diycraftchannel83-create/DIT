@@ -90,7 +90,7 @@ CREATE TABLE academic_years (
 CREATE TABLE semesters (
  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
  academic_year_id BIGINT UNSIGNED NOT NULL,
- name ENUM('Ganjil','Genap','Antara') NOT NULL,
+ name VARCHAR(20) NOT NULL,
  start_date DATE NOT NULL,
  end_date DATE NOT NULL,
  is_active BOOLEAN NOT NULL DEFAULT FALSE,
