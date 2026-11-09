@@ -25,3 +25,21 @@ Endpoint `GET /api/v1/me` menyertakan objek `student` dengan field profil tambah
 - Foto disimpan sebagai URL HTTP/HTTPS; unggah file foto belum dibuat.
 - Belum tersedia fitur edit profil, validasi referensi wilayah, impor Excel, atau pengaturan field wajib sesuai kebijakan kampus.
 - Sebelum produksi, tetapkan dasar pengumpulan, retensi, hak akses, dan perlindungan data pribadi.
+
+
+## Fitur pengelolaan Admin Web
+- Cari mahasiswa berdasarkan NIM, nama, atau email.
+- Buka tautan Edit pada daftar mahasiswa untuk memperbarui akun dan data profil.
+- Ekspor daftar mahasiswa ke CSV yang dapat dibuka di Excel atau LibreOffice.
+- Foto dapat diunggah sebagai JPG, PNG, atau WebP maksimal 2 MB. Nama file disimpan secara acak pada `admin/public/uploads/students/`; direktori ini menonaktifkan listing dan akses eksekusi file PHP melalui aturan Apache.
+- Foto lama dapat dipertahankan dengan tidak memilih unggahan baru. Kolom URL foto juga menerima URL HTTP/HTTPS.
+
+## Cara memakai
+1. Login sebagai `super_admin` atau `admin_akademik`.
+2. Buka menu Mahasiswa.
+3. Gunakan pencarian untuk menemukan mahasiswa, lalu pilih Edit.
+4. Perbarui field yang dibutuhkan dan simpan.
+5. Untuk unduh data, pilih Ekspor CSV.
+
+## Catatan keamanan foto
+Batas unggah aplikasi 2 MB dan MIME diperiksa menggunakan Fileinfo. Pastikan hosting menyediakan ekstensi PHP Fileinfo, mengizinkan upload, dan folder upload dapat ditulis oleh PHP. Aturan `.htaccess` berlaku pada Apache; untuk Nginx, pasang aturan server yang setara agar file skrip tidak dapat dieksekusi. Jangan unggah dokumen identitas ke folder foto publik.
