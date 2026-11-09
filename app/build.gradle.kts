@@ -14,7 +14,7 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "0.1.0"
-        buildConfigField("String", "API_BASE_URL", "\"https://your-domain.example/\"")
+        buildConfigField("String", "API_BASE_URL", "\"https://siakadstitdit.byethost24.com/backend/public\"")
     }
     buildFeatures { compose = true; buildConfig = true }
     compileOptions {
