@@ -216,7 +216,23 @@ private fun PortalApp() {
             item { SimpleInfoCard("Lokasi Kampus", data.address) }
             if (token != null) {
                 item {
-                    Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Column(Modifier.padding(horizontal = 20.dp, vertical = 16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(24.dp),
+                            colors = CardDefaults.cardColors(containerColor = Forest),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                        ) {
+                            Row(Modifier.fillMaxWidth().background(Brush.horizontalGradient(listOf(DeepGreen, Emerald))).padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                                    Text("PORTAL AKADEMIK", color = Lime, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.2.sp)
+                                    Text("Selamat Datang", color = Color.White, fontSize = 21.sp, fontWeight = FontWeight.ExtraBold)
+                                    Text(userName.ifBlank { "Civitas Akademika" }, color = Color.White, fontSize = 15.sp)
+                                    Text(role.replace('_',' ').uppercase(), color = Color.White.copy(alpha = .8f), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                }
+                                Icon(Icons.Default.AccountCircle, null, tint = Color.White.copy(alpha = .9f), modifier = Modifier.size(58.dp))
+                            }
+                        }
                         SectionHeading("Layanan Akun $role")
                         val modules = when (role.lowercase()) {
                             "mahasiswa" -> listOf("KRS", "KHS dan IPK", "Jadwal kuliah", "Nilai", "Tagihan")
@@ -234,12 +250,39 @@ private fun PortalApp() {
     if (showLogin) {
         AlertDialog(
             onDismissRequest = { showLogin = false },
-            title = { Text("Login civitas akademika") },
+            shape = RoundedCornerShape(28.dp),
+            containerColor = Color.White,
+            title = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).background(Brush.horizontalGradient(listOf(DeepGreen, Emerald))).padding(18.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Image(painterResource(R.drawable.stit_logo), "Logo STIT Darul Ilmi", Modifier.size(54.dp), contentScale = ContentScale.Fit)
+                            Spacer(Modifier.width(12.dp))
+                            Column {
+                                Text("STIT DARUL ILMI", color = Lime, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                Text("Login Civitas Akademika", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.ExtraBold)
+                            }
+                        }
+                    }
+                }
+            },
             text = {
-                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Text("Pengunjung publik tidak perlu login. Login hanya untuk mahasiswa, dosen, dan pimpinan.")
-                    OutlinedTextField(username, { username = it }, label = { Text("Username") }, singleLine = true)
-                    OutlinedTextField(password, { password = it }, label = { Text("Password") }, singleLine = true)
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text("Silakan masuk menggunakan akun mahasiswa, dosen, atau pimpinan. Pengunjung umum tetap dapat mengakses informasi kampus tanpa login.", color = Color(0xFF5D7064), fontSize = 13.sp, lineHeight = 19.sp)
+                    OutlinedTextField(
+                        username, { username = it },
+                        label = { Text("Username") },
+                        singleLine = true,
+                        shape = RoundedCornerShape(13.dp),
+                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Forest, focusedLabelColor = Forest, cursorColor = Forest)
+                    )
+                    OutlinedTextField(
+                        password, { password = it },
+                        label = { Text("Password") },
+                        singleLine = true,
+                        shape = RoundedCornerShape(13.dp),
+                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Forest, focusedLabelColor = Forest, cursorColor = Forest)
+                    )
                 }
             },
             confirmButton = {
@@ -260,7 +303,7 @@ private fun PortalApp() {
                     }
                 }, enabled = username.isNotBlank() && password.isNotBlank() && !loading) { Text("Masuk") }
             },
-            dismissButton = { TextButton(onClick = { showLogin = false }) { Text("Batal") } }
+            dismissButton = { TextButton(onClick = { showLogin = false }, colors = ButtonDefaults.textButtonColors(contentColor = Forest)) { Text("Batal") } }
         )
     }
 }
