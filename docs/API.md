@@ -24,3 +24,7 @@ Header: `Authorization: Bearer ACCESS_TOKEN`
 Revokes the current token.
 
 All errors use JSON with `success:false` and a message. Never expose SQL errors or secrets to clients.
+
+
+## Public homepage content
+`GET /public/home` (no authentication required) returns the public campus profile, active study programs, and up to 10 published news posts. Draft and scheduled-for-future posts are excluded. Apply the Phase 5A migration before calling this endpoint.
