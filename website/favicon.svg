@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<defs>
+ <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#b9e66b"/><stop offset=".35" stop-color="#078653"/><stop offset="1" stop-color="#03452f"/></linearGradient>
+ <linearGradient id="gold" x2="0" y2="1"><stop stop-color="#fff29a"/><stop offset="1" stop-color="#d6a928"/></linearGradient>
+ <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="8"/></filter>
+</defs>
+<rect width="512" height="512" rx="112" fill="url(#bg)"/>
+<path d="M22 132Q256 -30 490 132V380Q256 550 22 380Z" fill="none" stroke="#d5ff9a" stroke-width="5" opacity=".55"/>
+<path d="M256 48 420 124 405 326Q390 421 256 461Q122 421 107 326L92 124Z" fill="#002f20" opacity=".35" filter="url(#shadow)"/>
+<path d="M256 44 419 119 404 316Q389 407 256 448Q123 407 108 316L93 119Z" fill="#006b3c" stroke="#111" stroke-width="13" stroke-linejoin="round"/>
+<path d="M256 58 405 128 391 313Q377 393 256 430Q135 393 121 313L107 128Z" fill="#078d43" stroke="url(#gold)" stroke-width="9"/>
+<path d="M256 79 387 139 374 306Q360 377 256 411Q152 377 138 306L125 139Z" fill="none" stroke="#fff4a6" stroke-width="3"/>
+<g fill="#ffe43b"><path d="m256 92 8 17 19 2-14 13 4 18-17-9-17 9 4-18-14-13 19-2z"/><path d="m157 323 6 12 14 2-10 9 3 14-13-7-13 7 3-14-10-9 14-2z"/><path d="m355 323 6 12 14 2-10 9 3 14-13-7-13 7 3-14-10-9 14-2z"/></g>
+<g fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" opacity=".95">
+<path d="M153 286Q111 229 153 164Q174 130 205 120"/><path d="M359 286Q401 229 359 164Q338 130 307 120"/>
+<path d="M145 255l28 3m-25-33 29 9m-18-40 28 15m-5-44 25 19m-1-39 22 22"/>
+<path d="M367 255l-28 3m25-33-29 9m18-40-28 15m5-44-25 19m1-39-22 22"/>
+</g>
+<g fill="#fff" stroke="#173b2b" stroke-width="7" stroke-linejoin="round">
+<path d="M256 185Q207 156 159 177L180 306Q221 294 256 326Z"/>
+<path d="M256 185Q305 156 353 177L332 306Q291 294 256 326Z"/>
+</g>
+<path d="M256 185V326" stroke="#173b2b" stroke-width="8"/>
+<g fill="none" stroke="#6f7771" stroke-width="5" stroke-linecap="round">
+<path d="M184 205q27-13 50 5m-47 17q26-12 47 5m-43 17q23-10 42 6m-38 18q22-9 38 7"/>
+<path d="M328 205q-27-13-50 5m47 17q-26-12-47 5m43 17q-23-10-42 6m38 18q-22-9-38 7"/>
+</g>
+<path d="M176 310Q216 306 256 332Q296 306 336 310L314 341Q278 329 256 346Q234 329 198 341Z" fill="#03452f" stroke="#d7b73e" stroke-width="5"/>
+<path d="M170 367Q256 385 342 367L328 394Q256 412 184 394Z" fill="#fff" stroke="#d9c05b" stroke-width="5"/>
+<text x="256" y="390" font-family="Arial,sans-serif" font-size="20" font-weight="bold" fill="#03452f" text-anchor="middle">STIT DARUL ILMI</text>
+<text x="256" y="480" font-family="Arial,sans-serif" font-size="25" font-weight="bold" letter-spacing="2" fill="#ffe43b" text-anchor="middle">TASIKMALAYA</text>
+</svg>
