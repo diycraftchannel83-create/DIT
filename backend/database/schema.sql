@@ -329,6 +329,14 @@ VALUES(1,'Portal Informasi dan Akademik STIT Darul Ilmi Tasikmalaya',
 'Isi misi resmi kampus melalui Admin Web.',
 NULL,NULL,NULL,NULL,NULL);
 
+CREATE TABLE website_content (
+ content_key VARCHAR(80) NOT NULL PRIMARY KEY,
+ content_value LONGTEXT NOT NULL,
+ updated_by BIGINT UNSIGNED NULL,
+ updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ CONSTRAINT fk_website_content_user FOREIGN KEY(updated_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE news_posts (
  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
  title VARCHAR(200) NOT NULL,
