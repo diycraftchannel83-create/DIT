@@ -1,0 +1,9 @@
+<?php
+declare(strict_types=1);
+spl_autoload_register(static function(string $class): void {$prefix='App\\';if(!str_starts_with($class,$prefix))return;$relative=substr($class,strlen($prefix));$file=dirname(__DIR__).'/app/'.str_replace('\\','/',$relative).'.php';if(is_file($file))require $file;});
+use App\Controllers\AuthController;use App\Controllers\ProfileController;use App\Core\Database;use App\Core\Response;
+$cfgPath=dirname(__DIR__).'/config/database.local.php';if(!is_file($cfgPath))Response::json(['success'=>false,'message'=>'Server belum dikonfigurasi.'],503);$cfg=require $cfgPath;
+$origin=$_SERVER['HTTP_ORIGIN']??'';if($origin&&in_array($origin,$cfg['allowed_origins']??[],true)){header('Access-Control-Allow-Origin: '.$origin);header('Vary: Origin');}
+header('Access-Control-Allow-Methods: GET, POST, OPTIONS');header('Access-Control-Allow-Headers: Content-Type, Authorization');header('X-Content-Type-Options: nosniff');if(($_SERVER['REQUEST_METHOD']??'GET')==='OPTIONS'){http_response_code(204);exit;}
+$method=$_SERVER['REQUEST_METHOD']??'GET';$path=parse_url($_SERVER['REQUEST_URI']??'/',PHP_URL_PATH);$base=rtrim(dirname($_SERVER['SCRIPT_NAME']??''),'/');if($base&&str_starts_with($path,$base))$path=substr($path,strlen($base));$path='/'.trim($path,'/');
+try {if($method==='GET'&&$path==='/api/v1/health'){Database::connection()->query('SELECT 1');Response::json(['success'=>true,'service'=>'STIT Academic Portal API','version'=>'1.0.0']);}if($method==='POST'&&$path==='/api/v1/auth/login')AuthController::login();if($method==='POST'&&$path==='/api/v1/auth/logout')AuthController::logout();if($method==='GET'&&$path==='/api/v1/me')ProfileController::me();Response::json(['success'=>false,'message'=>'Endpoint tidak ditemukan.'],404);}catch(Throwable $e){error_log('[STIT API] '.$e->getMessage());Response::json(['success'=>false,'message'=>'Terjadi kesalahan server.'],500);}
