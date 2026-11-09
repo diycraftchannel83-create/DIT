@@ -32,7 +32,7 @@ $why=json_decode(webContent($pdo,'why_cards','[]'),true); if(!is_array($why)||!$
 ];
 $stats=json_decode(webContent($pdo,'stats_json','[]'),true); if(!is_array($stats))$stats=[];
 $pmbTitle=webContent($pdo,'pmb_title','Mulai Perjalanan Akademik Anda Bersama STIT Darul Ilmi');
-$pmbInfo=webContent($pdo,'pmb_info','Informasi persyaratan, jadwal, dan biaya pendaftaran akan diumumkan melalui kanal resmi kampus.');
+$pmbInfo=webContent($pdo,'pmb_info','Informasi persyaratan, jadwal, dan biaya pendaftaran.');
 $pmbUrl=$campus['pmb_url']??'';
 $whatsapp=webContent($pdo,'whatsapp','');
 $gallery=json_decode(webContent($pdo,'gallery_json','[]'),true); if(!is_array($gallery))$gallery=[];
