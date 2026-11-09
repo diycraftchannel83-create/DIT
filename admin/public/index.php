@@ -618,12 +618,16 @@ $mobileQuick = [
     ['page'=>in_array($u['role'],$academicRoles,true)?'krs':(in_array($u['role'],['super_admin','admin_akademik','dosen'],true)?'attendance':'dashboard'),'label'=>in_array($u['role'],$academicRoles,true)?'Akademik':'Presensi','icon'=>'▤'],
     ['page'=>in_array($u['role'],['super_admin','admin_akademik','ketua_prodi','ketua_stit'],true)?'khs':'dashboard','label'=>'Laporan','icon'=>'▥'],
 ];
-$mobileAllowed = static function(string $key) use ($u,$academicRoles): bool {
-    if($key==='migrations') return $u['role']==='super_admin';
-    if(in_array($key,['programs','years','semesters','courses','classes','schedules','students','lecturers','accounts','krs'],true)) return in_array($u['role'],$academicRoles,true);
-    if(in_array($key,['grades','attendance'],true)) return in_array($u['role'],['super_admin','admin_akademik','dosen'],true);
-    if(in_array($key,['khs','ipk'],true)) return in_array($u['role'],['super_admin','admin_akademik','ketua_prodi','ketua_stit'],true);
-    return true;
+// Samakan daftar menu mobile dengan guard akses halaman di bawah agar tidak
+// menampilkan tautan yang pasti ditolak oleh server.
+$mobileAllowed = static function(string $key) use ($u,$academicRoles,$viewRoles): bool {
+    $role=(string)$u['role'];
+    if($key==='migrations') return $role==='super_admin';
+    if(in_array($key,['programs','years','semesters','courses','classes','schedules','students','lecturers','accounts','krs','news','pmb'],true)) return in_array($role,$academicRoles,true);
+    if(in_array($key,['grades','attendance'],true)) return in_array($role,['super_admin','admin_akademik','dosen'],true);
+    if(in_array($key,['khs','ipk'],true)) return in_array($role,$viewRoles,true);
+    if($key==='dashboard') return in_array($role,['super_admin','admin_akademik','admin_keuangan','ketua_prodi','ketua_stit','dosen'],true);
+    return in_array($role,$viewRoles,true);
 };
 if ($page==='login') {
 ?><!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Login Admin - STIT Darul Ilmi</title><style>
@@ -669,7 +673,7 @@ if ($page==='migrations') allow(['super_admin']); elseif (in_array($page,['progr
   .side{display:none}
   .main{width:100%;min-width:0}
   .top{height:60px;padding:0 16px;position:sticky;top:0;z-index:20}
-  .content{padding:18px 14px 28px}
+  .content{padding:18px 14px calc(104px + env(safe-area-inset-bottom))}
   h1{font-size:22px}
   .cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:16px 0}
   .card,.panel{border-radius:15px;padding:15px}
