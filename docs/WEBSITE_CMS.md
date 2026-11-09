@@ -20,7 +20,8 @@ Website publik telah disusun ulang dengan identitas hijau muda:
 
 Login Admin Web, buka Dashboard:
 1. **Informasi Kampus**: tagline, profil, visi, misi, alamat, telepon, email, website, link PMB dan upload foto gedung.
-2. **Konten Website Resmi**: sejarah, judul/informasi PMB, WhatsApp, tautan sosial, statistik, keunggulan, galeri dan testimoni.
+2. **Logo Resmi Kampus**: unggah logo JPG/PNG/WebP (maksimum 5 MB); logo langsung digunakan di navbar dan footer. Logo bawaan tetap tersedia sebagai fallback.
+3. **Konten Website Resmi**: sejarah, judul/informasi PMB, WhatsApp, tautan sosial, statistik, keunggulan, galeri dan testimoni.
 
 Konten daftar (statistik, keunggulan, galeri, testimoni) saat ini menggunakan JSON array. Contoh:
 
@@ -56,8 +57,10 @@ Testimoni (hanya dengan persetujuan dan verifikasi):
 
 Database baru: gunakan versi terbaru `backend/database/schema.sql`.
 
-Database yang sudah berjalan: backup terlebih dahulu, lalu jalankan satu kali:
-`backend/database/migrations/2026_11_09_website_content.sql`.
+Database yang sudah berjalan: backup terlebih dahulu, lalu jalankan migrasi yang belum diterapkan satu kali:
+- `backend/database/migrations/2026_11_09_campus_hero_image.sql` (jika kolom hero_image_url belum ada).
+- `backend/database/migrations/2026_11_09_campus_logo_image.sql`.
+- `backend/database/migrations/2026_11_09_website_content.sql`.
 
 Foto gedung dikelola dari form Informasi Kampus yang telah tersedia. Direktori `admin/public/uploads/campus` harus writable oleh PHP. Jika hosting menggunakan Nginx, larang eksekusi skrip di folder upload melalui konfigurasi Nginx karena .htaccess hanya berlaku pada Apache.
 
