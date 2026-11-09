@@ -57,3 +57,22 @@ gradle assembleDebug
 ```
 
 APK: app/build/outputs/apk/debug/app-debug.apk.
+
+
+## Foto gedung kampus yang dapat diedit
+
+- Admin Web > Dashboard > Informasi Kampus menyediakan upload Foto Gedung Kampus.
+- Format yang diterima: JPG, PNG, WebP; maksimum 5 MB.
+- Admin dapat melihat pratinjau, mengganti foto, atau mencentang opsi hapus untuk kembali ke ilustrasi bawaan.
+- Foto disimpan di `admin/public/uploads/campus/`; file upload diberi nama acak dan folder melarang eksekusi skrip PHP melalui Apache `.htaccess`.
+- Public API `GET /api/v1/public/home` menyertakan `campus.hero_image_url`.
+- Android memuat URL tersebut dengan Coil; perubahan gambar tampil saat aplikasi memuat ulang konten tanpa rebuild APK.
+
+### Database
+
+Database baru: impor versi terbaru `backend/database/schema.sql`.
+
+Database lama: backup terlebih dahulu, lalu jalankan satu kali melalui phpMyAdmin:
+`backend/database/migrations/2026_11_09_campus_hero_image.sql`.
+
+Pastikan direktori `admin/public/uploads/campus` dapat ditulisi oleh PHP. Jika hosting memakai Nginx, tambahkan aturan server untuk melarang eksekusi file skrip di direktori upload karena `.htaccess` hanya berlaku pada Apache.
