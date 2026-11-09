@@ -15,9 +15,9 @@
 6. Tambahkan berita melalui menu Berita, lalu klik Terbitkan.
 
 ## Database lama yang sudah berjalan
-Jika database lama sudah dipakai dan berisi data, jangan import ulang `schema.sql` karena tabel akan berbenturan. Gunakan migration lama yang sesuai hanya untuk menambahkan tabel profil kampus dan berita.
+Jika database lama sudah dipakai dan berisi data, jangan import ulang `schema.sql` karena tabel akan berbenturan dan data lama tidak boleh ditimpa. Untuk database yang sudah berjalan, diperlukan skrip upgrade tambahan yang hanya membuat tabel yang belum ada; skrip upgrade tersebut berbeda dari file instalasi awal.
 
-Migration membuat tabel `campus_profile` dan `news_posts`. Baris profil awal hanya berisi nama/tagline umum; alamat, kontak, visi-misi dan data resmi harus diverifikasi dan diisi pihak kampus. Tidak ada berita fiktif yang di-seed.
+File instalasi awal membuat tabel `campus_profile` dan `news_posts`. Baris profil awal berisi placeholder yang harus diganti dengan informasi resmi; alamat, kontak, visi-misi dan data kampus harus diverifikasi oleh pihak kampus. Tidak ada berita fiktif yang di-seed.
 
 ## Deploy homepage
 Folder `website` berisi homepage PHP. Deploy folder ini sebagai document root website publik, atau sesuaikan jalur konfigurasi jika struktur hosting berbeda. Folder tersebut membaca konfigurasi database bersama dari `backend/config/database.local.php`. Admin Web tetap di document root `admin/public`, API di `backend/public`.
