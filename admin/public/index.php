@@ -704,7 +704,7 @@ if ($page==='migrations') allow(['super_admin']); elseif (in_array($page,['progr
   .mobile-menu-sheet{position:fixed;z-index:1002;left:0;right:0;bottom:0;padding:10px 18px calc(88px + env(safe-area-inset-bottom));background:#fff;border-radius:22px 22px 0 0;box-shadow:0 -12px 40px rgba(0,0,0,.18);max-height:78dvh;overflow:auto}
   .mobile-menu-handle{width:42px;height:4px;border-radius:4px;background:#cbd9cf;margin:2px auto 16px}
   .mobile-menu-title{font-weight:850;color:#03452f;font-size:17px;margin-bottom:12px}
-  .mobile-menu-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+  .mobile-menu-grid{display:grid;grid-template-columns:minmax(0,1fr)!important;gap:9px}
   .mobile-menu-grid a{display:flex;align-items:center;min-height:48px;padding:11px 13px;border:1px solid #e1eee5;border-radius:12px;background:#f8fbf8;color:#234b37;text-decoration:none;font-weight:700;font-size:13px}
   .mobile-menu-grid a.active{background:#eaf6ef;border-color:#b9d9c4;color:#075b3d}
   .account-modal{inset:0!important;padding:0!important;align-items:stretch!important;overflow:hidden!important}
