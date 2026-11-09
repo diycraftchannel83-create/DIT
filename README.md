@@ -20,6 +20,13 @@ Portal akademik terpadu STIT Darul Ilmi Tasikmalaya.
 - Academic data views; create forms for study programs, academic years, and semesters.
 - Deployment guide: `admin/docs/SETUP.md`.
 
+## Phase 3 — Academic Management
+- Create student and lecturer records together with login accounts.
+- Create operational admin accounts with role restrictions.
+- Create courses, course classes, and class schedules.
+- Prepared-statement database writes and transactional user/profile creation.
+- Details and staging test plan: `docs/PHASE3_ACADEMIC_MANAGEMENT.md` and `admin/docs/PHASE3_TESTING.md`.
+
 ## Setup
 1. Create a MySQL database in the hosting panel.
 2. Import `backend/database/schema.sql`.
