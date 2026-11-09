@@ -313,6 +313,36 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
         }
         go('migrations');
     }
+    if ($action==='update_account') {
+        allow(['super_admin','admin_akademik']);
+        $id=(int)($_POST['user_id']??0);$fullName=trim((string)($_POST['full_name']??''));$email=trim((string)($_POST['email']??''));$roleName=(string)($_POST['role']??'');$status=(string)($_POST['status']??'active');$password=(string)($_POST['password']??'');
+        $allowedRoles=['admin_akademik','admin_keuangan','ketua_prodi','ketua_stit','dosen','mahasiswa'];
+        if($id<1||$fullName===''||strlen($fullName)>160||($email!==''&&!filter_var($email,FILTER_VALIDATE_EMAIL))||!in_array($roleName,$allowedRoles,true)||!in_array($status,['active','inactive'],true)||($password!==''&&(strlen($password)<10||strlen($password)>200))){flash('Data akun tidak valid. Password baru harus minimal 10 karakter.','error');go('accounts');}
+        try {
+            $check=$pdo->prepare('SELECT u.id,r.name AS role FROM users u JOIN roles r ON r.id=u.role_id WHERE u.id=:id');$check->execute(['id'=>$id]);$existing=$check->fetch();
+            if(!$existing)throw new RuntimeException('Akun tidak ditemukan.');
+            if($existing['role']==='super_admin'&&$u['role']!=='super_admin')throw new RuntimeException('Hanya Super Admin yang dapat mengubah akun Super Admin.');
+            $role=$pdo->prepare('SELECT id FROM roles WHERE name=:role LIMIT 1');$role->execute(['role'=>$roleName]);$roleId=$role->fetchColumn();if(!$roleId)throw new RuntimeException('Role tidak tersedia.');
+            if($password!==''){$q=$pdo->prepare('UPDATE users SET full_name=:name,email=:email,role_id=:role,status=:status,password_hash=:hash WHERE id=:id');$q->execute(['name'=>$fullName,'email'=>$email?:null,'role'=>$roleId,'status'=>$status,'hash'=>password_hash($password,PASSWORD_DEFAULT),'id'=>$id]);}
+            else{$q=$pdo->prepare('UPDATE users SET full_name=:name,email=:email,role_id=:role,status=:status WHERE id=:id');$q->execute(['name'=>$fullName,'email'=>$email?:null,'role'=>$roleId,'status'=>$status,'id'=>$id]);}
+            auditLog($pdo,'admin.account_updated','user',$id,['role'=>$roleName,'status'=>$status,'password_changed'=>$password!=='']);flash('Data akun berhasil diperbarui.');
+        } catch(Throwable $e){error_log('[STIT UPDATE ACCOUNT] '.$e->getMessage());flash('Gagal memperbarui akun: '.$e->getMessage(),'error');}
+        go('accounts');
+    }
+    if ($action==='delete_account') {
+        allow(['super_admin','admin_akademik']);$id=(int)($_POST['user_id']??0);
+        try {
+            if($id<1||$id===(int)$u['id'])throw new RuntimeException('Akun yang sedang digunakan tidak dapat dihapus.');
+            $check=$pdo->prepare('SELECT u.id,r.name AS role FROM users u JOIN roles r ON r.id=u.role_id WHERE u.id=:id');$check->execute(['id'=>$id]);$target=$check->fetch();
+            if(!$target)throw new RuntimeException('Akun tidak ditemukan.');
+            if($target['role']==='super_admin')throw new RuntimeException('Akun Super Admin dilindungi dan tidak dapat dihapus dari menu ini.');
+            $linked=$pdo->prepare('SELECT (SELECT COUNT(*) FROM students WHERE user_id=:student_uid)+(SELECT COUNT(*) FROM lecturers WHERE user_id=:lecturer_uid)');$linked->execute(['student_uid'=>$id,'lecturer_uid'=>$id]);
+            if((int)$linked->fetchColumn()>0)throw new RuntimeException('Akun terhubung dengan data mahasiswa/dosen. Nonaktifkan akun agar riwayat akademik tetap aman.');
+            $pdo->beginTransaction();$pdo->prepare('DELETE FROM user_program_scopes WHERE user_id=:id')->execute(['id'=>$id]);$pdo->prepare('DELETE FROM users WHERE id=:id')->execute(['id'=>$id]);$pdo->commit();
+            auditLog($pdo,'admin.account_deleted','user',$id,['role'=>$target['role']]);flash('Akun berhasil dihapus.');
+        } catch(Throwable $e){if($pdo->inTransaction())$pdo->rollBack();error_log('[STIT DELETE ACCOUNT] '.$e->getMessage());flash('Akun tidak dapat dihapus: '.$e->getMessage(),'error');}
+        go('accounts');
+    }
     if ($action==='assign_prodi_scope') {
         allow(['super_admin','admin_akademik']);
         $targetUser=(int)($_POST['user_id']??0);
@@ -598,7 +628,7 @@ $datasets=[
  'khs'=>['title'=>'Kartu Hasil Studi (KHS)','sql'=>'SELECT s.nim,u.full_name AS mahasiswa,y.name AS tahun_akademik,se.name AS semester,COUNT(g.id) AS mata_kuliah,SUM(c.credits) AS total_sks,ROUND(SUM(g.grade_points*c.credits)/NULLIF(SUM(c.credits),0),2) AS ip FROM grades g JOIN students s ON s.id=g.student_id JOIN users u ON u.id=s.user_id JOIN course_classes cc ON cc.id=g.course_class_id JOIN courses c ON c.id=cc.course_id JOIN semesters se ON se.id=cc.semester_id JOIN academic_years y ON y.id=se.academic_year_id WHERE g.published_at IS NOT NULL GROUP BY s.id,u.full_name,s.nim,se.id,y.name,se.name ORDER BY y.name DESC,se.name,s.nim'],
  'ipk'=>['title'=>'Rekap Indeks Prestasi Kumulatif','sql'=>'SELECT s.nim,u.full_name AS mahasiswa,COUNT(g.id) AS mata_kuliah,SUM(c.credits) AS total_sks,ROUND(SUM(g.grade_points*c.credits)/NULLIF(SUM(c.credits),0),2) AS ipk FROM grades g JOIN students s ON s.id=g.student_id JOIN users u ON u.id=s.user_id JOIN course_classes cc ON cc.id=g.course_class_id JOIN courses c ON c.id=cc.course_id WHERE g.published_at IS NOT NULL GROUP BY s.id,u.full_name,s.nim ORDER BY s.nim'],
  'attendance'=>['title'=>'Presensi','sql'=>'SELECT a.id,s.nim,u.full_name AS mahasiswa,c.name AS mata_kuliah,cc.class_name,a.meeting_number,a.attendance_status,a.recorded_at FROM attendance a JOIN students s ON s.id=a.student_id JOIN users u ON u.id=s.user_id JOIN course_classes cc ON cc.id=a.course_class_id JOIN courses c ON c.id=cc.course_id ORDER BY a.recorded_at DESC LIMIT 300'],
- 'accounts'=>['title'=>'Akun Pengguna','sql'=>'SELECT u.username,u.full_name,u.email,r.name AS role,u.status,u.last_login_at FROM users u JOIN roles r ON r.id=u.role_id ORDER BY u.created_at DESC LIMIT 300'],
+ 'accounts'=>['title'=>'Akun Pengguna','sql'=>'SELECT u.id,u.username,u.full_name,u.email,r.name AS role,u.status,u.created_at,u.last_login_at,(SELECT p.name FROM user_program_scopes ups JOIN study_programs p ON p.id=ups.study_program_id WHERE ups.user_id=u.id LIMIT 1) AS program_studi FROM users u JOIN roles r ON r.id=u.role_id ORDER BY u.created_at DESC LIMIT 300'],
  'news'=>['title'=>'Berita Kampus','sql'=>'SELECT id,title,category,published_at,created_at FROM news_posts ORDER BY created_at DESC LIMIT 100'],
  'pmb'=>['title'=>'Penerimaan Mahasiswa Baru','sql'=>'SELECT registration_number,full_name,email,phone,status,created_at FROM pmb_applicants ORDER BY created_at DESC LIMIT 300']
 ];
@@ -809,7 +839,63 @@ $pendingCount=0;foreach($availableMigrations as $migrationName=>$migrationFile){
 <?php if($page==='programs'&&in_array($u['role'],$academicRoles,true)):?><div class="panel"><h2>Tambah Program Studi</h2><form class="inline" method="post"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="save_program"><div><label>Kode</label><input name="code" maxlength="30" required placeholder="MPI"></div><div><label>Nama Program Studi</label><input name="name" maxlength="160" required placeholder="Manajemen Pendidikan Islam"></div><div><label>Jenjang</label><select name="degree_level"><option>S1</option><option>S2</option><option>S3</option></select></div><button>Simpan</button></form></div><?php endif;?>
 <?php if($page==='years'&&in_array($u['role'],$academicRoles,true)):?><div class="panel"><h2>Tambah Tahun Akademik</h2><form class="inline" method="post"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="save_year"><div><label>Nama (contoh 2026/2027)</label><input name="name" pattern="\d{4}/\d{4}" required placeholder="2026/2027"></div><div><label>Tanggal Mulai</label><input type="date" name="start_date" required></div><div><label>Tanggal Selesai</label><input type="date" name="end_date" required></div><label><input type="checkbox" name="is_active" value="1"> Aktif</label><button>Simpan</button></form></div><?php endif;?>
 <?php if($page==='semesters'&&in_array($u['role'],$academicRoles,true)): $years=$pdo->query('SELECT id,name FROM academic_years ORDER BY start_date DESC')->fetchAll();?><div class="panel"><h2>Tambah Semester</h2><form class="inline" method="post"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="save_semester"><div><label>Tahun Akademik</label><select name="academic_year_id" required><?php foreach($years as $yr):?><option value="<?=$yr['id']?>"><?=e($yr['name'])?></option><?php endforeach;?></select></div><div><label>Semester</label><select name="name" required><?php for($sem=1;$sem<=8;$sem++):?><option value="Semester <?=$sem?>">Semester <?=$sem?></option><?php endfor;?></select></div><div><label>Mulai</label><input type="date" name="start_date" required></div><div><label>Selesai</label><input type="date" name="end_date" required></div><button>Simpan</button></form></div><?php endif;?>
-<div class="panel"><h2>Daftar <?=e($ds['title'])?> <span class="tag"><?=count($rows)?> data</span></h2><?php if(!$rows):?><p class="muted">Belum ada data untuk ditampilkan.</p><?php else:?><table><thead><tr><?php foreach(array_keys($rows[0]) as $col):?><th><?=e(str_replace('_',' ',$col))?></th><?php endforeach;?></tr></thead><tbody><?php foreach($rows as $row):?><tr><?php foreach($row as $value):?><td><?=e($value===null?'—':$value)?></td><?php endforeach;?></tr><?php endforeach;?></tbody></table><?php endif;?></div><?php endif;?></section></main></div><script>
+<?php if($page==='accounts'&&in_array($u['role'],$academicRoles,true)): ?>
+<div id="accountDetailModal" class="account-modal" hidden aria-hidden="true">
+ <div class="account-modal-backdrop" data-account-close></div>
+ <section class="account-modal-card" role="dialog" aria-modal="true" aria-labelledby="accountModalTitle">
+  <header class="account-modal-head"><h2 id="accountModalTitle">Detail Akun Pengguna</h2><button type="button" class="account-modal-x" data-account-close aria-label="Tutup">×</button></header>
+  <form id="accountEditForm" method="post">
+   <input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="update_account"><input type="hidden" name="user_id" id="accountUserId">
+   <div class="account-modal-body">
+    <div class="account-profile"><div class="account-avatar">👤</div><div><strong id="accountDisplayName">—</strong><span id="accountDisplayRole" class="tag">—</span><small id="accountDisplayUsername" class="muted"></small></div></div>
+    <div class="account-fields">
+     <div><label>Username</label><input id="accountUsername" readonly></div><div><label>Nama Lengkap</label><input name="full_name" id="accountFullName" maxlength="160" required></div>
+     <div><label>Email</label><input type="email" name="email" id="accountEmail" maxlength="190"></div>
+     <div><label>Role</label><select name="role" id="accountRole"><option value="admin_akademik">Admin Akademik</option><option value="admin_keuangan">Admin Keuangan</option><option value="ketua_prodi">Ketua Program Studi</option><option value="ketua_stit">Ketua STIT</option><option value="dosen">Dosen</option><option value="mahasiswa">Mahasiswa</option></select></div>
+     <div><label>Status</label><select name="status" id="accountStatus"><option value="active">Aktif</option><option value="inactive">Nonaktif</option></select></div>
+     <div><label>Password Baru (opsional)</label><input type="password" name="password" id="accountPassword" minlength="10" maxlength="200" autocomplete="new-password" placeholder="Kosongkan jika tidak diubah"></div>
+    </div>
+    <div class="account-scope" id="accountScope"><strong>Cakupan Akses</strong><span id="accountProgram">—</span></div>
+    <div class="account-meta"><div><span>Dibuat pada</span><strong id="accountCreated">—</strong></div><div><span>Login terakhir</span><strong id="accountLastLogin">—</strong></div></div>
+   </div>
+   <footer class="account-modal-actions"><button type="button" class="account-btn account-btn-light" data-account-close>Tutup</button><button type="submit" class="account-btn account-btn-primary">Simpan Edit</button></footer>
+  </form>
+  <form id="accountDeleteForm" method="post" class="account-delete-form" onsubmit="return confirm('Yakin ingin menghapus akun ini? Tindakan ini tidak dapat dibatalkan.')">
+   <input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="delete_account"><input type="hidden" name="user_id" id="accountDeleteUserId"><button type="submit" class="account-btn account-btn-danger">Hapus Akun</button>
+  </form>
+ </section>
+</div>
+<style>
+.account-link{color:#075db5;font-weight:750;text-decoration:underline;text-underline-offset:3px;cursor:pointer;background:none;border:0;padding:4px 0;font:inherit}
+.account-modal[hidden]{display:none}.account-modal{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;padding:18px}.account-modal-backdrop{position:absolute;inset:0;background:#10251dcc;backdrop-filter:blur(4px)}.account-modal-card{position:relative;width:min(720px,100%);max-height:92dvh;overflow:auto;background:#fff;border:1px solid #dcebe1;border-radius:22px;box-shadow:0 24px 80px #001d1460}.account-modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:17px 22px;background:linear-gradient(100deg,#03452f,#087a4b);color:#fff}.account-modal-head h2{margin:0;font-size:19px}.account-modal-x{border:0;background:transparent;color:#fff;font-size:30px;line-height:1;cursor:pointer}.account-modal-body{padding:20px 22px}.account-profile{display:flex;align-items:center;gap:16px;margin-bottom:20px}.account-avatar{width:76px;height:76px;display:grid;place-items:center;border-radius:50%;background:#dff2e7;font-size:34px}.account-profile strong,.account-profile small{display:block}.account-profile strong{font-size:21px;color:#123e2d;margin-bottom:6px}.account-profile small{margin-top:6px}.account-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.account-fields label{display:block;font-size:12px;font-weight:700;color:#53685c;margin-bottom:6px}.account-fields input,.account-fields select{width:100%;min-width:0;padding:11px 12px;border:1px solid #d5e4da;border-radius:11px;background:#fbfefc;font:inherit}.account-fields input[readonly]{background:#f0f4f1;color:#64756b}.account-scope{margin-top:16px;padding:13px 15px;background:#edf7f1;border:1px solid #cce5d5;border-radius:12px;display:grid;gap:5px}.account-scope strong{color:#315b43;font-size:12px}.account-meta{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;padding-top:14px;border-top:1px solid #edf1ed}.account-meta div{display:grid;gap:4px}.account-meta span{font-size:12px;color:#64756b}.account-meta strong{font-size:13px;font-weight:600;overflow-wrap:anywhere}.account-modal-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;padding:14px 22px;border-top:1px solid #edf1ed}.account-btn{border:0;border-radius:11px;padding:11px 17px;font-weight:750;cursor:pointer}.account-btn-light{background:#edf1ee;color:#263b30}.account-btn-primary{background:#087a4b;color:white}.account-btn-danger{background:#c92e28;color:white}.account-delete-form{padding:0 22px 18px;text-align:right}.account-delete-form button{min-width:140px}
+@media(max-width:600px){.account-modal{padding:10px;align-items:center}.account-modal-card{max-height:94dvh;border-radius:18px}.account-modal-head{padding:14px 16px}.account-modal-body{padding:16px}.account-fields{grid-template-columns:1fr;gap:10px}.account-profile{margin-bottom:14px}.account-avatar{width:62px;height:62px}.account-modal-actions{padding:12px 16px;display:grid;grid-template-columns:1fr 1fr}.account-modal-actions button{width:100%}.account-delete-form{padding:0 16px 16px}.account-delete-form button{width:100%}.account-meta{grid-template-columns:1fr}}
+</style>
+<script>
+(function(){
+ const modal=document.getElementById('accountDetailModal');if(!modal)return;
+ const close=()=>{modal.hidden=true;modal.setAttribute('aria-hidden','true');document.body.style.overflow='';};
+ modal.querySelectorAll('[data-account-close]').forEach(el=>el.addEventListener('click',close));
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.hidden)close();});
+ document.querySelectorAll('[data-account-json]').forEach(link=>link.addEventListener('click',()=>{
+  let d;try{d=JSON.parse(link.dataset.accountJson);}catch(e){return;}
+  document.getElementById('accountUserId').value=d.id;document.getElementById('accountDeleteUserId').value=d.id;
+  document.getElementById('accountUsername').value=d.username||'';document.getElementById('accountFullName').value=d.full_name||'';
+  document.getElementById('accountEmail').value=d.email||'';document.getElementById('accountRole').value=d.role||'admin_akademik';
+  document.getElementById('accountStatus').value=d.status||'active';document.getElementById('accountPassword').value='';
+  document.getElementById('accountDisplayName').textContent=d.full_name||d.username||'Akun';
+  document.getElementById('accountDisplayRole').textContent=d.role_label||d.role||'—';
+  document.getElementById('accountDisplayUsername').textContent='@'+(d.username||'');
+  document.getElementById('accountProgram').textContent=d.program_studi||'Tidak ada cakupan program studi';
+  document.getElementById('accountCreated').textContent=d.created_at||'—';document.getElementById('accountLastLogin').textContent=d.last_login_at||'Belum pernah login';
+  document.getElementById('accountScope').hidden=!d.program_studi;
+  const protectedAccount=d.role==='super_admin';document.getElementById('accountRole').disabled=protectedAccount;document.getElementById('accountStatus').disabled=protectedAccount;
+  document.querySelector('#accountEditForm button[type="submit"]').disabled=protectedAccount;document.getElementById('accountDeleteForm').hidden=protectedAccount;
+  modal.hidden=false;modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
+ }));
+})();
+</script>
+<?php endif;?>
+<div class="panel"><h2>Daftar <?=e($ds['title'])?> <span class="tag"><?=count($rows)?> data</span></h2><?php if(!$rows):?><p class="muted">Belum ada data untuk ditampilkan.</p><?php else:?><table><thead><tr><?php foreach(array_keys($rows[0]) as $col):?><th><?=e(str_replace('_',' ',$col))?></th><?php endforeach;?></tr></thead><tbody><?php foreach($rows as $row):?><tr><?php foreach($row as $column=>$value):?><td><?php if($page==='accounts'&&$column==='username'):$accountJson=['id'=>(int)$row['id'],'username'=>$row['username'],'full_name'=>$row['full_name'],'email'=>$row['email'],'role'=>$row['role'],'role_label'=>['super_admin'=>'Super Admin','admin_akademik'=>'Admin Akademik','admin_keuangan'=>'Admin Keuangan','ketua_prodi'=>'Ketua Program Studi','ketua_stit'=>'Ketua STIT','dosen'=>'Dosen','mahasiswa'=>'Mahasiswa'][$row['role']]??$row['role'],'status'=>$row['status'],'program_studi'=>$row['program_studi'],'created_at'=>$row['created_at']??null,'last_login_at'=>$row['last_login_at']];?><button type="button" class="account-link" data-account-json="<?=e(json_encode($accountJson,JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP))?>"><?=e($value)?></button><?php else:?><?=e($value===null?'—':$value)?><?php endif;?></td><?php endforeach;?></tr><?php endforeach;?></tbody></table><?php endif;?></div><?php endif;?></section></main></div><script>
 (function(){
  const form=document.getElementById('studentCreateForm');if(!form)return;
  const tabs=[...form.querySelectorAll('.student-tab')],panels=[...form.querySelectorAll('.student-tab-panel')];
