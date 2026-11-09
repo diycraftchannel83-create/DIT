@@ -3,6 +3,8 @@ package id.ac.darulilmi.portal
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import coil.compose.AsyncImage
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.Image
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.layout.ContentScale
@@ -44,6 +46,7 @@ data class CampusData(
     val tagline: String = "Membangun generasi berilmu dan berakhlak",
     val about: String = "Portal informasi resmi kampus. Konten pada aplikasi ini dapat diperbarui melalui Web Admin.",
     val address: String = "Tasikmalaya, Jawa Barat",
+    val heroImageUrl: String = "",
     val programs: List<String> = listOf("S1 Manajemen Pendidikan Islam"),
     val news: List<String> = emptyList()
 )
@@ -90,7 +93,20 @@ private fun PortalApp() {
         ) {
             item {
                 Card(shape = RoundedCornerShape(28.dp), colors = CardDefaults.cardColors(containerColor = Forest), elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)) {
-                    Column(Modifier.fillMaxWidth().padding(22.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        if (data.heroImageUrl.isNotBlank()) {
+                            AsyncImage(
+                                model = data.heroImageUrl,
+                                contentDescription = "Foto gedung STIT Darul Ilmi Tasikmalaya",
+                                modifier = Modifier.fillMaxWidth().height(190.dp).clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else {
+                            Box(Modifier.fillMaxWidth().height(150.dp).background(Brush.linearGradient(listOf(Emerald, Forest))), contentAlignment = Alignment.Center) {
+                                Icon(Icons.Default.AccountBalance, contentDescription = "Gedung kampus", tint = Color.White.copy(alpha = .9f), modifier = Modifier.size(76.dp))
+                            }
+                        }
+                        Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Image(
                                 painter = painterResource(id = R.drawable.stit_logo),
@@ -108,6 +124,7 @@ private fun PortalApp() {
                         Text("Jelajahi informasi kampus, program studi, berita, dan layanan akademik dalam satu aplikasi.", color = Color.White.copy(alpha = .88f), lineHeight = 21.sp)
                         Button(onClick = { showLogin = true }, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = Lime), contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp)) {
                             Text(if (token == null) "Login Civitas Akademika" else "Akun: $userName", color = Ink, fontWeight = FontWeight.Bold)
+                        }
                         }
                     }
                 }
@@ -228,6 +245,7 @@ private fun loadPublicHome(): CampusData {
         tagline = campus.optString("tagline").ifBlank { "Membangun generasi berilmu dan berakhlak" },
         about = campus.optString("about").ifBlank { "Portal informasi resmi kampus." },
         address = campus.optString("address").ifBlank { "Tasikmalaya, Jawa Barat" },
+        heroImageUrl = campus.optString("hero_image_url"),
         programs = programs.ifEmpty { listOf("Informasi program studi akan segera tersedia.") },
         news = news
     )
