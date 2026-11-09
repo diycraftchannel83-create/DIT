@@ -68,10 +68,35 @@ function tableCount(PDO $pdo, string $table): int {
 }
 
 $page = (string)($_GET['page'] ?? (user() ? 'dashboard' : 'login'));
-if($page==='students'&&isset($_GET['export'])&&$_GET['export']==='csv'){allow($academicRoles);$q=$pdo->query('SELECT s.nim,u.full_name,u.email,p.name AS program,s.entry_year,s.phone,s.birth_place,s.birth_date,s.gender,s.city,s.district,s.admission_pathway,s.status FROM students s JOIN users u ON u.id=s.user_id LEFT JOIN study_programs p ON p.id=s.study_program_id ORDER BY s.nim');header('Content-Type: text/csv; charset=utf-8');header('Content-Disposition: attachment; filename="data-mahasiswa.csv"');$out=fopen('php://output','w');fwrite($out,"\\xEF\\xBB\\xBF");fputcsv($out,['NIM','Nama','Email','Program Studi','Tahun Masuk','Telepon','Tempat Lahir','Tanggal Lahir','Jenis Kelamin','Kota','Kecamatan','Jalur Masuk','Status']);while($row=$q->fetch(PDO::FETCH_NUM))fputcsv($out,$row);fclose($out);exit;}
-
 $academicRoles=['super_admin','admin_akademik'];
 $viewRoles=['super_admin','admin_akademik','ketua_prodi','ketua_stit'];
+
+// Export ditempatkan setelah deklarasi role agar otorisasi selalu memakai daftar yang valid.
+if ($page === 'students' && ($_GET['export'] ?? '') === 'csv') {
+    allow($academicRoles);
+    $q = $pdo->query('SELECT s.nim,u.full_name,u.email,p.name AS program,s.entry_year,s.phone,s.birth_place,s.birth_date,s.gender,s.city,s.district,s.admission_pathway,s.status FROM students s JOIN users u ON u.id=s.user_id LEFT JOIN study_programs p ON p.id=s.study_program_id ORDER BY s.nim');
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename="data-mahasiswa.csv"');
+    $out = fopen('php://output', 'w');
+    if ($out === false) {
+        http_response_code(500);
+        exit('Gagal membuat ekspor CSV.');
+    }
+    // UTF-8 BOM agar karakter Indonesia terbaca baik oleh Excel.
+    fwrite($out, "\xEF\xBB\xBF");
+    fputcsv($out, ['NIM','Nama','Email','Program Studi','Tahun Masuk','Telepon','Tempat Lahir','Tanggal Lahir','Jenis Kelamin','Kota','Kecamatan','Jalur Masuk','Status']);
+    while ($row = $q->fetch(PDO::FETCH_NUM)) {
+        $safeRow = array_map(static function ($value) {
+            if (!is_string($value)) return $value;
+            // Cegah spreadsheet menafsirkan data pengguna sebagai formula.
+            if (preg_match('/^[\\x00-\\x20]*[=+\\-@]/', $value)) return "'" . $value;
+            return $value;
+        }, $row);
+        fputcsv($out, $safeRow);
+    }
+    fclose($out);
+    exit;
+}
 
 if ($_SERVER['REQUEST_METHOD']==='POST') {
     checkCsrf();
