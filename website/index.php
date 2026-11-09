@@ -21,7 +21,7 @@ $tagline=$campus['tagline']??'Membangun Generasi Unggul, Berilmu, Berakhlak, dan
 $about=$campus['about']??'STIT Darul Ilmi Tasikmalaya hadir sebagai lembaga pendidikan tinggi yang berkomitmen mencetak generasi pendidik dan pemimpin masa depan.';
 $hero=$campus['hero_image_url']??'';
 $logo=($campus['logo_image_url']??'')?:'https://raw.githubusercontent.com/diycraftchannel83-create/DIT/main/app/src/main/res/drawable/stit_logo.jpg';
-$history=webContent($pdo,'history','Sejarah resmi kampus dapat dilengkapi melalui Dashboard Admin.');
+$history=webContent($pdo,'history','');
 $why=json_decode(webContent($pdo,'why_cards','[]'),true); if(!is_array($why)||!$why)$why=[
  ['icon'=>'☪','title'=>'Pendidikan Berbasis Nilai Islam','text'=>'Mengintegrasikan nilai keislaman dalam proses pendidikan dan pembentukan karakter.'],
  ['icon'=>'✦','title'=>'Dosen Profesional dan Kompeten','text'=>'Pembelajaran didukung tenaga pendidik sesuai bidang keilmuan.'],
