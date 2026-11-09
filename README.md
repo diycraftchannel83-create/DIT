@@ -43,3 +43,11 @@ Portal akademik terpadu STIT Darul Ilmi Tasikmalaya.
 6. Follow `admin/docs/SETUP.md` and test `/api/v1/health`.
 
 This is an evolving development foundation, not yet a complete production SIS. The Admin Web has not yet been deployed or tested on ByetHost. Validate PHP/MySQL compatibility, security, backups, and access controls before real student data is used.
+
+
+## Phase 5A — Campus Homepage and News
+- Public homepage in `website/index.php`: campus profile, vision/mission, active study programs, published news, contact, and PMB link.
+- Admin dashboard can update campus profile; the Berita menu supports draft, edit, publish, and unpublish.
+- Public endpoint: `GET /api/v1/public/home` (no login required; returns only public campus content).
+- Apply database migration `backend/database/migrations/2026_11_09_campus_profile_and_news.sql` once before using these features.
+- Setup and deployment notes: `docs/PHASE5A_CAMPUS_HOMEPAGE_NEWS.md`.
