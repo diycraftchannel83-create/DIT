@@ -256,3 +256,51 @@ INSERT INTO roles(name,description) VALUES
 ('mahasiswa','Akses layanan mahasiswa'),
 ('ketua_prodi','Monitoring program studi'),
 ('ketua_stit','Monitoring pimpinan kampus');
+
+-- ============================================================
+-- MODUL HOMEPAGE: PROFIL KAMPUS DAN BERITA
+-- Termasuk dalam instalasi database baru; tidak perlu migration.
+-- Informasi resmi kampus diisi/diperbarui melalui Admin Web.
+-- ============================================================
+
+CREATE TABLE campus_profile (
+ id TINYINT UNSIGNED NOT NULL PRIMARY KEY,
+ tagline VARCHAR(220) NULL,
+ about TEXT NULL,
+ vision TEXT NULL,
+ mission TEXT NULL,
+ address VARCHAR(500) NULL,
+ phone VARCHAR(60) NULL,
+ email VARCHAR(190) NULL,
+ website VARCHAR(255) NULL,
+ pmb_url VARCHAR(255) NULL,
+ updated_by BIGINT UNSIGNED NULL,
+ updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ CONSTRAINT fk_campus_profile_user FOREIGN KEY(updated_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Baris awal hanya placeholder yang perlu dilengkapi pihak kampus.
+INSERT INTO campus_profile(id,tagline,about,vision,mission,address,phone,email,website,pmb_url)
+VALUES(1,'Portal Informasi dan Akademik STIT Darul Ilmi Tasikmalaya',
+'Lengkapi bagian ini dengan sejarah, profil, dan keunggulan resmi kampus melalui Admin Web.',
+'Isi visi resmi kampus melalui Admin Web.',
+'Isi misi resmi kampus melalui Admin Web.',
+NULL,NULL,NULL,NULL,NULL);
+
+CREATE TABLE news_posts (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+ title VARCHAR(200) NOT NULL,
+ excerpt VARCHAR(400) NULL,
+ body LONGTEXT NOT NULL,
+ category VARCHAR(60) NOT NULL DEFAULT 'Berita',
+ image_url VARCHAR(500) NULL,
+ published_at DATETIME NULL,
+ created_by BIGINT UNSIGNED NOT NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ INDEX idx_news_publication(published_at,created_at),
+ CONSTRAINT fk_news_creator FOREIGN KEY(created_by) REFERENCES users(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Berita tidak diisi otomatis. Admin membuat dan menerbitkan berita resmi.
+
