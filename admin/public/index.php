@@ -876,7 +876,8 @@ $pendingCount=0;foreach($availableMigrations as $migrationName=>$migrationFile){
  const close=()=>{modal.hidden=true;modal.setAttribute('aria-hidden','true');document.body.style.overflow='';};
  modal.querySelectorAll('[data-account-close]').forEach(el=>el.addEventListener('click',close));
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.hidden)close();});
- document.querySelectorAll('[data-account-json]').forEach(link=>link.addEventListener('click',()=>{
+ document.addEventListener('click',function(event){
+  const link=event.target.closest('[data-account-json]');if(!link)return;
   let d;try{d=JSON.parse(link.dataset.accountJson);}catch(e){return;}
   document.getElementById('accountUserId').value=d.id;document.getElementById('accountDeleteUserId').value=d.id;
   document.getElementById('accountUsername').value=d.username||'';document.getElementById('accountFullName').value=d.full_name||'';
@@ -891,7 +892,7 @@ $pendingCount=0;foreach($availableMigrations as $migrationName=>$migrationFile){
   const protectedAccount=d.role==='super_admin';document.getElementById('accountRole').disabled=protectedAccount;document.getElementById('accountStatus').disabled=protectedAccount;
   document.querySelector('#accountEditForm button[type="submit"]').disabled=protectedAccount;document.getElementById('accountDeleteForm').hidden=protectedAccount;
   modal.hidden=false;modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
- }));
+ });
 })();
 </script>
 <?php endif;?>
