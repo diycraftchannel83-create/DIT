@@ -27,6 +27,13 @@ Portal akademik terpadu STIT Darul Ilmi Tasikmalaya.
 - Prepared-statement database writes and transactional user/profile creation.
 - Details and staging test plan: `docs/PHASE3_ACADEMIC_MANAGEMENT.md` and `admin/docs/PHASE3_TESTING.md`.
 
+## Phase 4 — Academic Operations
+- KRS submission/review workflow with multiple course classes per semester plan.
+- Lecturer login with class-assignment scope for grade and attendance entry.
+- Draft grade entry, academic-admin publication, KHS semester GPA, and cumulative IPK reports.
+- Attendance recording by student, class, and meeting.
+- Details and staging checklist: `docs/PHASE4_ACADEMIC_OPERATIONS.md` and `admin/docs/PHASE4_TESTING.md`.
+
 ## Setup
 1. Create a MySQL database in the hosting panel.
 2. Import `backend/database/schema.sql`.
