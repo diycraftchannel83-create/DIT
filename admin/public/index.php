@@ -132,6 +132,46 @@ function tableCount(PDO $pdo, string $table): int {
     if (!in_array($table,$allowed,true)) return 0;
     try { return (int)$pdo->query("SELECT COUNT(*) FROM {$table}")->fetchColumn(); } catch(Throwable) { return 0; }
 }
+function ensureMigrationRegistry(PDO $pdo): void {
+    $pdo->exec("CREATE TABLE IF NOT EXISTS schema_migrations (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        migration_name VARCHAR(190) NOT NULL UNIQUE,
+        checksum CHAR(64) NOT NULL,
+        executed_by BIGINT UNSIGNED NULL,
+        executed_at DATETIME NOT NULL,
+        INDEX idx_schema_migrations_executed_at(executed_at),
+        CONSTRAINT fk_schema_migrations_user FOREIGN KEY(executed_by) REFERENCES users(id) ON DELETE SET NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+}
+function availableMigrationFiles(string $backend): array {
+    $dir=realpath($backend.'/database/migrations');
+    if($dir===false || !is_dir($dir)) return [];
+    $items=[];
+    foreach(glob($dir.'/*.sql') ?: [] as $path) {
+        $real=realpath($path);
+        $name=basename($path);
+        if($real===false || dirname($real)!==$dir || !preg_match('/^202[0-9]_\\d{2}_\\d{2}_[a-z0-9_]+\\.sql$/',$name)) continue;
+        $items[$name]=['path'=>$real,'checksum'=>hash_file('sha256',$real)];
+    }
+    ksort($items,SORT_STRING);
+    return $items;
+}
+function executeMigrationFile(PDO $pdo, string $path): void {
+    $sql=file_get_contents($path);
+    if($sql===false || trim($sql)==='') throw new RuntimeException('File migrasi kosong atau tidak dapat dibaca.');
+    // Migration repository hanya menggunakan SQL standar tanpa delimiter/procedure.
+    $sql=preg_replace('/^\\s*--.*(?:\\R|$)/m','',$sql) ?? $sql;
+    $statements=preg_split('/;\\s*(?:\\R|$)/',$sql) ?: [];
+    $executed=0;
+    foreach($statements as $statement) {
+        $statement=trim($statement);
+        if($statement==='') continue;
+        if(stripos($statement,'DELIMITER ')===0) throw new RuntimeException('Perintah DELIMITER tidak didukung untuk migrasi aplikasi.');
+        $pdo->exec($statement);
+        $executed++;
+    }
+    if($executed===0) throw new RuntimeException('Tidak ditemukan perintah SQL yang dapat dijalankan.');
+}
 
 $page = (string)($_GET['page'] ?? (user() ? 'dashboard' : 'login'));
 $academicRoles=['super_admin','admin_akademik'];
@@ -196,6 +236,36 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
     }
     if ($action==='logout') { auditLog($pdo,'admin.logout','user',(int)(user()['id']??0)); $_SESSION=[]; session_regenerate_id(true); go('login'); }
     $u=requireLogin();
+    if ($action==='run_database_migrations') {
+        allow(['super_admin']);
+        $selected=$_POST['migrations']??[];
+        if(!is_array($selected) || !$selected) { flash('Pilih minimal satu file migrasi terlebih dahulu.','error'); go('migrations'); }
+        try {
+            ensureMigrationRegistry($pdo);
+            $available=availableMigrationFiles($backend);
+            $done=0;
+            foreach(array_values(array_unique($selected)) as $name) {
+                if(!is_string($name) || !isset($available[$name])) throw new RuntimeException('File migrasi yang dipilih tidak dikenal atau tidak tersedia.');
+                $check=$pdo->prepare('SELECT checksum FROM schema_migrations WHERE migration_name=:name LIMIT 1');
+                $check->execute(['name'=>$name]);
+                $existing=$check->fetchColumn();
+                if($existing!==false) {
+                    if(!hash_equals((string)$existing,(string)$available[$name]['checksum'])) throw new RuntimeException('Checksum file '.$name.' berubah setelah pernah diterapkan. Periksa manual sebelum melanjutkan.');
+                    continue;
+                }
+                executeMigrationFile($pdo,$available[$name]['path']);
+                $insert=$pdo->prepare('INSERT INTO schema_migrations(migration_name,checksum,executed_by,executed_at) VALUES(:name,:checksum,:actor,UTC_TIMESTAMP())');
+                $insert->execute(['name'=>$name,'checksum'=>$available[$name]['checksum'],'actor'=>(int)$u['id']]);
+                auditLog($pdo,'admin.database_migration_applied','schema_migration',null,['migration'=>$name,'checksum'=>$available[$name]['checksum']]);
+                $done++;
+            }
+            flash($done>0 ? $done.' file migrasi berhasil diterapkan.' : 'Tidak ada migrasi baru yang dijalankan. File terpilih sudah diterapkan.');
+        } catch(Throwable $e) {
+            error_log('[STIT DB MIGRATION] '.$e->getMessage());
+            flash('Migrasi dihentikan: '.$e->getMessage().' Periksa kondisi database sebelum mencoba ulang.','error');
+        }
+        go('migrations');
+    }
     if ($action==='assign_prodi_scope') {
         allow(['super_admin','admin_akademik']);
         $targetUser=(int)($_POST['user_id']??0);
@@ -454,7 +524,7 @@ $flash=$_SESSION['flash']??null; unset($_SESSION['flash']);
 $labels=['super_admin'=>'Super Admin','admin_akademik'=>'Admin Akademik','admin_keuangan'=>'Admin Keuangan','ketua_prodi'=>'Ketua Program Studi','ketua_stit'=>'Ketua STIT','dosen'=>'Dosen'];
 $menus=[
  'dashboard'=>'Dashboard','programs'=>'Program Studi','years'=>'Tahun Akademik','semesters'=>'Semester',
- 'students'=>'Mahasiswa','lecturers'=>'Dosen','courses'=>'Mata Kuliah','classes'=>'Kelas Kuliah','schedules'=>'Jadwal Kuliah','krs'=>'KRS','grades'=>'Input Nilai','khs'=>'KHS / IP Semester','ipk'=>'Rekap IPK','attendance'=>'Presensi','accounts'=>'Akun Pengguna','pmb'=>'PMB','news'=>'Berita Kampus'
+ 'students'=>'Mahasiswa','lecturers'=>'Dosen','courses'=>'Mata Kuliah','classes'=>'Kelas Kuliah','schedules'=>'Jadwal Kuliah','krs'=>'KRS','grades'=>'Input Nilai','khs'=>'KHS / IP Semester','ipk'=>'Rekap IPK','attendance'=>'Presensi','accounts'=>'Akun Pengguna','pmb'=>'PMB','news'=>'Berita Kampus','migrations'=>'Migrasi Database'
 ];
 if ($page==='login') {
 ?><!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Login Admin - STIT Darul Ilmi</title><style>
@@ -478,7 +548,7 @@ $datasets=[
  'news'=>['title'=>'Berita Kampus','sql'=>'SELECT id,title,category,published_at,created_at FROM news_posts ORDER BY created_at DESC LIMIT 100'],
  'pmb'=>['title'=>'Penerimaan Mahasiswa Baru','sql'=>'SELECT registration_number,full_name,email,phone,status,created_at FROM pmb_applicants ORDER BY created_at DESC LIMIT 300']
 ];
-if ($page!=='dashboard' && !isset($datasets[$page])) $page='dashboard';
+if ($page!=='dashboard' && $page!=='migrations' && !isset($datasets[$page])) $page='dashboard';
 $programScopeId=null;
 if ($u['role']==='ketua_prodi') {
     $scopeQuery=$pdo->prepare('SELECT study_program_id FROM user_program_scopes WHERE user_id=:uid LIMIT 1');
@@ -487,7 +557,7 @@ if ($u['role']==='ketua_prodi') {
     if(!$scopeValue) { http_response_code(403); exit('Akun Ketua Prodi belum diberi cakupan program studi. Hubungi Admin Akademik.'); }
     $programScopeId=(int)$scopeValue;
 }
-if (in_array($page,['programs','years','semesters','courses','classes','schedules','students','lecturers','accounts','krs','news','pmb'],true)) allow($academicRoles); elseif (in_array($page,['grades','attendance'],true)) allow(['super_admin','admin_akademik','dosen']); elseif (in_array($page,['khs','ipk'],true)) allow(['super_admin','admin_akademik','ketua_prodi','ketua_stit']); elseif ($page==='dashboard') allow(['super_admin','admin_akademik','admin_keuangan','ketua_prodi','ketua_stit','dosen']); else allow($viewRoles);
+if ($page==='migrations') allow(['super_admin']); elseif (in_array($page,['programs','years','semesters','courses','classes','schedules','students','lecturers','accounts','krs','news','pmb'],true)) allow($academicRoles); elseif (in_array($page,['grades','attendance'],true)) allow(['super_admin','admin_akademik','dosen']); elseif (in_array($page,['khs','ipk'],true)) allow(['super_admin','admin_akademik','ketua_prodi','ketua_stit']); elseif ($page==='dashboard') allow(['super_admin','admin_akademik','admin_keuangan','ketua_prodi','ketua_stit','dosen']); else allow($viewRoles);
 ?><!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title><?=e($menus[$page]??'Dashboard')?> - STIT Darul Ilmi</title><style>
 :root{--navy:#03452f;--teal:#087a4b;--bg:#f5faf6;--ink:#173b2b;--muted:#64756b;--line:#e1eee5;--mint:#eaf6ef;--lime:#b9e66b}*{box-sizing:border-box}body{margin:0;background:var(--bg);font:14px system-ui;color:var(--ink)}.layout{display:flex;min-height:100vh}.side{width:255px;background:linear-gradient(180deg,#03452f,#075b3d 70%,#087a4b);color:#fff;padding:24px 16px;flex-shrink:0;box-shadow:8px 0 28px #03452f12}.brand{font-size:17px;font-weight:850;padding:5px 10px 25px;letter-spacing:.02em}.brand:before{content:'DI';display:inline-grid;place-items:center;width:42px;height:42px;border-radius:13px;margin-right:10px;vertical-align:middle;background:linear-gradient(145deg,#eaf6ef,#b9e66b);color:#075b3d;font-weight:900}.brand small{display:block;color:#c5e4d2;font-weight:500;font-size:12px;margin:7px 0 0 54px}.nav a{display:block;color:#e0f0e6;text-decoration:none;padding:12px 14px;border-radius:12px;margin:4px 0;transition:.15s}.nav a.active,.nav a:hover{background:#ffffff20;color:#fff;box-shadow:inset 3px 0 #b9e66b}.main{flex:1;min-width:0}.top{height:72px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 30px;box-shadow:0 3px 16px #03452f08}.content{padding:28px 30px;max-width:1400px;margin:auto}h1{font-size:25px;margin:0 0 7px;color:var(--navy)}.muted{color:var(--muted)}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:15px;margin:24px 0}.card,.panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:19px;box-shadow:0 5px 18px #03452f08}.card strong{display:block;font-size:28px;margin-top:7px;color:var(--teal)}.panel{margin-top:20px;overflow:auto}.panel h2{font-size:17px;margin:0 0 16px;color:var(--navy)}table{border-collapse:collapse;width:100%;min-width:580px}th,td{text-align:left;padding:12px 13px;border-bottom:1px solid #edf3ee}th{background:var(--mint);color:#315b43;font-size:12px;text-transform:uppercase;letter-spacing:.03em}form.inline{display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin-bottom:18px}form.inline label{display:block;font-size:12px;color:#475d50;margin-bottom:5px}input,select{padding:10px;border:1px solid #d4e5d9;border-radius:10px;font:inherit;background:#fcfefc}input:focus,select:focus{outline:0;border-color:var(--teal);box-shadow:0 0 0 3px #087a4b18}button,.btn{padding:10px 14px;border:0;border-radius:11px;background:var(--teal);color:white;font-weight:700;cursor:pointer;text-decoration:none}.alert{padding:12px 14px;border-radius:12px;margin:0 0 18px;background:#e8f6ee;color:#17663a}.alert.error{background:#fff0ee;color:#a32118}.logout{background:var(--mint);color:var(--navy)}.tag{background:var(--mint);color:var(--teal);border-radius:20px;padding:4px 9px;font-size:12px}.student-create-panel{padding:24px;overflow:visible}.student-form-heading{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:20px}.student-form-heading h2{font-size:21px;margin:5px 0}.student-form-heading p{margin:0}.eyebrow{font-size:10px;letter-spacing:.14em;font-weight:850;color:var(--teal)}.student-tabs{display:flex;gap:8px;overflow-x:auto;padding:5px 2px 14px;border-bottom:1px solid var(--line);margin-bottom:22px}.student-tab{white-space:nowrap;background:#f2f8f4;color:#466451;border:1px solid #e0ece3;border-radius:12px;padding:11px 15px;margin:0}.student-tab.active{background:var(--navy);color:#fff;border-color:var(--navy);box-shadow:0 5px 14px #03452f20}.student-tab-panel{min-height:280px}.student-tab-panel[hidden]{display:none}.student-tab-panel h3{font-size:16px;margin:0 0 5px;color:var(--navy)}.student-tab-panel>p{margin:0 0 20px}.student-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.student-fields>div{min-width:0}.student-fields label,.student-photo-control label{display:block;font-size:12px;font-weight:750;color:#405b49;margin-bottom:7px}.student-fields input,.student-fields select{width:100%;min-height:43px}.student-profile-upload{display:flex;align-items:center;gap:20px;padding:16px;background:#f5faf6;border:1px dashed #bdd9c6;border-radius:15px;margin-bottom:20px}.student-avatar-preview{width:104px;height:104px;flex:0 0 104px;border-radius:50%;background:#e2f0e6;border:3px solid #fff;box-shadow:0 0 0 1px #cfe3d5;display:grid;place-items:center;overflow:hidden;color:#6a8a73;font-size:11px;font-weight:800}.student-avatar-preview img{width:100%;height:100%;object-fit:cover}.student-photo-control{flex:1;min-width:0}.student-photo-control input{display:block;width:100%;padding:9px;background:#fff;border:1px solid #d4e5d9;border-radius:10px}.student-photo-control small{display:block;margin-top:7px;line-height:1.5}.student-security-note{display:flex;flex-direction:column;gap:4px;background:#f0f8f2;border:1px solid #d7eadc;border-radius:12px;padding:13px;margin-top:20px;color:#47624e;font-size:12px}.student-form-footer{display:flex;justify-content:space-between;align-items:center;gap:14px;border-top:1px solid var(--line);padding-top:18px;margin-top:25px}.student-form-footer>div{display:flex;gap:8px}.student-form-footer button{margin:0;min-width:120px}.student-next{background:#eaf4ed;color:var(--navy)}.student-form-footer button[type=submit]{background:var(--teal)}@media(max-width:650px){.student-create-panel{padding:17px}.student-form-heading{display:block}.student-form-heading>.tag{display:inline-block;margin-top:10px}.student-fields{grid-template-columns:1fr}.student-tab{padding:10px 12px;font-size:12px}.student-profile-upload{align-items:flex-start;flex-direction:column}.student-form-footer{align-items:flex-start;flex-direction:column}.student-form-footer>div{width:100%}.student-form-footer button{flex:1}}@media(max-width:760px){.layout{display:block}.side{width:100%;padding:12px}.brand{padding:5px 8px 12px}.nav{display:flex;overflow:auto;gap:4px}.nav a{white-space:nowrap}.top{height:58px;padding:0 16px}.content{padding:20px 14px}}
 </style></head><body><div class="layout"><aside class="side"><div class="brand">STIT DARUL ILMI<small>Academic Portal</small></div><nav class="nav"><?php foreach($menus as $key=>$label): if(in_array($key,['programs','years','semesters','courses','classes','schedules','students','lecturers','accounts','krs'],true)&&!in_array($u['role'],$academicRoles,true))continue; if(in_array($key,['grades','attendance'],true)&&!in_array($u['role'],['super_admin','admin_akademik','dosen'],true))continue; if(in_array($key,['khs','ipk'],true)&&!in_array($u['role'],['super_admin','admin_akademik','ketua_prodi','ketua_stit'],true))continue;?><a class="<?=$page===$key?'active':''?>" href="?page=<?=$key?>"><?=e($label)?></a><?php endforeach;?></nav></aside><main class="main"><header class="top"><strong><?=e($labels[$u['role']]??$u['role'])?></strong><form method="post"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="logout"><button class="logout">Keluar</button></form></header><section class="content"><?php if($flash):?><div class="alert <?=$flash['type']==='error'?'error':''?>"><?=e($flash['message'])?></div><?php endif;?>
@@ -516,6 +586,54 @@ try{$webRows=$pdo->query('SELECT content_key,content_value FROM website_content'
 <div class="panel"><h2>Berita Terbaru <a class="btn" href="?page=news" style="float:right">Kelola Berita</a></h2><?php if(!$recentNews):?><p class="muted">Belum ada berita. Tambahkan berita resmi melalui menu Kelola Berita.</p><?php else:?><ul><?php foreach($recentNews as $nr):?><li style="padding:8px 0"><?=e($nr['title'])?> — <span class="tag"><?=e($nr['published_at']?'Terbit':'Draft')?></span></li><?php endforeach;?></ul><?php endif;?></div>
 <div class="panel"><h2>Informasi Sistem</h2><p>Profil kampus dan berita disimpan di database bersama, lalu disediakan melalui REST API untuk homepage dan aplikasi Android.</p><p class="muted">Isi hanya informasi resmi yang telah diverifikasi oleh pihak kampus.</p></div>
 <?php endif;?>
+<?php elseif($page==='migrations'):
+ensureMigrationRegistry($pdo);
+$availableMigrations=availableMigrationFiles($backend);
+$appliedRows=$pdo->query('SELECT migration_name,checksum,executed_at FROM schema_migrations ORDER BY executed_at DESC')->fetchAll();
+$appliedMap=[];foreach($appliedRows as $migrationRow){$appliedMap[$migrationRow['migration_name']]=$migrationRow;}
+$pendingCount=0;foreach($availableMigrations as $migrationName=>$migrationFile){if(!isset($appliedMap[$migrationName]))$pendingCount++;}
+?>
+<h1>Migrasi Database</h1>
+<p class="muted">Pilih file SQL dari <code>backend/database/migrations</code> untuk memperbarui struktur database portal.</p>
+<div class="cards">
+ <div class="card"><span class="muted">Total File</span><strong><?=count($availableMigrations)?></strong></div>
+ <div class="card"><span class="muted">Sudah Diterapkan</span><strong><?=count($appliedMap)?></strong></div>
+ <div class="card"><span class="muted">Belum Diterapkan</span><strong><?=$pendingCount?></strong></div>
+</div>
+<div class="panel" style="border-left:4px solid #d69e22;background:#fffdf6">
+ <strong style="color:#8a5a08">Penting — Backup sebelum migrasi</strong>
+ <p class="muted" style="margin:8px 0 0">Lakukan backup database melalui phpMyAdmin terlebih dahulu. Migrasi ALTER TABLE/UPDATE umumnya tidak dapat dibatalkan otomatis. Jalankan file sesuai urutan tanggal dan hanya pada database yang sesuai. Jangan jalankan ulang file yang sudah bertanda centang biru.</p>
+</div>
+<form method="post" class="panel">
+ <input type="hidden" name="_csrf" value="<?=e(csrf())?>">
+ <input type="hidden" name="action" value="run_database_migrations">
+ <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
+  <h2 style="margin:0">Daftar File Migration</h2>
+  <span class="tag">Sumber: repository</span>
+ </div>
+ <?php if(!$availableMigrations):?><p class="muted">Tidak ada file SQL di folder backend/database/migrations.</p><?php else:?>
+ <div style="display:grid;gap:10px">
+ <?php foreach($availableMigrations as $migrationName=>$migrationFile):$isApplied=isset($appliedMap[$migrationName]);$checksumChanged=$isApplied&&!hash_equals((string)$appliedMap[$migrationName]['checksum'],(string)$migrationFile['checksum']);?>
+ <label style="display:flex;align-items:flex-start;gap:12px;padding:14px;border:1px solid <?=$isApplied?'#cfe1ff':'#e1eee5'?>;border-radius:14px;background:<?=$isApplied?'#f4f8ff':'#fbfefc'?>;margin:0">
+  <?php if($isApplied&&!$checksumChanged):?>
+   <span aria-label="Sudah diterapkan" title="Sudah diterapkan" style="display:inline-grid;place-items:center;flex:0 0 25px;width:25px;height:25px;border-radius:50%;background:#2563eb;color:white;font-size:16px;font-weight:900">✓</span>
+  <?php elseif($checksumChanged):?>
+   <span title="Checksum berubah" style="display:inline-grid;place-items:center;flex:0 0 25px;width:25px;height:25px;border-radius:50%;background:#b45309;color:white;font-weight:900">!</span>
+  <?php else:?>
+   <input type="checkbox" name="migrations[]" value="<?=e($migrationName)?>" style="width:19px;height:19px;flex:0 0 19px;margin:3px 0 0;accent-color:#087a4b">
+  <?php endif;?>
+  <span style="display:block;min-width:0;flex:1">
+   <strong style="display:block;overflow-wrap:anywhere;color:#173b2b"><?=e($migrationName)?></strong>
+   <small class="muted"><?= $isApplied&&!$checksumChanged ? 'Sudah diterapkan pada '.e($appliedMap[$migrationName]['executed_at']) : ($checksumChanged ? 'File berubah setelah diterapkan — perlu pemeriksaan manual' : 'Belum diterapkan · dapat dipilih') ?></small>
+  </span>
+  <?php if($isApplied&&!$checksumChanged):?><span style="color:#2563eb;font-size:12px;font-weight:800;white-space:nowrap">MIGRATED</span><?php elseif($checksumChanged):?><span style="color:#b45309;font-size:12px;font-weight:800">CHECK</span><?php else:?><span class="tag">PENDING</span><?php endif;?>
+ </label>
+ <?php endforeach;?>
+ </div>
+ <div style="display:flex;justify-content:flex-end;margin-top:18px"><button type="submit" onclick="return confirm('Jalankan file migrasi yang dipilih? Pastikan backup database sudah tersedia.')">Jalankan Migrasi Terpilih</button></div>
+ <?php endif;?>
+</form>
+<div class="panel"><h2>Riwayat Migrasi</h2><?php if(!$appliedRows):?><p class="muted">Belum ada migrasi yang tercatat melalui dashboard ini. Jika migrasi pernah dijalankan manual melalui phpMyAdmin, statusnya belum otomatis diketahui.</p><?php else:?><div style="overflow:auto"><table><thead><tr><th>File</th><th>Status</th><th>Waktu</th><th>Checksum</th></tr></thead><tbody><?php foreach($appliedRows as $history):$stillExists=isset($availableMigrations[$history['migration_name']]);$same=$stillExists&&hash_equals((string)$history['checksum'],(string)$availableMigrations[$history['migration_name']]['checksum']);?><tr><td><?=e($history['migration_name'])?></td><td><?=$same?'<span style="color:#2563eb;font-weight:800">✓ Applied</span>':'<span style="color:#b45309;font-weight:800">Perlu pemeriksaan</span>'?></td><td><?=e($history['executed_at'])?></td><td><code><?=e(substr((string)$history['checksum'],0,12))?>…</code></td></tr><?php endforeach;?></tbody></table></div><?php endif;?></div>
 <?php else: $ds=$datasets[$page];if($u['role']==='ketua_prodi' && $programScopeId!==null && in_array($page,['khs','ipk'],true)) {
     $scopedSql=preg_replace('/ ORDER BY /',' AND s.study_program_id=:scope_program ORDER BY ',$ds['sql'],1);
     if(!is_string($scopedSql) || $scopedSql===$ds['sql']) throw new RuntimeException('Query laporan tidak dapat dibatasi berdasarkan program studi.');
