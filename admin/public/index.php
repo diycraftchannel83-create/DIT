@@ -169,7 +169,7 @@ $flash=$_SESSION['flash']??null; unset($_SESSION['flash']);
 $labels=['super_admin'=>'Super Admin','admin_akademik'=>'Admin Akademik','admin_keuangan'=>'Admin Keuangan','ketua_prodi'=>'Ketua Program Studi','ketua_stit'=>'Ketua STIT'];
 $menus=[
  'dashboard'=>'Dashboard','programs'=>'Program Studi','years'=>'Tahun Akademik','semesters'=>'Semester',
- 'students'=>'Mahasiswa','lecturers'=>'Dosen','courses'=>'Mata Kuliah','classes'=>'Kelas Kuliah','pmb'=>'PMB'
+ 'students'=>'Mahasiswa','lecturers'=>'Dosen','courses'=>'Mata Kuliah','classes'=>'Kelas Kuliah','accounts'=>'Akun Pengguna','pmb'=>'PMB'
 ];
 if ($page==='login') {
 ?><!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Login Admin - STIT Darul Ilmi</title><style>
@@ -183,7 +183,8 @@ $datasets=[
  'lecturers'=>['title'=>'Dosen','sql'=>'SELECT l.lecturer_number,u.full_name,u.email,l.phone FROM lecturers l JOIN users u ON u.id=l.user_id ORDER BY u.full_name LIMIT 200'],
  'courses'=>['title'=>'Mata Kuliah','sql'=>'SELECT c.code,c.name,c.credits,p.name AS program,c.recommended_semester FROM courses c JOIN study_programs p ON p.id=c.study_program_id ORDER BY p.name,c.recommended_semester,c.name LIMIT 300'],
  'classes'=>['title'=>'Kelas Kuliah','sql'=>'SELECT c.class_name,co.code,co.name AS course,s.name AS semester,u.full_name AS lecturer,c.capacity FROM course_classes c JOIN courses co ON co.id=c.course_id JOIN semesters s ON s.id=c.semester_id LEFT JOIN lecturers l ON l.id=c.lecturer_id LEFT JOIN users u ON u.id=l.user_id ORDER BY s.start_date DESC LIMIT 300'],
- 'accounts'=>['title'=>'Akun Pengguna','sql'=>'SELECT u.username,u.full_name,u.email,r.name AS role,u.status,u.last_login_at FROM users u JOIN roles r ON r.id=u.role_id ORDER BY u.created_at DESC LIMIT 300'],\n 'pmb'=>['title'=>'Penerimaan Mahasiswa Baru','sql'=>'SELECT registration_number,full_name,email,phone,status,created_at FROM pmb_applicants ORDER BY created_at DESC LIMIT 300']
+ 'accounts'=>['title'=>'Akun Pengguna','sql'=>'SELECT u.username,u.full_name,u.email,r.name AS role,u.status,u.last_login_at FROM users u JOIN roles r ON r.id=u.role_id ORDER BY u.created_at DESC LIMIT 300'],\n 'accounts'=>['title'=>'Akun Pengguna','sql'=>'SELECT u.username,u.full_name,u.email,r.name AS role,u.status,u.last_login_at FROM users u JOIN roles r ON r.id=u.role_id ORDER BY u.created_at DESC LIMIT 300'],
+ 'pmb'=>['title'=>'Penerimaan Mahasiswa Baru','sql'=>'SELECT registration_number,full_name,email,phone,status,created_at FROM pmb_applicants ORDER BY created_at DESC LIMIT 300']
 ];
 if ($page!=='dashboard' && !isset($datasets[$page])) $page='dashboard';
 if (in_array($page,['programs','years','semesters','courses','classes','students','lecturers','accounts'],true)) allow($academicRoles); elseif ($page==='dashboard') allow(['super_admin','admin_akademik','admin_keuangan','ketua_prodi','ketua_stit']); else allow($viewRoles);
