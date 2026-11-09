@@ -79,7 +79,7 @@ footer{background:#245c3a;color:#e9f4e9;padding:54px 0 20px}.foot-grid{display:g
 <header><div class="container nav">
 <a class="brand" href="#beranda"><img src="<?=h($logo)?>" alt="Logo resmi STIT Darul Ilmi"><span><strong>STIT DARUL ILMI</strong><small>TASIKMALAYA · SEKOLAH TINGGI ILMU TARBIYAH</small></span></a>
 <button class="hamb" id="menuToggle" aria-label="Buka navigasi" aria-expanded="false">☰</button>
-<nav class="links" id="mainNav" aria-label="Navigasi utama"><a href="#beranda">Beranda</a><a href="#profil">Profil Kampus</a><a href="#akademik">Akademik</a><a href="#program">Program Studi</a><a href="#pmb">Penerimaan Mahasiswa Baru</a><a href="#berita">Berita</a><a href="#galeri">Galeri</a><a href="#kontak">Kontak</a></nav>
+<nav class="links" id="mainNav" aria-label="Navigasi utama"><a href="#beranda">Beranda</a><a href="#profil">Profil Kampus</a><a href="#akademik">Akademik</a><a href="#program">Program Studi</a><a href="#pmb">Penerimaan Mahasiswa Baru</a><a href="#berita">Berita</a><a href="#galeri">Galeri</a><a href="#kontak">Kontak</a><a href="../portal/public/?page=login">Login Akademik</a></nav>
 <a class="nav-cta" href="<?=h($pmbUrl?:'#pmb')?>">Pendaftaran Mahasiswa Baru ↗</a>
 </div></header>
 <main>
