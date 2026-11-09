@@ -20,7 +20,7 @@ $name='STIT Darul Ilmi Tasikmalaya';
 $tagline=$campus['tagline']??'Membangun Generasi Unggul, Berilmu, Berakhlak, dan Berlandaskan Nilai-Nilai Islam.';
 $about=$campus['about']??'STIT Darul Ilmi Tasikmalaya hadir sebagai lembaga pendidikan tinggi yang berkomitmen mencetak generasi pendidik dan pemimpin masa depan.';
 $hero=$campus['hero_image_url']??'';
-$logo='https://raw.githubusercontent.com/diycraftchannel83-create/DIT/main/app/src/main/res/drawable/stit_logo.jpg';
+$logo=($campus['logo_image_url']??'')?:'https://raw.githubusercontent.com/diycraftchannel83-create/DIT/main/app/src/main/res/drawable/stit_logo.jpg';
 $history=webContent($pdo,'history','Sejarah resmi kampus dapat dilengkapi melalui Dashboard Admin.');
 $why=json_decode(webContent($pdo,'why_cards','[]'),true); if(!is_array($why)||!$why)$why=[
  ['icon'=>'☪','title'=>'Pendidikan Berbasis Nilai Islam','text'=>'Mengintegrasikan nilai keislaman dalam proses pendidikan dan pembentukan karakter.'],
