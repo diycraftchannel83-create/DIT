@@ -22,15 +22,15 @@ Pada menu Mahasiswa, formulir pembuatan mahasiswa menyediakan bagian data pribad
 Endpoint `GET /api/v1/me` menyertakan objek `student` dengan field profil tambahan jika akun yang login merupakan mahasiswa. Field sensitif tidak disertakan dalam daftar publik.
 
 ## Batasan saat ini
-- Foto disimpan sebagai URL HTTP/HTTPS; unggah file foto belum dibuat.
-- Belum tersedia fitur edit profil, validasi referensi wilayah, impor Excel, atau pengaturan field wajib sesuai kebijakan kampus.
+- Edit profil, pencarian, ekspor CSV, dan unggah foto sudah tersedia pada Admin Web.
+- Validasi referensi wilayah, impor Excel, dan pengaturan field wajib sesuai kebijakan kampus belum tersedia.
 - Sebelum produksi, tetapkan dasar pengumpulan, retensi, hak akses, dan perlindungan data pribadi.
 
 
 ## Fitur pengelolaan Admin Web
 - Cari mahasiswa berdasarkan NIM, nama, atau email.
 - Buka tautan Edit pada daftar mahasiswa untuk memperbarui akun dan data profil.
-- Ekspor daftar mahasiswa ke CSV yang dapat dibuka di Excel atau LibreOffice.
+- Ekspor daftar mahasiswa ke CSV yang dapat dibuka di Excel atau LibreOffice. Nilai yang diawali karakter formula spreadsheet dinetralkan saat ekspor.
 - Foto dapat diunggah sebagai JPG, PNG, atau WebP maksimal 2 MB. Nama file disimpan secara acak pada `admin/public/uploads/students/`; direktori ini menonaktifkan listing dan akses eksekusi file PHP melalui aturan Apache.
 - Foto lama dapat dipertahankan dengan tidak memilih unggahan baru. Kolom URL foto juga menerima URL HTTP/HTTPS.
 
