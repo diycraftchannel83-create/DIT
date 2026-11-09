@@ -442,7 +442,9 @@ if (in_array($page,['programs','years','semesters','courses','classes','schedule
 <div class="panel"><h2>Informasi Sistem</h2><p>Profil kampus dan berita disimpan di database bersama, lalu disediakan melalui REST API untuk homepage dan aplikasi Android.</p><p class="muted">Isi hanya informasi resmi yang telah diverifikasi oleh pihak kampus.</p></div>
 <?php endif;?>
 <?php else: $ds=$datasets[$page];if($u['role']==='ketua_prodi' && $programScopeId!==null && in_array($page,['khs','ipk'],true)) {
-    $stmt=$pdo->prepare($ds['sql'].' AND s.study_program_id=:scope_program');
+    $scopedSql=preg_replace('/ ORDER BY /',' AND s.study_program_id=:scope_program ORDER BY ',$ds['sql'],1);
+    if(!is_string($scopedSql) || $scopedSql===$ds['sql']) throw new RuntimeException('Query laporan tidak dapat dibatasi berdasarkan program studi.');
+    $stmt=$pdo->prepare($scopedSql);
     $stmt->execute(['scope_program'=>$programScopeId]);
     $rows=$stmt->fetchAll();
 } else {
