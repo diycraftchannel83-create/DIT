@@ -1,0 +1,106 @@
+name: Sync Website dari ByetHost ke GitHub
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-byethost-to-github
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    name: Download website from ByetHost and commit to GitHub
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+
+      - name: Install FTP client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lftp rsync
+
+      - name: Download latest hosting files
+        env:
+          FTP_SERVER: ${{ secrets.BYETHOST_FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.BYETHOST_FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.BYETHOST_FTP_PASSWORD }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${FTP_SERVER}" ] || [ -z "${FTP_USERNAME}" ] || [ -z "${FTP_PASSWORD}" ]; then
+            echo "::error::Lengkapi BYETHOST_FTP_SERVER, BYETHOST_FTP_USERNAME, dan BYETHOST_FTP_PASSWORD di GitHub Actions Secrets."
+            exit 1
+          fi
+
+          mkdir -p "$RUNNER_TEMP/byethost-htdocs"
+
+          lftp -e "
+            set cmd:fail-exit yes
+            set net:max-retries 2
+            set net:timeout 30
+            set ftp:passive-mode yes
+            open -u \"${FTP_USERNAME}\",\"${FTP_PASSWORD}\" \"${FTP_SERVER}\"
+            mirror --verbose --parallel=2 \
+              --exclude-glob .git \
+              --exclude-glob .git/** \
+              --exclude-glob .github \
+              --exclude-glob .github/** \
+              --exclude-glob .env \
+              --exclude-glob .env.* \
+              --exclude-glob database.local.php \
+              --exclude-glob '*.sql' \
+              --exclude-glob '*.log' \
+              --exclude-glob '*.bak' \
+              --exclude-glob '*.zip' \
+              --exclude-glob '*.tar' \
+              --exclude-glob '*.pem' \
+              --exclude-glob '*.key' \
+              --exclude-glob 'cek-konfigurasi.php' \
+              --exclude-glob 'cek-db.php' \
+              --exclude-glob 'tes-query.php' \
+              --exclude-glob 'debug*.php' \
+              --exclude-glob 'buat-hash.php' \
+              /htdocs/ "$RUNNER_TEMP/byethost-htdocs/"
+            bye
+          "
+
+      - name: Copy hosting files into repository
+        run: |
+          set -euo pipefail
+          rsync -av "$RUNNER_TEMP/byethost-htdocs/" ./ \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='database.local.php' \
+            --exclude='.env' \
+            --exclude='.env.*' \
+            --exclude='*.sql' \
+            --exclude='*.log' \
+            --exclude='*.bak' \
+            --exclude='*.pem' \
+            --exclude='*.key' \
+            --exclude='cek-konfigurasi.php' \
+            --exclude='cek-db.php' \
+            --exclude='tes-query.php' \
+            --exclude='debug*.php' \
+            --exclude='buat-hash.php'
+
+      - name: Commit and push hosting updates
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Tidak ada perubahan dari hosting. Repository sudah sama dengan file yang diunduh."
+            exit 0
+          fi
+          git commit -m "Sync latest website files from ByetHost"
+          git push origin HEAD:main
