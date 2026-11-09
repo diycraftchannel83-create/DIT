@@ -873,30 +873,47 @@ $pendingCount=0;foreach($availableMigrations as $migrationName=>$migrationFile){
 <script>
 (function(){
  const modal=document.getElementById('accountDetailModal');if(!modal)return;
+ const byId=id=>document.getElementById(id);
  const close=()=>{modal.hidden=true;modal.setAttribute('aria-hidden','true');document.body.style.overflow='';};
  modal.querySelectorAll('[data-account-close]').forEach(el=>el.addEventListener('click',close));
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.hidden)close();});
- document.addEventListener('click',function(event){
-  const link=event.target.closest('[data-account-json]');if(!link)return;
-  let d;try{d=JSON.parse(link.dataset.accountJson);}catch(e){return;}
-  document.getElementById('accountUserId').value=d.id;document.getElementById('accountDeleteUserId').value=d.id;
-  document.getElementById('accountUsername').value=d.username||'';document.getElementById('accountFullName').value=d.full_name||'';
-  document.getElementById('accountEmail').value=d.email||'';document.getElementById('accountRole').value=d.role||'admin_akademik';
-  document.getElementById('accountStatus').value=d.status||'active';document.getElementById('accountPassword').value='';
-  document.getElementById('accountDisplayName').textContent=d.full_name||d.username||'Akun';
-  document.getElementById('accountDisplayRole').textContent=d.role_label||d.role||'—';
-  document.getElementById('accountDisplayUsername').textContent='@'+(d.username||'');
-  document.getElementById('accountProgram').textContent=d.program_studi||'Tidak ada cakupan program studi';
-  document.getElementById('accountCreated').textContent=d.created_at||'—';document.getElementById('accountLastLogin').textContent=d.last_login_at||'Belum pernah login';
-  document.getElementById('accountScope').hidden=!d.program_studi;
-  const protectedAccount=d.role==='super_admin';document.getElementById('accountRole').disabled=protectedAccount;document.getElementById('accountStatus').disabled=protectedAccount;
-  document.querySelector('#accountEditForm button[type="submit"]').disabled=protectedAccount;document.getElementById('accountDeleteForm').hidden=protectedAccount;
+ window.openAccountDetail=function(button){
+  let d;
+  try{
+   const raw=button.getAttribute('data-account-json')||'';
+   d=JSON.parse(raw);
+   if(!d||!d.id)throw new Error('Data akun tidak lengkap (ID akun tidak ditemukan).');
+  }catch(error){
+   alert('Data akun gagal dibaca. Muat ulang halaman Akun Pengguna. Detail: '+error.message);
+   return false;
+  }
+  byId('accountUserId').value=d.id;byId('accountDeleteUserId').value=d.id;
+  byId('accountUsername').value=d.username||'';byId('accountFullName').value=d.full_name||'';
+  byId('accountEmail').value=d.email||'';byId('accountRole').value=d.role||'admin_akademik';
+  byId('accountStatus').value=d.status||'active';byId('accountPassword').value='';
+  byId('accountDisplayName').textContent=d.full_name||d.username||'Akun';
+  byId('accountDisplayRole').textContent=d.role_label||d.role||'—';
+  byId('accountDisplayUsername').textContent='@'+(d.username||'');
+  byId('accountProgram').textContent=d.program_studi||'Tidak ada cakupan program studi';
+  byId('accountCreated').textContent=d.created_at||'—';byId('accountLastLogin').textContent=d.last_login_at||'Belum pernah login';
+  byId('accountScope').hidden=!d.program_studi;
+  const protectedAccount=d.role==='super_admin';
+  byId('accountRole').disabled=protectedAccount;byId('accountStatus').disabled=protectedAccount;
+  byId('accountEditForm').querySelector('button[type="submit"]').disabled=protectedAccount;
+  byId('accountDeleteForm').hidden=protectedAccount;
   modal.hidden=false;modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
+  return false;
+ };
+ document.addEventListener('click',function(event){
+  let target=event.target;
+  if(target&&target.nodeType===3)target=target.parentElement;
+  const link=target&&target.closest?target.closest('[data-account-json]'):null;
+  if(link)window.openAccountDetail(link);
  });
 })();
 </script>
 <?php endif;?>
-<div class="panel"><h2>Daftar <?=e($ds['title'])?> <span class="tag"><?=count($rows)?> data</span></h2><?php if(!$rows):?><p class="muted">Belum ada data untuk ditampilkan.</p><?php else:?><table><thead><tr><?php foreach(array_keys($rows[0]) as $col):if($page==='accounts'&&$col==='id')continue;?><th><?=e(str_replace('_',' ',$col))?></th><?php endforeach;?></tr></thead><tbody><?php foreach($rows as $row):?><tr><?php foreach($row as $column=>$value):if($page==='accounts'&&$column==='id')continue;?><td><?php if($page==='accounts'&&$column==='username'):$accountJson=['id'=>(int)$row['id'],'username'=>$row['username'],'full_name'=>$row['full_name'],'email'=>$row['email'],'role'=>$row['role'],'role_label'=>['super_admin'=>'Super Admin','admin_akademik'=>'Admin Akademik','admin_keuangan'=>'Admin Keuangan','ketua_prodi'=>'Ketua Program Studi','ketua_stit'=>'Ketua STIT','dosen'=>'Dosen','mahasiswa'=>'Mahasiswa'][$row['role']]??$row['role'],'status'=>$row['status'],'program_studi'=>$row['program_studi'],'created_at'=>$row['created_at']??null,'last_login_at'=>$row['last_login_at']];?><button type="button" class="account-link" data-account-json="<?=e(json_encode($accountJson,JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP))?>"><?=e($value)?></button><?php else:?><?=e($value===null?'—':$value)?><?php endif;?></td><?php endforeach;?></tr><?php endforeach;?></tbody></table><?php endif;?></div><?php endif;?></section></main></div><script>
+<div class="panel"><h2>Daftar <?=e($ds['title'])?> <span class="tag"><?=count($rows)?> data</span></h2><?php if(!$rows):?><p class="muted">Belum ada data untuk ditampilkan.</p><?php else:?><table><thead><tr><?php foreach(array_keys($rows[0]) as $col):if($page==='accounts'&&$col==='id')continue;?><th><?=e(str_replace('_',' ',$col))?></th><?php endforeach;?></tr></thead><tbody><?php foreach($rows as $row):?><tr><?php foreach($row as $column=>$value):if($page==='accounts'&&$column==='id')continue;?><td><?php if($page==='accounts'&&$column==='username'):$accountJson=['id'=>(int)$row['id'],'username'=>$row['username'],'full_name'=>$row['full_name'],'email'=>$row['email'],'role'=>$row['role'],'role_label'=>['super_admin'=>'Super Admin','admin_akademik'=>'Admin Akademik','admin_keuangan'=>'Admin Keuangan','ketua_prodi'=>'Ketua Program Studi','ketua_stit'=>'Ketua STIT','dosen'=>'Dosen','mahasiswa'=>'Mahasiswa'][$row['role']]??$row['role'],'status'=>$row['status'],'program_studi'=>$row['program_studi'],'created_at'=>$row['created_at']??null,'last_login_at'=>$row['last_login_at']];?><button type="button" class="account-link" onclick="return window.openAccountDetail(this)" data-account-json="<?=e(json_encode($accountJson,JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP))?>"><?=e($value)?></button><?php else:?><?=e($value===null?'—':$value)?><?php endif;?></td><?php endforeach;?></tr><?php endforeach;?></tbody></table><?php endif;?></div><?php endif;?></section></main></div><script>
 (function(){
  const form=document.getElementById('studentCreateForm');if(!form)return;
  const tabs=[...form.querySelectorAll('.student-tab')],panels=[...form.querySelectorAll('.student-tab-panel')];
