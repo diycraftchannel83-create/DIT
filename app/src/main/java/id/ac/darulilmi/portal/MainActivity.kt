@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import coil.compose.AsyncImage
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -175,7 +176,7 @@ private fun PortalApp() {
                 }
             }
             items(data.programs) { name ->
-                Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 4.dp).clip(RoundedCornerShape(18.dp)).background(Color.White).borderStroke(), verticalAlignment = Alignment.CenterVertically) {
+                Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 4.dp).clip(RoundedCornerShape(18.dp)).background(Color.White).border(BorderStroke(1.dp, Color(0xFFE1EEE5)), RoundedCornerShape(18.dp)), verticalAlignment = Alignment.CenterVertically) {
                     Box(Modifier.padding(12.dp).size(58.dp).clip(RoundedCornerShape(14.dp)).background(Forest), contentAlignment = Alignment.Center) {
                         Icon(Icons.Default.Layers, null, tint = Color.White, modifier = Modifier.size(31.dp))
                     }
@@ -348,8 +349,6 @@ private fun SimpleInfoCard(title: String, subtitle: String) {
         }
     }
 }
-
-private fun Modifier.borderStroke(): Modifier = this.then(Modifier)
 
 private fun loadPublicHome(): CampusData {
     val base = BuildConfig.API_BASE_URL.trimEnd('/')
