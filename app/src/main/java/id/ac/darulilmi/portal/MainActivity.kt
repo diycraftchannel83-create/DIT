@@ -6,6 +6,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
+import android.webkit.WebResourceError
+import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -13,8 +15,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.getValue
@@ -24,6 +31,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.viewinterop.AndroidView
 
 private const val CAMPUS_WEBSITE_URL = "https://siakadstitdit.byethost24.com/website/"
@@ -41,6 +50,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             var loading by remember { mutableStateOf(true) }
+            var pageError by remember { mutableStateOf<String?>(null) }
             var webViewRef by remember { mutableStateOf<WebView?>(null) }
 
             BackHandler(enabled = webViewRef?.canGoBack() == true) {
@@ -107,6 +117,28 @@ class MainActivity : ComponentActivity() {
                                         loading = true
                                     }
 
+                                    override fun onReceivedHttpError(
+                                        view: WebView?,
+                                        request: WebResourceRequest?,
+                                        errorResponse: WebResourceResponse?
+                                    ) {
+                                        if (request?.isForMainFrame == true) {
+                                            pageError = "Server mengembalikan HTTP ${errorResponse?.statusCode ?: "error"} saat membuka halaman. Periksa konfigurasi PHP/database hosting."
+                                            loading = false
+                                        }
+                                    }
+
+                                    override fun onReceivedError(
+                                        view: WebView?,
+                                        request: WebResourceRequest?,
+                                        error: WebResourceError?
+                                    ) {
+                                        if (request?.isForMainFrame == true) {
+                                            pageError = "Halaman tidak dapat dihubungi: ${error?.description ?: "koneksi gagal"}. Periksa koneksi internet atau server hosting."
+                                            loading = false
+                                        }
+                                    }
+
                                     override fun onPageFinished(view: WebView?, url: String?) {
                                         loading = false
                                     }
@@ -125,6 +157,18 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.align(Alignment.Center),
                             color = CampusGreen
                         )
+                    }
+                    if (pageError != null) {
+                        Column(
+                            modifier = Modifier.align(Alignment.Center).fillMaxWidth().padding(24.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text("Layanan kampus belum dapat dibuka", color = CampusGreen, fontWeight = FontWeight.Bold)
+                            Text(pageError!!, modifier = Modifier.padding(top = 10.dp, bottom = 16.dp))
+                            Button(onClick = { pageError = null; loading = true; webViewRef?.reload() }) {
+                                Text("Coba Lagi")
+                            }
+                        }
                     }
                 }
             }
