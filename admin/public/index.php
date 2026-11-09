@@ -440,7 +440,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
     if ($action==='save_semester') {
         allow($academicRoles);
         $year=(int)($_POST['academic_year_id']??0); $name=(string)($_POST['name']??''); $start=(string)($_POST['start_date']??''); $end=(string)($_POST['end_date']??'');
-        if(!$year || !in_array($name,array_map(static fn($n)=>'Semester '.$n,range(1,8)),true) || !$start || !$end || $start>$end) { flash('Data semester tidak valid.','error'); go('semesters'); }
+        if(!$year || !in_array($name,['Semester 1','Semester 2','Semester 3','Semester 4','Semester 5','Semester 6','Semester 7','Semester 8'],true) || !$start || !$end || $start>$end) { flash('Data semester tidak valid.','error'); go('semesters'); }
         try {$q=$pdo->prepare('INSERT INTO semesters(academic_year_id,name,start_date,end_date,is_active) VALUES(:year,:name,:start,:end,0)');$q->execute(['year'=>$year,'name'=>$name,'start'=>$start,'end'=>$end]);flash('Semester berhasil ditambahkan.');}
         catch(Throwable $e){flash('Gagal menambahkan semester. Kombinasi tahun dan semester mungkin sudah ada.','error');}
         go('semesters');
