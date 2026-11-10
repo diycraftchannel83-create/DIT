@@ -12,6 +12,7 @@ on:
   pull_request:
     paths:
       - 'admin/**/*.php'
+      - 'portal/**/*.php'
       - 'backend/**/*.php'
       - 'website/**/*.php'
   workflow_dispatch:
