@@ -20,9 +20,8 @@ Gunakan akun Google yang memang akan menjadi pengirim notifikasi. Kuota pengirim
 Edit file yang hanya ada di hosting dan tidak di-commit ke Git:
 `backend/config/database.local.php`
 
-Tambahkan dua entri berikut ke array konfigurasi (ganti nilainya):
+URL GAS sudah disetel sebagai nilai bawaan di kode portal. Anda cukup menambahkan token berikut ke array konfigurasi:
 ```php
-'password_notification_gas_url' => 'https://script.google.com/macros/s/DEPLOYMENT_ID/exec',
 'password_notification_gas_token' => 'TOKEN_ACAK_YANG_SAMA',
 ```
 
