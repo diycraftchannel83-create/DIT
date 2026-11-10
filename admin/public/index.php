@@ -702,6 +702,38 @@ if ($page==='migrations') allow(['super_admin']); elseif (in_array($page,['progr
   .mobile-menu-backdrop{position:fixed;inset:0;z-index:1001;background:rgba(9,31,20,.42)}
   .mobile-menu-backdrop[hidden],.mobile-menu-sheet[hidden]{display:none}
   .mobile-menu-sheet{position:fixed!important;z-index:1002!important;top:0!important;right:0!important;bottom:0!important;left:auto!important;width:min(88vw,390px)!important;height:100vh!important;height:100dvh!important;min-height:100vh!important;max-height:none!important;box-sizing:border-box!important;display:block!important;padding:24px 18px calc(24px + env(safe-area-inset-bottom))!important;margin:0!important;background:#fff!important;border-radius:22px 0 0 22px!important;box-shadow:-16px 0 48px rgba(0,0,0,.20)!important;overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior:contain;}
+  #mobileMenuSheet:not([hidden]){background:linear-gradient(180deg,#101a20 0%,#0b1218 55%,#080e13 100%)!important;color:#eef8f3!important;border-radius:0 24px 24px 0!important;box-shadow:18px 0 55px rgba(0,0,0,.42)!important;padding:calc(16px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom))!important;display:flex!important;flex-direction:column!important;gap:0!important}
+  .mobile-drawer-brand{display:flex;align-items:center;gap:12px;padding:8px 0 18px;border-bottom:1px solid rgba(180,220,200,.16)}
+  .mobile-drawer-brand img{width:52px;height:52px;object-fit:contain;background:#fff;border-radius:14px;padding:4px}
+  .mobile-drawer-brand>div{display:grid;gap:4px;min-width:0;flex:1}
+  .mobile-drawer-brand strong{font-size:14px;letter-spacing:.06em;color:#fff}
+  .mobile-drawer-brand span{font-size:10px;font-weight:800;letter-spacing:.16em;color:#37e0b0}
+  .mobile-menu-close{width:40px!important;height:40px!important;flex:0 0 40px!important;border:1px solid rgba(180,220,200,.18)!important;border-radius:13px!important;background:rgba(255,255,255,.06)!important;color:#d8eee3!important;font-size:25px!important}
+  .mobile-drawer-profile{display:flex;align-items:center;gap:12px;padding:18px 4px 17px;margin-bottom:12px;border-bottom:1px solid rgba(180,220,200,.13)}
+  .mobile-drawer-avatar{width:44px;height:44px;display:grid;place-items:center;border-radius:50%;background:linear-gradient(145deg,#0d8062,#064b40);border:1px solid rgba(58,235,183,.32)}
+  .mobile-drawer-avatar svg{width:24px;height:24px;fill:none;stroke:#7af2cf;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .mobile-drawer-profile>div:last-child{display:grid;gap:4px;min-width:0}
+  .mobile-drawer-profile strong{font-size:14px;color:#f2fff8;overflow-wrap:anywhere}
+  .mobile-drawer-profile span{font-size:11px;color:#9aafa6;overflow-wrap:anywhere}
+  .mobile-drawer-home{display:flex;align-items:center;gap:12px;min-height:48px;padding:10px 13px;margin:0 0 15px;border:1px solid rgba(42,225,175,.18);border-radius:13px;background:linear-gradient(100deg,rgba(0,142,104,.28),rgba(0,95,80,.12));color:#eafff6;text-decoration:none;font-weight:750;font-size:13px}
+  .mobile-drawer-home.active{background:linear-gradient(100deg,#087b60,#075344);border-color:#1bc99a}
+  .mobile-drawer-groups{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:0 2px 12px}
+  .mobile-menu-group{margin:0 0 13px;padding:0 0 12px;border-bottom:1px solid rgba(177,207,190,.15)}
+  .mobile-menu-group h3{display:flex;align-items:center;margin:0 0 7px;padding:0 8px;color:#93a79e;font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+  .mobile-menu-group h3:before{content:'';width:3px;height:13px;border-radius:3px;background:#29d6a5;margin-right:8px}
+  .mobile-menu-grid{display:grid;grid-template-columns:minmax(0,1fr)!important;gap:3px}
+  .mobile-menu-grid a{display:flex;align-items:center;gap:12px;min-height:43px;padding:8px 10px;border:1px solid transparent;border-radius:11px;background:transparent;color:#dce9e3;text-decoration:none;font-weight:550;font-size:13px;box-shadow:none;transition:background .15s,border-color .15s}
+  .mobile-menu-grid a:active{transform:scale(.99)}
+  .mobile-drawer-icon{width:24px;height:24px;flex:0 0 24px;display:grid;place-items:center;color:#35e0b0}
+  .mobile-drawer-icon svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .mobile-drawer-label{flex:1;min-width:0}
+  .mobile-drawer-chevron{color:#80958c;font-size:22px;line-height:1;font-weight:400}
+  .mobile-menu-grid a.active{background:linear-gradient(100deg,rgba(0,139,102,.38),rgba(0,86,76,.18));border-color:rgba(47,221,171,.22);color:#fff;box-shadow:inset 3px 0 #36e3b2}
+  .mobile-menu-grid a.active .mobile-drawer-icon,.mobile-menu-grid a.active .mobile-drawer-chevron{color:#54edc1}
+  .mobile-drawer-logout{flex:0 0 auto;padding-top:13px;margin-top:4px;border-top:1px solid rgba(177,207,190,.15)}
+  .mobile-drawer-logout button{width:100%;display:flex;align-items:center;gap:12px;min-height:46px;padding:10px 13px;margin:0;border:1px solid rgba(255,83,108,.20);border-radius:12px;background:rgba(190,43,67,.13);color:#ff7588;font-size:13px;font-weight:800;text-align:left;box-shadow:none}
+  .mobile-drawer-logout .mobile-drawer-icon{color:#ff7188}
+  .mobile-drawer-logout .mobile-drawer-icon svg{stroke:currentColor}
   #mobileMenuSheet:not([hidden]){position:fixed!important;inset:0!important;z-index:1002!important;width:100vw!important;max-width:100vw!important;height:100vh!important;height:100dvh!important;min-height:100vh!important;min-height:100dvh!important;max-height:100dvh!important;box-sizing:border-box!important;margin:0!important;padding:calc(24px + env(safe-area-inset-top)) 20px calc(24px + env(safe-area-inset-bottom))!important;border-radius:0!important;display:block!important;overflow-x:hidden!important;overflow-y:auto!important;background:#fff!important;}
   #mobileMenuSheet:not([hidden]) .mobile-menu-heading{position:sticky;top:0;z-index:1;background:#fff;padding:8px 0 18px;}
 @keyframes mobileDrawerIn{from{transform:translateX(28px);opacity:.7}to{transform:translateX(0);opacity:1}}
@@ -728,7 +760,60 @@ if ($page==='migrations') allow(['super_admin']); elseif (in_array($page,['progr
 <button type="button" class="mobile-nav-item mobile-more-trigger" id="mobileMenuToggle" aria-expanded="false"><span class="mobile-nav-icon" aria-hidden="true">☰</span><span>Menu</span></button>
 </nav>
 <div class="mobile-menu-backdrop" id="mobileMenuBackdrop" hidden></div>
-<section class="mobile-menu-sheet" id="mobileMenuSheet" aria-label="Semua menu" hidden><div class="mobile-menu-heading"><div><span class="mobile-menu-kicker">STIT DARUL ILMI</span><div class="mobile-menu-title">Navigasi Menu</div><small>Akses fitur berdasarkan kelompok</small></div><button type="button" class="mobile-menu-close" id="mobileMenuClose" aria-label="Tutup navigasi">×</button></div><?php foreach($visibleMenuGroups as $groupLabel=>$groupKeys): ?><div class="mobile-menu-group"><h3><?=e($groupLabel)?></h3><div class="mobile-menu-grid"><?php foreach($groupKeys as $key): ?><a href="?page=<?=e($key)?>" class="<?=$page===$key?'active':''?>"><span><?=e($menus[$key])?></span><span aria-hidden="true">›</span></a><?php endforeach; ?></div></div><?php endforeach; ?></section>
+<?php
+$mobileIconPaths = [
+ 'dashboard'=>'M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z',
+ 'programs'=>'M3 5h18v14H3z M7 9h10 M7 13h6',
+ 'years'=>'M4 4h16v16H4z M8 2v4 M16 2v4 M4 9h16',
+ 'semesters'=>'M4 4h16v16H4z M8 8h8 M8 12h8 M8 16h5',
+ 'students'=>'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8 M20 8v6 M17 11h6',
+ 'lecturers'=>'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8 M4 21a8 8 0 0 1 16 0',
+ 'courses'=>'M4 4h16v16H4z M8 8h8 M8 12h8 M8 16h5',
+ 'classes'=>'M3 7h18v13H3z M7 7V4h10v3 M7 12h10',
+ 'schedules'=>'M4 4h16v16H4z M8 2v4 M16 2v4 M4 9h16 M8 13h3',
+ 'krs'=>'M5 3h14v18H5z M8 8h8 M8 12h8 M8 16h5',
+ 'grades'=>'M4 4h16v16H4z M8 15l3-3 2 2 4-5',
+ 'khs'=>'M4 19V5 M4 19h16 M8 15l3-4 3 2 4-7',
+ 'ipk'=>'M4 19V5 M4 19h16 M8 15l3-4 3 2 4-7',
+ 'attendance'=>'M4 4h16v16H4z M8 9h8 M8 13h3 M14 14l2 2 4-5',
+ 'accounts'=>'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8 M18 8v6 M15 11h6',
+ 'pmb'=>'M12 2 20 6v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z M9 12l2 2 4-4',
+ 'news'=>'M4 4h16v16H4z M8 8h8 M8 12h8 M8 16h5',
+ 'migrations'=>'M4 7h16 M7 4 4 7l3 3 M20 17H4 M17 14l3 3-3 3',
+ 'default'=>'M4 4h16v16H4z M8 8h8 M8 12h8'
+];
+$mobileIcon = static function(string $key) use ($mobileIconPaths): string {
+ $path=$mobileIconPaths[$key]??$mobileIconPaths['default'];
+ return '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="'.$path.'"/></svg>';
+};
+?>
+<section class="mobile-menu-sheet" id="mobileMenuSheet" aria-label="Navigasi SIAKAD" hidden>
+ <div class="mobile-drawer-brand">
+  <img src="<?=e($campusLogoUrl)?>" alt="Logo STIT Darul Ilmi">
+  <div><strong>STIT DARUL ILMI</strong><span>SIAKAD TERPADU</span></div>
+  <button type="button" class="mobile-menu-close" id="mobileMenuClose" aria-label="Tutup navigasi">×</button>
+ </div>
+ <div class="mobile-drawer-profile">
+  <div class="mobile-drawer-avatar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/></svg></div>
+  <div><strong><?=e($u['name']??$u['username']??'Pengguna')?></strong><span><?=e($labels[$u['role']]??$u['role'])?> · @<?=e($u['username']??'')?></span></div>
+ </div>
+ <a class="mobile-drawer-home <?=$page==='dashboard'?'active':''?>" href="?page=dashboard"><span class="mobile-drawer-icon"><?=$mobileIcon('dashboard')?></span><span>Beranda</span><span class="mobile-drawer-chevron">›</span></a>
+ <div class="mobile-drawer-groups">
+ <?php foreach($visibleMenuGroups as $groupLabel=>$groupKeys): ?>
+  <div class="mobile-menu-group">
+   <h3><?=e($groupLabel)?></h3>
+   <div class="mobile-menu-grid">
+    <?php foreach($groupKeys as $key): ?>
+     <a href="?page=<?=e($key)?>" class="<?=$page===$key?'active':''?>">
+      <span class="mobile-drawer-icon"><?=$mobileIcon($key)?></span><span class="mobile-drawer-label"><?=e($menus[$key])?></span><span class="mobile-drawer-chevron">›</span>
+     </a>
+    <?php endforeach; ?>
+   </div>
+  </div>
+ <?php endforeach; ?>
+ </div>
+ <form class="mobile-drawer-logout" method="post"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="logout"><button type="submit"><span class="mobile-drawer-icon"><?=$mobileIcon('migrations')?></span>Keluar dari Sistem</button></form>
+</section>
 <main class="main"><header class="top"><strong><?=e($labels[$u['role']]??$u['role'])?></strong><form method="post"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="logout"><button class="logout">Keluar</button></form></header><section class="content"><?php if($flash):?><div class="alert <?=$flash['type']==='error'?'error':''?>"><?=e($flash['message'])?></div><?php endif;?>
 <?php if($page==='dashboard'):?><h1>Dashboard Akademik</h1><p class="muted">Ringkasan data STIT Darul Ilmi Tasikmalaya.</p><div class="cards"><?php if($u['role']==='ketua_prodi' && $programScopeId!==null): $scopeCounts=[['Mahasiswa',"SELECT COUNT(*) FROM students WHERE study_program_id=".$programScopeId],['Mata Kuliah',"SELECT COUNT(*) FROM courses WHERE study_program_id=".$programScopeId]]; foreach($scopeCounts as [$label,$sql]):?><div class="card"><span class="muted"><?=e($label)?></span><strong><?=number_format((int)$pdo->query($sql)->fetchColumn())?></strong></div><?php endforeach; else: foreach(['students'=>'Mahasiswa','lecturers'=>'Dosen','study_programs'=>'Program Studi','courses'=>'Mata Kuliah','course_classes'=>'Kelas Kuliah','pmb_applicants'=>'Pendaftar PMB'] as $t=>$label):?><div class="card"><span class="muted"><?=e($label)?></span><strong><?=number_format(tableCount($pdo,$t))?></strong></div><?php endforeach; endif;?></div><?php if(in_array($u['role'],$academicRoles,true)): $campus=$pdo->query('SELECT * FROM campus_profile WHERE id=1')->fetch()?:[];$recentNews=$pdo->query('SELECT id,title,category,published_at,created_at FROM news_posts ORDER BY created_at DESC LIMIT 5')->fetchAll();?>
 <div class="panel"><h2>Informasi Kampus</h2><form method="post" enctype="multipart/form-data" class="inline"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="save_campus_profile"><div style="flex-basis:100%;padding:14px;background:#f0f8f2;border:1px solid #cfe8d6;border-radius:12px"><label>Logo Resmi Kampus (JPG, PNG, WebP — maksimal 5 MB)</label><?php if(!empty($campus['logo_image_url'])):?><div style="margin:10px 0"><img src="<?=e($campus['logo_image_url'])?>" alt="Logo kampus saat ini" style="width:92px;height:92px;object-fit:contain;background:white;border-radius:12px;padding:6px"></div><?php endif;?><input type="file" name="logo_image_file" accept="image/jpeg,image/png,image/webp"><small class="muted">Unggah logo resmi untuk header dan footer website.</small><?php if(!empty($campus['logo_image_url'])):?><label style="display:block;margin-top:8px"><input type="checkbox" name="remove_logo_image" value="1"> Gunakan logo bawaan repository</label><?php endif;?></div><div style="flex-basis:100%;padding:14px;background:#f0f8f2;border:1px solid #cfe8d6;border-radius:12px"><label>Foto Gedung Kampus (JPG, PNG, WebP — maksimal 5 MB)</label><?php if(!empty($campus['hero_image_url'])):?><div style="margin:10px 0"><img src="<?=e($campus['hero_image_url'])?>" alt="Foto gedung kampus saat ini" style="width:100%;max-width:520px;max-height:220px;object-fit:cover;border-radius:10px"></div><?php else:?><p class="muted">Belum ada foto gedung. Aplikasi akan menampilkan gambar bawaan.</p><?php endif;?><input type="file" name="hero_image_file" accept="image/jpeg,image/png,image/webp"><small class="muted">Pilih foto baru untuk mengganti gambar yang tampil di banner aplikasi.</small><?php if(!empty($campus['hero_image_url'])):?><label style="display:block;margin-top:8px"><input type="checkbox" name="remove_hero_image" value="1"> Hapus foto gedung dan gunakan gambar bawaan</label><?php endif;?></div><div><label>Tagline</label><input name="tagline" maxlength="220" value="<?=e($campus['tagline']??'')?>" placeholder="Tagline resmi kampus"></div><div><label>Alamat Kampus</label><input name="address" maxlength="500" value="<?=e($campus['address']??'')?>"></div><div><label>Telepon</label><input name="phone" maxlength="60" value="<?=e($campus['phone']??'')?>"></div><div><label>Email</label><input type="email" name="email" value="<?=e($campus['email']??'')?>"></div><div><label>Website</label><input name="website" maxlength="255" value="<?=e($campus['website']??'')?>"></div><div><label>Link PMB</label><input name="pmb_url" maxlength="255" value="<?=e($campus['pmb_url']??'')?>"></div><div style="flex-basis:100%"><label>Tentang Kampus</label><textarea name="about" rows="4" style="width:100%;padding:10px;border:1px solid #d0d5dd;border-radius:7px"><?=e($campus['about']??'')?></textarea></div><div style="flex-basis:100%"><label>Visi</label><textarea name="vision" rows="2" style="width:100%;padding:10px;border:1px solid #d0d5dd;border-radius:7px"><?=e($campus['vision']??'')?></textarea></div><div style="flex-basis:100%"><label>Misi</label><textarea name="mission" rows="3" style="width:100%;padding:10px;border:1px solid #d0d5dd;border-radius:7px"><?=e($campus['mission']??'')?></textarea></div><button>Simpan Informasi Kampus</button></form></div>
