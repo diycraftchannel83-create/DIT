@@ -814,6 +814,40 @@ if ($page==='migrations') allow(['super_admin']); elseif (in_array($page,['progr
   .account-delete-form{flex:0 0 auto;padding:0 16px 12px}
   .account-delete-form button{width:100%}
 }
+
+/* STIT DARUL ILMI — PREMIUM DARK DASHBOARD THEME */
+:root{--navy:#080e17!important;--teal:#0b6b54!important;--bg:#0b1119!important;--ink:#e8f1ed!important;--muted:#a0b0aa!important;--line:#293840!important;--mint:#14251f!important;--lime:#39dda9!important;color-scheme:dark}
+html,body{background:#0b1119!important;color:#e8f1ed!important}
+body{background:radial-gradient(ellipse at 50% -18%,#123b32 0%,#0b1119 52%)!important;color:#e8f1ed!important}
+.layout,.main{background:transparent!important}
+.side{background:linear-gradient(180deg,#101820 0%,#0b1119 62%,#080e15 100%)!important;color:#eaf4ef!important;border-right:1px solid #263840!important;box-shadow:12px 0 35px rgba(0,0,0,.28)!important}
+.brand{color:#f4faf7!important;border-bottom:1px solid #293840!important}.brand small{color:#a8c8ba!important}.brand img{border-radius:50%!important}
+.nav a{color:#dce8e2!important}.nav a.active,.nav a:hover{background:linear-gradient(100deg,#103f37,#12352f)!important;color:#fff!important;box-shadow:inset 3px 0 #39dda9!important}
+.nav-group{border-top-color:#293840!important}.nav-group-title{color:#9eacbd!important}
+.top{background:linear-gradient(105deg,#064d43,#075b4a 62%,#0b403a)!important;color:#f3fff9!important;border-bottom:1px solid #176b57!important;box-shadow:0 8px 28px rgba(0,0,0,.22)!important}
+.top strong{color:#f3fff9!important}.top .logout{background:#12372f!important;color:#75efc8!important;border:1px solid #26765f!important}
+.content{color:#e8f1ed!important}h1,h2,h3,h4,.panel h2{color:#f0faf5!important}.muted,.content .muted{color:#a0b0aa!important}
+.card,.panel{background:linear-gradient(145deg,#151f28,#101820)!important;border:1px solid #2a3b43!important;color:#e8f1ed!important;box-shadow:0 10px 28px rgba(0,0,0,.18)!important}
+.card strong{color:#45e0b1!important}.panel h2{color:#dff8ec!important}
+table{color:#e1ebe6!important}th{background:#18372f!important;color:#8de8c7!important;border-bottom:1px solid #315448!important}td,th{border-bottom-color:#293840!important}tr:hover td{background:#17252a!important}
+input,select,textarea{background:#111c24!important;color:#e8f1ed!important;border:1px solid #35464d!important}
+input::placeholder,textarea::placeholder{color:#80918b!important}
+input:focus,select:focus,textarea:focus{border-color:#38dba8!important;box-shadow:0 0 0 3px rgba(56,219,168,.13)!important;outline:none!important}
+.alert{background:#15382f!important;color:#aaf2d6!important;border:1px solid #286b56!important}.alert.error{background:#3a2029!important;color:#ff9aa9!important;border-color:#75404b!important}
+.mobile-bottom-nav{background:rgba(8,14,23,.98)!important;border-top:1px solid #293840!important;box-shadow:0 -8px 28px rgba(0,0,0,.38)!important;backdrop-filter:blur(18px)!important}
+.mobile-nav-item{color:#9aaba4!important;background:transparent!important}.mobile-nav-item.active{background:#103c36!important;color:#45e2b2!important}.mobile-nav-icon{color:inherit!important}
+.mobile-menu-backdrop{background:rgba(1,6,10,.72)!important;backdrop-filter:blur(3px)!important}
+@media(max-width:760px){
+ body{background:#0b1119!important}.top{background:linear-gradient(105deg,#064d43,#075b4a 62%,#0b403a)!important}
+ .content{background:transparent!important}.cards .card,.content .panel{background:linear-gradient(145deg,#151f28,#101820)!important}
+ .mobile-bottom-nav{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+ #mobileMenuSheet:not([hidden]){background:linear-gradient(160deg,#101820 0%,#0b1119 58%,#080e15 100%)!important;color:#eaf4ef!important;border:1px solid rgba(170,205,188,.13)!important;box-shadow:18px 0 48px rgba(0,0,0,.5)!important}
+ #mobileMenuSheet:not([hidden]) .mobile-menu-group h3{color:#9eacbd!important}
+ #mobileMenuSheet:not([hidden]) .mobile-menu-grid{grid-template-columns:minmax(0,1fr)!important}
+ #mobileMenuSheet:not([hidden]) .mobile-menu-grid a{color:#e1e9e6!important;background:transparent!important}
+ #mobileMenuSheet:not([hidden]) .mobile-menu-grid a.active{background:#103f37!important;color:#fff!important;border-color:#286c57!important}
+}
+
 </style></head><body><div class="layout"><aside class="side"><div class="brand"><img src="<?=e($campusLogoUrl)?>" alt="Logo STIT Darul Ilmi"><span class="brand-copy">STIT DARUL ILMI<small>Academic Portal</small></span></div><nav class="nav" aria-label="Navigasi desktop"><a class="nav-dashboard <?=$page==='dashboard'?'active':''?>" href="?page=dashboard">Dashboard</a><?php foreach($visibleMenuGroups as $groupLabel=>$groupKeys): ?><div class="nav-group"><div class="nav-group-title"><?=e($groupLabel)?></div><?php foreach($groupKeys as $key): ?><a class="<?=$page===$key?'active':''?>" href="?page=<?=e($key)?>"><?=e($menus[$key])?></a><?php endforeach; ?></div><?php endforeach; ?></nav></aside>
 <nav class="mobile-bottom-nav" aria-label="Navigasi utama Android">
 <?php foreach($mobileQuick as $item): ?><a class="mobile-nav-item <?=$page===$item['page']?'active':''?>" href="?page=<?=e($item['page'])?>"><span class="mobile-nav-icon" aria-hidden="true"><?=e($item['icon'])?></span><span><?=e($item['label'])?></span></a><?php endforeach; ?>
