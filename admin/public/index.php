@@ -1401,23 +1401,7 @@ $pendingCount=0;foreach($availableMigrations as $migrationName=>$migrationFile){
 </script>
 <?php endif;?>
 <div class="panel"><h2>Daftar <?=e($ds['title'])?> <span class="tag"><?=count($rows)?> data</span></h2><?php if(!$rows):?><p class="muted">Belum ada data untuk ditampilkan.</p><?php else:?><table><thead><tr><?php foreach(array_keys($rows[0]) as $col):if($page==='accounts'&&$col==='id')continue;?><th><?=e(str_replace('_',' ',$col))?></th><?php endforeach;?></tr></thead><tbody><?php foreach($rows as $row):?><tr><?php foreach($row as $column=>$value):if($page==='accounts'&&$column==='id')continue;?><td><?php if($page==='accounts'&&$column==='username'):$accountJson=['id'=>(int)$row['id'],'username'=>$row['username'],'full_name'=>$row['full_name'],'email'=>$row['email'],'role'=>$row['role'],'role_label'=>['super_admin'=>'Super Admin','admin_akademik'=>'Admin Akademik','admin_keuangan'=>'Admin Keuangan','ketua_prodi'=>'Ketua Program Studi','ketua_stit'=>'Ketua STIT','dosen'=>'Dosen','mahasiswa'=>'Mahasiswa'][$row['role']]??$row['role'],'status'=>$row['status'],'program_studi'=>$row['program_studi'],'created_at'=>$row['created_at']??null,'last_login_at'=>$row['last_login_at']];?><button type="button" class="account-link" onclick="return window.openAccountDetail(this)" data-account-json="<?=e(json_encode($accountJson,JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP))?>"><?=e($value)?></button><?php else:?><?=e($value===null?'—':$value)?><?php endif;?></td><?php endforeach;?></tr><?php endforeach;?></tbody></table><?php endif;?></div><?php endif;?></section></main></div><script>
-(function(){
- const toggle=document.getElementById('mobileMenuToggle');
- const sheet=document.getElementById('mobileMenuSheet');
- const backdrop=document.getElementById('mobileMenuBackdrop');
- const closeButton=document.getElementById('mobileMenuClose');
- if(!toggle||!sheet||!backdrop)return;
- // Move the drawer and backdrop to the body root to escape any transformed/stacked dashboard ancestors.
- document.body.appendChild(backdrop);
- document.body.appendChild(sheet);
- const close=()=>{sheet.hidden=true;backdrop.hidden=true;toggle.setAttribute('aria-expanded','false');document.body.style.overflow='';};
- const open=()=>{sheet.hidden=false;backdrop.hidden=false;toggle.setAttribute('aria-expanded','true');document.body.style.overflow='hidden';};
- toggle.addEventListener('click',()=>sheet.hidden?open():close());
- if(closeButton)closeButton.addEventListener('click',close);
- backdrop.addEventListener('click',close);
- document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!sheet.hidden)close();});
- sheet.querySelectorAll('a').forEach(link=>link.addEventListener('click',close));
-})();
+;
 </script><script>
 (function(){
  const form=document.getElementById('studentCreateForm');if(!form)return;
