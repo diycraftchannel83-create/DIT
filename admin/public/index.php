@@ -2086,4 +2086,28 @@ html[data-theme="green"] .student-tab-panel[hidden] {display:none!important}
   #mobileMenuSheet,#mobileMenuBackdrop,#mobileMenuToggle { display:none!important; }
 }
 
-</style></body></html>
+
+/* Ensure the student editor escapes dashboard containers/overflow on Android WebView. */
+body>.student-detail-backdrop{position:fixed!important;inset:0!important;z-index:2147483647!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow-y:auto!important;overscroll-behavior:contain!important;padding:12px!important;box-sizing:border-box!important}
+body>.student-detail-backdrop>.student-detail-modal{position:relative!important;display:block!important;visibility:visible!important;opacity:1!important;width:min(920px,100%)!important;max-height:calc(100dvh - 24px)!important;overflow-x:hidden!important;overflow-y:auto!important;margin:auto!important;transform:none!important;box-sizing:border-box!important;-webkit-overflow-scrolling:touch!important}
+@media(max-width:760px){body>.student-detail-backdrop{align-items:flex-end!important;padding:0!important}body>.student-detail-backdrop>.student-detail-modal{width:100%!important;max-height:92vh!important;max-height:92dvh!important;border-radius:22px 22px 0 0!important;padding:18px 16px calc(20px + env(safe-area-inset-bottom))!important}}
+</style>
+<script>
+(function(){
+  function mountStudentEditor(){
+    var backdrop=document.querySelector('.student-detail-backdrop');
+    if(!backdrop) return;
+    /* Move the overlay out of dashboard wrappers that may clip fixed elements in Android WebView. */
+    if(backdrop.parentElement!==document.body) document.body.appendChild(backdrop);
+    document.body.classList.add('student-detail-open');
+    backdrop.style.setProperty('display','flex','important');
+    backdrop.style.setProperty('position','fixed','important');
+    backdrop.style.setProperty('inset','0','important');
+    backdrop.style.setProperty('z-index','2147483647','important');
+    var modal=backdrop.querySelector('.student-detail-modal');
+    if(modal){modal.setAttribute('tabindex','-1');try{modal.focus({preventScroll:true});}catch(e){modal.focus();}}
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',mountStudentEditor,{once:true}); else mountStudentEditor();
+})();
+</script>
+</body></html>
