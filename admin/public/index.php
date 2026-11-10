@@ -2186,7 +2186,49 @@ html[data-theme="green"] .student-form-footer button.student-next{color:#14563b!
  .student-form-footer>div{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;width:100%!important}
  .student-form-footer .student-next,.student-form-footer a.student-next{width:100%!important;min-width:0!important;min-height:46px!important}
 }
-</style>
+
+/* DATA AKADEMIK header on student edit: override inherited dark/black panel styles. */
+html[data-theme="green"] .student-edit-page,
+html[data-theme="green"] .student-edit-page .student-form-heading,
+html[data-theme="green"] .student-edit-page .student-tabs,
+html[data-theme="green"] .student-edit-page .student-tab-panel,
+html[data-theme="green"] .student-edit-page .student-tab-panel.active{
+  background:#fff!important;background-color:#fff!important;background-image:none!important;
+  color:#174b35!important;box-shadow:none!important;
+}
+html[data-theme="green"] .student-edit-page .student-form-heading{
+  border:0!important;border-radius:12px!important;padding:0 0 16px!important;
+}
+html[data-theme="green"] .student-edit-page .student-form-heading h2,
+html[data-theme="green"] .student-edit-page .student-form-heading p,
+html[data-theme="green"] .student-edit-page .student-form-heading .eyebrow{
+  background:transparent!important;color:#145d45!important;
+}
+html[data-theme="green"] .student-edit-page .student-tabs{
+  border-bottom:1px solid #d5e9dc!important;
+}
+html[data-theme="green"] .student-edit-page .student-tabs .student-tab{
+  background:#edf7f0!important;background-image:none!important;color:#315b43!important;
+  border:1px solid #cfe5d6!important;box-shadow:none!important;
+}
+html[data-theme="green"] .student-edit-page .student-tabs .student-tab.active,
+html[data-theme="green"] .student-edit-page .student-tabs .student-tab[aria-selected="true"]{
+  background:#087a4b!important;background-image:none!important;color:#fff!important;
+  border-color:#087a4b!important;box-shadow:0 3px 10px rgba(8,122,75,.16)!important;
+}
+html[data-theme="green"] .student-edit-page .student-tab-panel h3,
+html[data-theme="green"] .student-edit-page .student-tab-panel label{
+  color:#145d45!important;background:transparent!important;
+}
+html[data-theme="green"] .student-edit-page .student-tab-panel input,
+html[data-theme="green"] .student-edit-page .student-tab-panel select,
+html[data-theme="green"] .student-edit-page .student-tab-panel textarea{
+  background:#fff!important;background-color:#fff!important;color:#174b35!important;
+}
+html[data-theme="green"] .student-edit-page .student-form-heading .tag{
+  background:#e5f3e9!important;color:#145d45!important;border:1px solid #cfe5d6!important;
+}
+
 <script>
 (function(){
   function mountStudentEditor(){
