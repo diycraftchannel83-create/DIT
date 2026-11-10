@@ -68,8 +68,10 @@ class MainActivity : ComponentActivity() {
             if (result.resultCode == RESULT_OK) deliverSelectedFiles(result.data)
             else deliverSelectedFiles(null)
         }
-        window.statusBarColor = android.graphics.Color.rgb(8, 14, 23)
-        window.navigationBarColor = android.graphics.Color.rgb(8, 14, 23)
+        window.statusBarColor = android.graphics.Color.rgb(0, 48, 35)
+        window.navigationBarColor = android.graphics.Color.rgb(0, 30, 23)
+        @Suppress("DEPRECATION")
+        window.decorView.systemUiVisibility = 0
 
         setContent {
             var loading by remember { mutableStateOf(true) }
