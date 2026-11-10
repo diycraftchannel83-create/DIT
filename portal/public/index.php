@@ -91,7 +91,10 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
         $pdo->beginTransaction();
         try {
             $pdo->prepare('UPDATE users SET full_name=:name,email=:email WHERE id=:id')->execute(['name'=>$fullName,'email'=>$email!==''?$email:null,'id'=>$user['id']]);
-            $pdo->prepare('UPDATE students SET phone=:phone,address=:address,national_id=:national_id,birth_place=:birth_place,birth_date=:birth_date,gender=:gender,religion=:religion,marital_status=:marital_status,province=:province,city=:city,district=:district,village=:village,postal_code=:postal_code,father_name=:father_name,mother_name=:mother_name,guardian_name=:guardian_name,guardian_phone=:guardian_phone,emergency_contact_name=:emergency_contact_name,emergency_contact_phone=:emergency_contact_phone,admission_pathway=:admission_pathway,registration_date=:registration_date,photo_url=:photo WHERE id=:id')->execute($data+['birth_date'=>$birthDate!==''?$birthDate:null,'gender'=>$gender!==''?$gender:null,'registration_date'=>$registrationDate!==''?$registrationDate:null,'photo'=>$photoPath,'id'=>$student['id']]);
+            $availableFields=['phone','address','national_id','birth_place','birth_date','gender','religion','marital_status','province','city','district','village','postal_code','father_name','mother_name','guardian_name','guardian_phone','emergency_contact_name','emergency_contact_phone','admission_pathway','registration_date','photo_url'];
+            $sets=[];$params=['id'=>$student['id']];
+            foreach($availableFields as $field){if(!isset($studentColumns[$field])) continue;$sets[]=$field.'=:'.$field;$params[$field]=$field==='birth_date'?($birthDate!==''?$birthDate:null):($field==='gender'?($gender!==''?$gender:null):($field==='registration_date'?($registrationDate!==''?$registrationDate:null):($field==='photo_url'?$photoPath:($data[$field]??null))));}
+            if($sets){$pdo->prepare('UPDATE students SET '.implode(',',$sets).' WHERE id=:id')->execute($params);}
             $pdo->commit();
         } catch(Throwable $e) { if($pdo->inTransaction())$pdo->rollBack(); throw $e; }
         $_SESSION['portal_user']['name']=$fullName;$_SESSION['portal_user']['email']=$email;
@@ -110,7 +113,13 @@ if ($user && !in_array($user['role'],['mahasiswa','dosen'],true)) { $_SESSION=[]
 $profile=null;$stats=[];$rows=[];$roleLabel=$user ? ($user['role']==='mahasiswa'?'Mahasiswa':'Dosen') : '';
 if ($user) {
     if ($user['role']==='mahasiswa') {
-        $profile=queryOne($pdo,'SELECT s.id,s.nim,s.entry_year,s.status AS student_status,s.phone,s.address,s.national_id,s.birth_place,s.birth_date,s.gender,s.religion,s.marital_status,s.province,s.city,s.district,s.village,s.postal_code,s.father_name,s.mother_name,s.guardian_name,s.guardian_phone,s.emergency_contact_name,s.emergency_contact_phone,s.admission_pathway,s.registration_date,s.photo_url,u.full_name,u.email,p.name AS program,p.degree_level WHERE s.user_id=:uid LIMIT 1',['uid'=>$user['id']]);
+        $studentColumns=[];
+        foreach($pdo->query('SHOW COLUMNS FROM students')->fetchAll(PDO::FETCH_COLUMN) as $columnName) $studentColumns[$columnName]=true;
+        $optionalStudentFields=['phone','address','national_id','birth_place','birth_date','gender','religion','marital_status','province','city','district','village','postal_code','father_name','mother_name','guardian_name','guardian_phone','emergency_contact_name','emergency_contact_phone','admission_pathway','registration_date','photo_url'];
+        $studentSelect=['s.id','s.nim','s.entry_year','s.status AS student_status'];
+        foreach($optionalStudentFields as $field) $studentSelect[] = isset($studentColumns[$field]) ? 's.'.$field : 'NULL AS '.$field;
+        $profileSql='SELECT '.implode(',',$studentSelect).',u.full_name,u.email,p.name AS program,p.degree_level FROM students s JOIN users u ON u.id=s.user_id LEFT JOIN study_programs p ON p.id=s.study_program_id WHERE s.user_id=:uid LIMIT 1';
+        $profile=queryOne($pdo,$profileSql,['uid'=>$user['id']]);
         if (!$profile) { http_response_code(403); exit('Profil mahasiswa belum terhubung. Hubungi Admin Akademik.'); }
         $sid=(int)$profile['id'];
         $stats=[
