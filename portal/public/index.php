@@ -59,6 +59,39 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
         $pdo->prepare('UPDATE users SET last_login_at=UTC_TIMESTAMP() WHERE id=:id')->execute(['id'=>$u['id']]);
         redirectTo('dashboard');
     }
+    if ($action==='update_student_profile' && ($user=portalUser()) && $user['role']==='mahasiswa') {
+        $student=queryOne($pdo,'SELECT id,photo_url FROM students WHERE user_id=:uid LIMIT 1',['uid'=>$user['id']]);
+        if (!$student) { http_response_code(403); exit('Profil mahasiswa tidak ditemukan.'); }
+        $fullName=trim((string)($_POST['full_name']??''));$email=trim((string)($_POST['email']??''));$phone=trim((string)($_POST['phone']??''));$address=trim((string)($_POST['address']??''));
+        if ($fullName==='' || mb_strlen($fullName)>160 || ($email!=='' && (!filter_var($email,FILTER_VALIDATE_EMAIL)||mb_strlen($email)>190)) || mb_strlen($phone)>30) {
+            $_SESSION['portal_flash']=['type'=>'error','message'=>'Periksa kembali nama, email, dan nomor telepon.'];redirectTo('profile');
+        }
+        if ($email!=='') {
+            $exists=queryOne($pdo,'SELECT id FROM users WHERE email=:email AND id<>:id LIMIT 1',['email'=>$email,'id'=>$user['id']]);
+            if ($exists) { $_SESSION['portal_flash']=['type'=>'error','message'=>'Email tersebut sudah digunakan akun lain.'];redirectTo('profile'); }
+        }
+        $photoPath=$student['photo_url']??null;
+        if (isset($_FILES['profile_photo']) && $_FILES['profile_photo']['error']!==UPLOAD_ERR_NO_FILE) {
+            $file=$_FILES['profile_photo'];
+            if ($file['error']!==UPLOAD_ERR_OK || $file['size']>3*1024*1024) { $_SESSION['portal_flash']=['type'=>'error','message'=>'Foto gagal diunggah atau ukurannya melebihi 3 MB.'];redirectTo('profile'); }
+            $image=@getimagesize($file['tmp_name']);$mime=$image['mime']??'';
+            $extensions=['image/jpeg'=>'jpg','image/png'=>'png','image/webp'=>'webp'];
+            if (!$image || !isset($extensions[$mime])) { $_SESSION['portal_flash']=['type'=>'error','message'=>'Format foto harus JPG, PNG, atau WEBP.'];redirectTo('profile'); }
+            $uploadDir=__DIR__.'/uploads/profiles';
+            if (!is_dir($uploadDir) && !mkdir($uploadDir,0755,true) && !is_dir($uploadDir)) { $_SESSION['portal_flash']=['type'=>'error','message'=>'Folder penyimpanan foto tidak dapat dibuat.'];redirectTo('profile'); }
+            $filename='student_'.$user['id'].'_'.bin2hex(random_bytes(8)).'.'.$extensions[$mime];
+            if (!move_uploaded_file($file['tmp_name'],$uploadDir.'/'.$filename)) { $_SESSION['portal_flash']=['type'=>'error','message'=>'Foto tidak berhasil disimpan.'];redirectTo('profile'); }
+            $photoPath='uploads/profiles/'.$filename;
+        }
+        $pdo->beginTransaction();
+        try {
+            $pdo->prepare('UPDATE users SET full_name=:name,email=:email WHERE id=:id')->execute(['name'=>$fullName,'email'=>$email!==''?$email:null,'id'=>$user['id']]);
+            $pdo->prepare('UPDATE students SET phone=:phone,address=:address,photo_url=:photo WHERE id=:id')->execute(['phone'=>$phone!==''?$phone:null,'address'=>$address!==''?$address:null,'photo'=>$photoPath,'id'=>$student['id']]);
+            $pdo->commit();
+        } catch(Throwable $e) { if($pdo->inTransaction())$pdo->rollBack(); throw $e; }
+        $_SESSION['portal_user']['name']=$fullName;$_SESSION['portal_user']['email']=$email;
+        $_SESSION['portal_flash']=['type'=>'success','message'=>'Data pribadi berhasil diperbarui.'];redirectTo('profile');
+    }
     if ($action==='logout') {
         $_SESSION=[];session_regenerate_id(true);$_SESSION['portal_flash']=['type'=>'success','message'=>'Anda telah keluar.'];redirectTo('login');
     }
@@ -66,12 +99,13 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
 $user=portalUser();
 if ($page!=='login' && !$user) redirectTo('login');
 if ($page==='login' && $user) redirectTo('dashboard');
+if ($page==='profile' && $user && $user['role']!=='mahasiswa') redirectTo('dashboard');
 if ($user && !in_array($user['role'],['mahasiswa','dosen'],true)) { $_SESSION=[]; redirectTo('login'); }
 
 $profile=null;$stats=[];$rows=[];$roleLabel=$user ? ($user['role']==='mahasiswa'?'Mahasiswa':'Dosen') : '';
 if ($user) {
     if ($user['role']==='mahasiswa') {
-        $profile=queryOne($pdo,'SELECT s.id,s.nim,s.entry_year,s.status AS student_status,p.name AS program,p.degree_level FROM students s LEFT JOIN study_programs p ON p.id=s.study_program_id WHERE s.user_id=:uid LIMIT 1',['uid'=>$user['id']]);
+        $profile=queryOne($pdo,'SELECT s.id,s.nim,s.entry_year,s.status AS student_status,s.phone,s.address,s.photo_url,u.full_name,u.email,p.name AS program,p.degree_level FROM students s JOIN users u ON u.id=s.user_id LEFT JOIN study_programs p ON p.id=s.study_program_id WHERE s.user_id=:uid LIMIT 1',['uid'=>$user['id']]);
         if (!$profile) { http_response_code(403); exit('Profil mahasiswa belum terhubung. Hubungi Admin Akademik.'); }
         $sid=(int)$profile['id'];
         $stats=[
@@ -123,14 +157,17 @@ if ($user) {
  .mobile-bottom-nav a span:first-child{font-size:20px;line-height:1.1}
  .mobile-bottom-nav a:active,.mobile-bottom-nav a:focus{background:var(--mint);color:var(--green)}
 }
-@media(min-width:761px){.mobile-bottom-nav{display:none}}
+.student-identity{display:flex;align-items:center;gap:16px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:15px 18px;margin:0 0 18px}.student-identity img{width:68px;height:68px;border-radius:50%;object-fit:cover;border:3px solid var(--mint);background:var(--mint)}.student-identity strong,.student-identity span{display:block}.student-identity span{font-size:13px;color:var(--muted);margin:4px 0}.student-identity a{font-size:13px;font-weight:750;text-decoration:none}.profile-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.profile-edit label{display:block;font-weight:700;font-size:13px;color:var(--dark);margin:12px 0}.profile-edit input,.profile-edit textarea{display:block;width:100%;margin-top:7px;padding:12px;border:1px solid #cfded3;border-radius:10px;font:inherit;color:var(--ink);background:#fff}.photo-upload input{border-style:dashed}.profile-actions{display:flex;align-items:center;gap:16px;margin-top:16px}.save-profile{border:0;border-radius:22px;padding:12px 20px;background:var(--green);color:#fff;font-weight:800;cursor:pointer}.profile-actions a{font-size:13px;font-weight:700;text-decoration:none}@media(max-width:760px){.student-identity{padding:12px;gap:12px}.student-identity img{width:58px;height:58px}.profile-form-grid{grid-template-columns:1fr}.profile-actions{align-items:stretch;flex-direction:column}.mobile-bottom-nav a{font-size:9px}}@media(min-width:761px){.mobile-bottom-nav{display:none}}
 </style></head><body>
 <?php if (!$user): ?>
 <div class="login-wrap"><main class="login"><div class="logo-wrap"><img class="campus-logo" src="<?=h($campusLogoUrl)?>" alt="Logo STIT Darul Ilmi Tasikmalaya"></div><p class="muted" style="font-size:11px;font-weight:800;letter-spacing:.14em;margin:20px 0 0">PORTAL AKADEMIK TERPADU</p><h1>Login Mahasiswa & Dosen</h1><p class="muted">Gunakan akun akademik yang telah diberikan oleh Admin STIT Darul Ilmi Tasikmalaya.</p><?php if($flash):?><div class="alert"><?=h($flash['message'])?></div><?php endif;?><form method="post"><input type="hidden" name="_csrf" value="<?=h(csrfToken())?>"><input type="hidden" name="action" value="login"><label>Username</label><input name="username" autocomplete="username" required maxlength="100" placeholder="Masukkan username"><label>Password</label><input type="password" name="password" autocomplete="current-password" required maxlength="200" placeholder="Masukkan password"><button type="submit">Masuk ke Portal →</button></form><div class="foot">Khusus akun mahasiswa dan dosen. Admin menggunakan halaman Admin Web.</div><p class="foot"><a href="../../website/">Kembali ke Website Kampus</a></p></main></div>
 <?php else: ?>
 <div class="shell"><header class="top"><div class="brand"><img src="<?=h($campusLogoUrl)?>" alt="Logo STIT Darul Ilmi"><span class="brand-copy">STIT DARUL ILMI<small>Portal Akademik · <?=h($roleLabel)?></small></span></div><div class="user"><div><strong><?=h($user['name'])?></strong><div class="muted" style="font-size:12px"><?=h($user['username'])?></div></div><form method="post"><input type="hidden" name="_csrf" value="<?=h(csrfToken())?>"><input type="hidden" name="action" value="logout"><button class="logout">Keluar</button></form></div></header>
 <section class="hero" id="dashboard"><h1>Selamat datang, <?=h($user['name'])?></h1><p><?= $user['role']==='mahasiswa' ? 'Pantau aktivitas akademik, KRS, hasil studi, presensi, dan informasi tagihan Anda.' : 'Pantau kelas yang Anda ampu, peserta kelas, dan ringkasan presensi akademik.' ?></p></section>
-<?php if($profile):?><section class="panel" id="profil"><h2>Profil Akademik</h2><div class="grid" style="margin:0"><?php if($user['role']==='mahasiswa'):?><div><span class="muted">NIM</span><br><strong><?=h($profile['nim'])?></strong></div><div><span class="muted">Program Studi</span><br><strong><?=h($profile['program']??'-')?></strong></div><div><span class="muted">Tahun Masuk</span><br><strong><?=h($profile['entry_year']??'-')?></strong></div><div><span class="muted">Status</span><br><span class="pill"><?=h($profile['student_status'])?></span></div><?php else:?><div><span class="muted">Nomor Induk Dosen</span><br><strong><?=h($profile['lecturer_number']??'-')?></strong></div><div><span class="muted">Telepon</span><br><strong><?=h($profile['phone']??'-')?></strong></div><?php endif;?></div></section><?php endif;?>
+<?php if($user['role']==='mahasiswa'): ?><section class="student-identity"><img src="<?=h($profile['photo_url']?:'assets/profile-placeholder.svg')?>" alt="Foto profil mahasiswa" onerror="this.src='assets/profile-placeholder.svg'"><div><strong><?=h($user['name'])?></strong><span><?=h($profile['nim'])?> · <?=h($profile['program']??'Mahasiswa')?></span><a href="?page=profile">Kelola data pribadi →</a></div></section><?php endif;?>
+<?php if($user['role']==='mahasiswa' && $page==='profile'): ?><section class="panel profile-edit" id="data-pribadi"><h2>Edit Data Pribadi</h2><p class="muted">Perbarui informasi kontak dan foto profil. Data akademik seperti NIM dan program studi dikelola oleh Admin Akademik.</p><form method="post" enctype="multipart/form-data"><input type="hidden" name="_csrf" value="<?=h(csrfToken())?>"><input type="hidden" name="action" value="update_student_profile"><div class="profile-form-grid"><label>Nama lengkap<input name="full_name" maxlength="160" required value="<?=h($profile['full_name'])?>"></label><label>Email<input type="email" name="email" maxlength="190" value="<?=h($profile['email']??'')?>"></label><label>Nomor telepon<input name="phone" maxlength="30" value="<?=h($profile['phone']??'')?>"></label><label>Alamat<textarea name="address" rows="3"><?=h($profile['address']??'')?></textarea></label></div><label class="photo-upload">Foto profil (JPG, PNG, WEBP · Maks. 3 MB)<input type="file" name="profile_photo" accept="image/jpeg,image/png,image/webp"></label><div class="profile-actions"><button class="save-profile" type="submit">Simpan Perubahan</button><a href="?page=dashboard">Kembali ke Dashboard</a></div></form></section><?php endif;?>
+<?php if($profile && $page!=='profile'):?><section class="panel" id="profil"><h2>Profil Akademik</h2><div class="grid" style="margin:0"><?php if($user['role']==='mahasiswa'):?><div><span class="muted">NIM</span><br><strong><?=h($profile['nim'])?></strong></div><div><span class="muted">Program Studi</span><br><strong><?=h($profile['program']??'-')?></strong></div><div><span class="muted">Tahun Masuk</span><br><strong><?=h($profile['entry_year']??'-')?></strong></div><div><span class="muted">Status</span><br><span class="pill"><?=h($profile['student_status'])?></span></div><?php else:?><div><span class="muted">Nomor Induk Dosen</span><br><strong><?=h($profile['lecturer_number']??'-')?></strong></div><div><span class="muted">Telepon</span><br><strong><?=h($profile['phone']??'-')?></strong></div><?php endif;?></div></section><?php endif;?>
+<?php if($page!=='profile'): ?>
 <div class="grid"><?php foreach($stats as $stat):?><article class="stat"><span class="muted"><?=h($stat['label'])?></span><strong><?=number_format((int)$stat['value'])?></strong></article><?php endforeach;?></div>
 <?php if($user['role']==='mahasiswa'):?>
 <section class="panel" id="krs"><h2>Rencana Studi (KRS)</h2><div class="table-wrap"><table><thead><tr><th>Tahun / Semester</th><th>Kode</th><th>Mata Kuliah</th><th>Kelas</th><th>SKS</th><th>Dosen</th><th>Status KRS</th></tr></thead><tbody><?php foreach($rows as $r):?><tr><td><?=h($r['academic_year'].' / '.$r['semester'])?></td><td><?=h($r['code'])?></td><td><?=h($r['course'])?></td><td><?=h($r['class_name'])?></td><td><?=h($r['credits'])?></td><td><?=h($r['lecturer']??'-')?></td><td><span class="pill"><?=h($r['status'])?></span></td></tr><?php endforeach;?><?php if(!$rows):?><tr><td colspan="7" class="muted">Belum ada data KRS.</td></tr><?php endif;?></tbody></table></div></section>
@@ -142,7 +179,7 @@ if ($user) {
 <section class="panel" id="mahasiswa"><h2>Daftar Mahasiswa pada Kelas Anda</h2><div class="table-wrap"><table><thead><tr><th>Kelas</th><th>Mata Kuliah</th><th>NIM</th><th>Nama Mahasiswa</th><th>Status KRS</th><th>Nilai</th></tr></thead><tbody><?php foreach($roster as $r):?><tr><td><?=h($r['class_name'])?></td><td><?=h($r['course'])?></td><td><?=h($r['nim'])?></td><td><?=h($r['student'])?></td><td><span class="pill"><?=h($r['status'])?></span></td><td><?=h($r['letter_grade']??'Belum ada')?></td></tr><?php endforeach;?><?php if(!$roster):?><tr><td colspan="6" class="muted">Belum ada mahasiswa pada kelas Anda.</td></tr><?php endif;?></tbody></table></div></section>
 <section class="panel" id="presensi"><h2>Ringkasan Presensi Kelas</h2><div class="table-wrap"><table><thead><tr><th>Mata Kuliah</th><th>Pertemuan</th><th>Status</th><th>Jumlah</th></tr></thead><tbody><?php foreach($attendance as $r):?><tr><td><?=h($r['course'])?></td><td><?=h($r['meeting_number'])?></td><td><?=h($r['attendance_status'])?></td><td><?=h($r['total'])?></td></tr><?php endforeach;?><?php if(!$attendance):?><tr><td colspan="4" class="muted">Belum ada data presensi.</td></tr><?php endif;?></tbody></table></div></section>
 <?php endif;?>
-<p class="muted" style="font-size:12px;text-align:center;padding:18px">STIT Darul Ilmi Tasikmalaya · Portal Akademik · Hubungi Admin Akademik jika data Anda tidak sesuai.</p></div>
+<?php endif; ?><p class="muted" style="font-size:12px;text-align:center;padding:18px">STIT Darul Ilmi Tasikmalaya · Portal Akademik · Hubungi Admin Akademik jika data Anda tidak sesuai.</p></div>
 <nav class="mobile-bottom-nav" aria-label="Navigasi portal akademik">
 <a href="#dashboard"><span aria-hidden="true">⌂</span><span>Beranda</span></a>
 <?php if($user['role']==='mahasiswa'): ?>
@@ -154,6 +191,6 @@ if ($user) {
 <a href="#mahasiswa"><span aria-hidden="true">♙</span><span>Mahasiswa</span></a>
 <a href="#presensi"><span aria-hidden="true">◷</span><span>Presensi</span></a>
 <?php endif; ?>
-<a href="#profil"><span aria-hidden="true">◎</span><span>Profil</span></a>
+<?php if($user['role']==='mahasiswa'): ?><a href="?page=profile"><span aria-hidden="true">◎</span><span>Akun</span></a><?php else: ?><a href="#profil"><span aria-hidden="true">◎</span><span>Profil</span></a><?php endif;?>
 </nav>
 <?php endif;?></body></html>
