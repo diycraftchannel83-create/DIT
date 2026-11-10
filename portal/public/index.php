@@ -37,6 +37,25 @@ function verifyCsrf(): void {
 function portalUser(): ?array { return $_SESSION['portal_user'] ?? null; }
 function queryOne(PDO $pdo, string $sql, array $params=[]): ?array { $q=$pdo->prepare($sql);$q->execute($params);$r=$q->fetch();return $r?:null; }
 function queryAll(PDO $pdo, string $sql, array $params=[]): array { $q=$pdo->prepare($sql);$q->execute($params);return $q->fetchAll(); }
+function sendPasswordChangeNotification(array $cfg, string $email, string $name, string $username): bool {
+    $url=trim((string)($cfg['password_notification_gas_url']??''));
+    $token=(string)($cfg['password_notification_gas_token']??'');
+    if($url==='' || $token==='' || !filter_var($email,FILTER_VALIDATE_EMAIL)) return false;
+    $payload=json_encode(['token'=>$token,'email'=>$email,'name'=>$name,'username'=>$username,'changed_at'=>date(DATE_ATOM),'app'=>'SIAKAD STIT Darul Ilmi'],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
+    if($payload===false) return false;
+    $context=stream_context_create(['http'=>['method'=>'POST','header'=>"Content-Type: application/json\\r\\n",'content'=>$payload,'timeout'=>12,'ignore_errors'=>true]]);
+    $response=@file_get_contents($url,false,$context);
+    if($response===false || !isset($http_response_header[0]) || !preg_match('/\\s2\\d\\d\\s/',$http_response_header[0])) {
+        error_log('[STIT PASSWORD NOTICE] Google Apps Script notification request failed.');
+        return false;
+    }
+    $result=json_decode($response,true);
+    if(!is_array($result) || empty($result['ok'])) {
+        error_log('[STIT PASSWORD NOTICE] Google Apps Script rejected notification: '.substr((string)$response,0,300));
+        return false;
+    }
+    return true;
+}
 
 $flash = $_SESSION['portal_flash'] ?? null; unset($_SESSION['portal_flash']);
 $campusLogoUrl='../../website/assets/stit-darul-ilmi-icon.svg';
@@ -67,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
             $currentPassword=(string)($_POST['current_password']??'');
             $newPassword=(string)($_POST['new_password']??'');
             $confirmPassword=(string)($_POST['confirm_password']??'');
-            $account=queryOne($pdo,'SELECT password_hash FROM users WHERE id=:id LIMIT 1',['id'=>$user['id']]);
+            $account=queryOne($pdo,'SELECT password_hash,email,full_name,username FROM users WHERE id=:id LIMIT 1',['id'=>$user['id']]);
             if (!$account || !password_verify($currentPassword,(string)$account['password_hash'])) {
                 $_SESSION['portal_flash']=['type'=>'error','message'=>'Password saat ini tidak sesuai.'];redirectTo('profile');
             }
@@ -78,9 +97,10 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
                 $_SESSION['portal_flash']=['type'=>'error','message'=>'Konfirmasi password baru tidak sama.'];redirectTo('profile');
             }
             $pdo->prepare('UPDATE users SET password_hash=:hash WHERE id=:id')->execute(['hash'=>password_hash($newPassword,PASSWORD_DEFAULT),'id'=>$user['id']]);
+            $noticeSent=sendPasswordChangeNotification($cfg,(string)($account['email']??''),(string)($account['full_name']??$user['name']),(string)($account['username']??$user['username']));
             session_regenerate_id(true);
             $_SESSION['portal_csrf']=bin2hex(random_bytes(32));
-            $_SESSION['portal_flash']=['type'=>'success','message'=>'Password berhasil diganti. Gunakan password baru saat login berikutnya.'];redirectTo('profile');
+            $_SESSION['portal_flash']=['type'=>'success','message'=>$noticeSent?'Password berhasil diganti. Email notifikasi telah dikirim ke alamat akun Anda.':'Password berhasil diganti. Email notifikasi belum terkirim; periksa konfigurasi Google Apps Script dan alamat email akun.'];redirectTo('profile');
         }
         $fullName=trim((string)($_POST['full_name']??''));$email=trim((string)($_POST['email']??''));
         $fields=['phone'=>30,'address'=>5000,'national_id'=>32,'birth_place'=>100,'religion'=>40,'marital_status'=>30,'province'=>100,'city'=>100,'district'=>100,'village'=>100,'postal_code'=>10,'father_name'=>160,'mother_name'=>160,'guardian_name'=>160,'guardian_phone'=>30,'emergency_contact_name'=>160,'emergency_contact_phone'=>30,'admission_pathway'=>60];
