@@ -969,7 +969,104 @@ html[data-theme="green"] .badge,html[data-theme="green"] .status{background:#e5f
 html[data-theme="green"] .pagination a,html[data-theme="green"] .pagination button{background:#fff!important;color:#087a4b!important;border-color:#cfe5d6!important}
 html[data-theme="green"] .pagination .active{background:#087a4b!important;color:#fff!important}
 
-</style><link rel="stylesheet" href="../../website/assets/css/campus-theme.css?v=1"></head><body><div class="layout"><aside class="side"><div class="brand"><img src="<?=e($campusLogoUrl)?>" alt="Logo STIT Darul Ilmi"><span class="brand-copy">STIT DARUL ILMI<small>Academic Portal</small></span></div><nav class="nav" aria-label="Navigasi desktop"><a class="nav-dashboard <?=$page==='dashboard'?'active':''?>" href="?page=dashboard">Dashboard</a><?php foreach($visibleMenuGroups as $groupLabel=>$groupKeys): ?><div class="nav-group"><div class="nav-group-title"><?=e($groupLabel)?></div><?php foreach($groupKeys as $key): ?><a class="<?=$page===$key?'active':''?>" href="?page=<?=e($key)?>"><?=e($menus[$key])?></a><?php endforeach; ?></div><?php endforeach; ?></nav></aside>
+</style><link rel="stylesheet" href="../../website/assets/css/campus-theme.css?v=1">
+<style id="admin-green-theme-final">
+/* Admin theme guard: shared public-site stylesheet must not introduce dark surfaces in green admin. */
+html[data-theme="green"] body,
+html[data-theme="green"] .layout,
+html[data-theme="green"] .main,
+html[data-theme="green"] .content,
+html[data-theme="green"] .content main{
+  background:#f3faf5!important;color:#174b35!important;
+}
+html[data-theme="green"] .panel,
+html[data-theme="green"] .card,
+html[data-theme="green"] .stat,
+html[data-theme="green"] .item,
+html[data-theme="green"] .student-create-panel,
+html[data-theme="green"] .student-edit-page,
+html[data-theme="green"] .student-detail-modal,
+html[data-theme="green"] .account-modal-card,
+html[data-theme="green"] .modal,
+html[data-theme="green"] .modal-content,
+html[data-theme="green"] .dialog{
+  background:#fff!important;background-image:none!important;color:#174b35!important;
+  border-color:#d5e9dc!important;box-shadow:0 8px 24px rgba(7,91,61,.07)!important;
+}
+html[data-theme="green"] .panel h1,
+html[data-theme="green"] .panel h2,
+html[data-theme="green"] .panel h3,
+html[data-theme="green"] .panel h4,
+html[data-theme="green"] .card h1,
+html[data-theme="green"] .card h2,
+html[data-theme="green"] .card h3,
+html[data-theme="green"] .student-form-heading h2,
+html[data-theme="green"] .student-tab-panel h3,
+html[data-theme="green"] label,
+html[data-theme="green"] .panel strong,
+html[data-theme="green"] .card strong{
+  color:#075b3d!important;
+}
+html[data-theme="green"] p,
+html[data-theme="green"] .muted,
+html[data-theme="green"] small,
+html[data-theme="green"] .student-form-heading p{
+  color:#547564!important;
+}
+html[data-theme="green"] input,
+html[data-theme="green"] select,
+html[data-theme="green"] textarea,
+html[data-theme="green"] option{
+  background:#fff!important;background-color:#fff!important;color:#174b35!important;
+  border:1px solid #bddbc8!important;box-shadow:none!important;
+}
+html[data-theme="green"] input::placeholder,
+html[data-theme="green"] textarea::placeholder{color:#819b8c!important}
+html[data-theme="green"] button,
+html[data-theme="green"] .btn{
+  background:#087a4b!important;background-image:none!important;color:#fff!important;
+  border:1px solid #087a4b!important;box-shadow:0 2px 7px rgba(7,91,61,.10)!important;
+}
+html[data-theme="green"] button:hover,
+html[data-theme="green"] .btn:hover{background:#05613e!important;color:#fff!important}
+html[data-theme="green"] button.logout,
+html[data-theme="green"] .logout,
+html[data-theme="green"] button.student-next,
+html[data-theme="green"] .student-next,
+html[data-theme="green"] a.student-next,
+html[data-theme="green"] .account-btn-light,
+html[data-theme="green"] .btn-secondary{
+  background:#e5f3e9!important;background-image:none!important;color:#145d45!important;
+  border:1px solid #b8d8c4!important;box-shadow:none!important;
+}
+html[data-theme="green"] .student-tabs .student-tab{background:#edf7f0!important;color:#315b43!important;border-color:#cfe5d6!important}
+html[data-theme="green"] .student-tabs .student-tab.active,
+html[data-theme="green"] .student-tabs .student-tab[aria-selected="true"]{background:#087a4b!important;color:#fff!important;border-color:#087a4b!important}
+html[data-theme="green"] table{background:#fff!important;color:#174b35!important}
+html[data-theme="green"] th{background:#e2f3e7!important;color:#075b3d!important}
+html[data-theme="green"] td{background:#fff!important;color:#174b35!important}
+html[data-theme="green"] tr:nth-child(even) td{background:#f7fcf8!important}
+html[data-theme="green"] .student-detail-backdrop,
+html[data-theme="green"] .account-modal{background:rgba(10,45,30,.58)!important}
+html[data-theme="green"] .student-detail-modal *,
+html[data-theme="green"] .account-modal-card *{color:inherit}
+html[data-theme="green"] .student-detail-modal input,
+html[data-theme="green"] .student-detail-modal select,
+html[data-theme="green"] .student-detail-modal textarea,
+html[data-theme="green"] .account-modal-card input,
+html[data-theme="green"] .account-modal-card select{background:#fff!important;color:#174b35!important}
+html[data-theme="green"] .mobile-bottom-nav{background:#fff!important;border-color:#cfe5d6!important}
+html[data-theme="green"] .mobile-nav-item{color:#547564!important}
+html[data-theme="green"] .mobile-nav-item.active{background:#e4f5e9!important;color:#087a4b!important}
+html[data-theme="green"] .alert{background:#e7f6eb!important;color:#075b3d!important}
+html[data-theme="green"] .tag,
+html[data-theme="green"] .badge,
+html[data-theme="green"] .status{background:#e5f4e9!important;color:#087a4b!important}
+html[data-theme="green"] a:not(.nav a):not(.mobile-nav-item){color:#075b3d}
+html[data-theme="green"] .student-edit-action{background:#e5f4eb!important;color:#176b50!important}
+html[data-theme="green"] .student-form-footer button#studentNext,
+html[data-theme="green"] .student-form-footer button#studentSubmit{background:#087a4b!important;color:#fff!important}
+</style></head><body><div class="layout"><aside class="side"><div class="brand"><img src="<?=e($campusLogoUrl)?>" alt="Logo STIT Darul Ilmi"><span class="brand-copy">STIT DARUL ILMI<small>Academic Portal</small></span></div><nav class="nav" aria-label="Navigasi desktop"><a class="nav-dashboard <?=$page==='dashboard'?'active':''?>" href="?page=dashboard">Dashboard</a><?php foreach($visibleMenuGroups as $groupLabel=>$groupKeys): ?><div class="nav-group"><div class="nav-group-title"><?=e($groupLabel)?></div><?php foreach($groupKeys as $key): ?><a class="<?=$page===$key?'active':''?>" href="?page=<?=e($key)?>"><?=e($menus[$key])?></a><?php endforeach; ?></div><?php endforeach; ?></nav></aside>
 <nav class="mobile-bottom-nav" aria-label="Navigasi utama Android">
 <?php foreach($mobileQuick as $item): ?><a class="mobile-nav-item <?=$page===$item['page']?'active':''?>" href="?page=<?=e($item['page'])?>"><span class="mobile-nav-icon" aria-hidden="true"><?=e($item['icon'])?></span><span><?=e($item['label'])?></span></a><?php endforeach; ?>
 
