@@ -38,7 +38,7 @@ function portalUser(): ?array { return $_SESSION['portal_user'] ?? null; }
 function queryOne(PDO $pdo, string $sql, array $params=[]): ?array { $q=$pdo->prepare($sql);$q->execute($params);$r=$q->fetch();return $r?:null; }
 function queryAll(PDO $pdo, string $sql, array $params=[]): array { $q=$pdo->prepare($sql);$q->execute($params);return $q->fetchAll(); }
 function sendPasswordChangeNotification(array $cfg, string $email, string $name, string $username): bool {
-    $url=trim((string)($cfg['password_notification_gas_url']??''));
+    $url=trim((string)($cfg['password_notification_gas_url']??'https://script.google.com/macros/s/AKfycbxY_cMbZD4FKoJRgTjCAhH_RS2cv3ZOj2jhMLmGx1He9VDWOi-vIMATG3OQ8wP1StCI/exec'));
     $token=(string)($cfg['password_notification_gas_token']??'');
     if($url==='' || $token==='' || !filter_var($email,FILTER_VALIDATE_EMAIL)) return false;
     $payload=json_encode(['token'=>$token,'email'=>$email,'name'=>$name,'username'=>$username,'changed_at'=>date(DATE_ATOM),'app'=>'SIAKAD STIT Darul Ilmi'],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
