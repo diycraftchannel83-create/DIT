@@ -728,6 +728,81 @@ if ($page==='login') {
 }
 html[data-theme="green"] .card,html[data-theme="green"] .panel,html[data-theme="green"] .stat,html[data-theme="green"] .item,html[data-theme="green"] .modal,html[data-theme="green"] .modal-content{background:#fff!important;color:#174b35!important}
 html[data-theme="green"] .content,html[data-theme="green"] .main{background:#f3faf5!important;color:#174b35!important}
+
+/* NAVIGATION HOTFIX — authoritative mobile drawer layout (overrides legacy rules) */
+@media (max-width:760px) {
+  #mobileMenuSheet:not([hidden]) {
+    position:fixed!important;
+    inset:0 auto 0 0!important;
+    width:min(86vw,380px)!important;
+    max-width:calc(100vw - 44px)!important;
+    height:100vh!important;
+    height:100dvh!important;
+    min-height:100dvh!important;
+    max-height:100dvh!important;
+    box-sizing:border-box!important;
+    margin:0!important;
+    padding:calc(14px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom))!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:stretch!important;
+    gap:0!important;
+    overflow-x:hidden!important;
+    overflow-y:auto!important;
+    overscroll-behavior:contain!important;
+    border:0!important;
+    border-right:1px solid #cfe5d6!important;
+    border-radius:0 22px 22px 0!important;
+    background:#fff!important;
+    color:#174b35!important;
+    box-shadow:18px 0 48px rgba(7,55,35,.22)!important;
+    z-index:1002!important;
+  }
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-brand {
+    flex:0 0 auto!important;
+    min-height:76px!important;
+    margin:0!important;
+    padding:8px 0 16px!important;
+    background:transparent!important;
+    border-bottom:1px solid #d5e9dc!important;
+  }
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-profile,
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-home,
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-groups {
+    flex:0 0 auto!important;
+  }
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-groups {
+    display:flex!important;
+    flex-direction:column!important;
+    gap:14px!important;
+    min-height:0!important;
+    overflow:visible!important;
+  }
+  #mobileMenuSheet:not([hidden]) .mobile-menu-grid {
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:8px!important;
+  }
+  #mobileMenuSheet:not([hidden]) .mobile-menu-grid a {
+    display:flex!important;
+    align-items:center!important;
+    min-height:48px!important;
+    width:100%!important;
+    box-sizing:border-box!important;
+  }
+  #mobileMenuBackdrop:not([hidden]),.mobile-menu-backdrop:not([hidden]) {
+    position:fixed!important;
+    inset:0!important;
+    z-index:1001!important;
+  }
+  .mobile-bottom-nav {
+    bottom:0!important;
+    padding-bottom:calc(7px + env(safe-area-inset-bottom))!important;
+    z-index:1000!important;
+  }
+  body { padding-bottom:calc(76px + env(safe-area-inset-bottom))!important; }
+}
+
 </style></head><body><main class="login"><div class="mark-wrap"><img class="campus-logo" src="<?=e($campusLogoUrl)?>" alt="Logo STIT Darul Ilmi Tasikmalaya"></div><p style="color:#078653;font-weight:800;letter-spacing:.12em;font-size:11px;margin:20px 0 0">PORTAL AKADEMIK TERPADU</p><h1>Selamat Datang<br>Admin STIT Darul Ilmi</h1><p class="muted">Masuk untuk mengelola layanan akademik dan informasi kampus STIT Darul Ilmi Tasikmalaya.</p><?php if($flash):?><div class="alert"><?=e($flash['message'])?></div><?php endif;?><form method="post"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="login"><label>Username</label><input name="username" autocomplete="username" placeholder="Masukkan username" required><label>Password</label><input type="password" name="password" autocomplete="current-password" placeholder="Masukkan password" required><button type="submit">Masuk ke Dashboard　›</button></form><div class="login-foot muted">Gunakan akun admin yang dibuat melalui prosedur setup backend. Tidak ada akun bawaan.<br><a href="../../portal/public/?page=login" style="display:inline-block;margin-top:12px;color:#087a4b;font-weight:800">Login Mahasiswa / Dosen →</a></div></main></body></html><?php exit;
 }
 $datasets=[
