@@ -622,7 +622,8 @@ $mobileQuick = [
 // menampilkan tautan yang pasti ditolak oleh server.
 $mobileAllowed = static function(string $key) use ($u,$academicRoles,$viewRoles): bool {
     $role=(string)$u['role'];
-    if($key==='system') return in_array($role,['super_admin','admin_akademik','admin_keuangan','ketua_prodi','ketua_stit','dosen'],true);\n    if($key==='migrations') return $role==='super_admin';
+    if($key==='system') return in_array($role,['super_admin','admin_akademik','admin_keuangan','ketua_prodi','ketua_stit','dosen'],true);
+    if($key==='migrations') return $role==='super_admin';
     if(in_array($key,['programs','years','semesters','courses','classes','schedules','students','lecturers','accounts','krs','news','pmb'],true)) return in_array($role,$academicRoles,true);
     if(in_array($key,['grades','attendance'],true)) return in_array($role,['super_admin','admin_akademik','dosen'],true);
     if(in_array($key,['khs','ipk'],true)) return in_array($role,$viewRoles,true);
