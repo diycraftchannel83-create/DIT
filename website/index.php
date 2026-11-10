@@ -77,7 +77,25 @@ footer{background:#245c3a;color:#e9f4e9;padding:54px 0 20px}.foot-grid{display:g
 </style>
 <link rel="icon" href="<?=h($logo)?>">
 <link rel="alternate icon" href="<?=h($logo)?>">
-<link rel="stylesheet" href="assets/css/campus-theme.css?v=1">
+<style>
+/* Desktop navigation and overflow hardening */
+html,body{max-width:100%;overflow-x:clip}
+img,svg,video,iframe{max-width:100%}
+.container,.nav,.hero-grid,.hero-grid>*{min-width:0}
+@media (min-width:781px) and (max-width:1400px){
+  .nav{flex-wrap:wrap;gap:10px 18px;padding-top:12px;padding-bottom:12px}
+  .brand{min-width:270px;flex:1 1 270px}
+  .nav-cta{flex:0 1 auto;max-width:230px;text-align:center;padding:10px 13px}
+  .links{order:3;flex:1 0 100%;justify-content:space-between;flex-wrap:wrap;gap:8px 14px;padding:2px 0 5px}
+  .links a{font-size:12px}
+}
+@media (max-width:780px){
+  .nav{flex-wrap:nowrap}
+  .links{max-width:100%;max-height:calc(100vh - 90px);overflow-y:auto;overflow-x:hidden}
+  .nav-cta{max-width:46%;white-space:normal;text-align:center}
+}
+</style>
+<link rel="stylesheet" href="assets/css/campus-theme.css?v=2">
 <meta name="theme-color" content="#075b3d">
 </head>
 <body>
