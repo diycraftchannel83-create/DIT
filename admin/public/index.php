@@ -2160,6 +2160,32 @@ body>.student-detail-backdrop>.student-detail-modal{position:relative!important;
 .student-edit-page .student-edit-form .student-fields input,.student-edit-page .student-edit-form .student-fields select,.student-edit-page .student-edit-form .student-fields textarea{width:100%;box-sizing:border-box}
 .student-edit-page .student-form-footer{position:sticky;bottom:0;z-index:5;background:#fff;padding:14px 0 calc(10px + env(safe-area-inset-bottom));border-top:1px solid #e0ece5}
 .student-edit-page .student-form-footer>div{display:flex;gap:8px;flex-wrap:wrap}
+
+/* Fix wizard controls: keep every action visibly styled and readable in green theme. */
+.student-form-footer>div{display:flex;align-items:center;justify-content:flex-end;gap:9px;flex-wrap:wrap}
+.student-form-footer .student-next,
+.student-form-footer a.student-next{
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  min-height:44px!important;min-width:116px!important;padding:11px 16px!important;
+  border:1px solid #b8d8c4!important;border-radius:12px!important;
+  background:#e5f3e9!important;color:#14563b!important;
+  font:700 13px/1.25 system-ui,sans-serif!important;text-decoration:none!important;
+  white-space:nowrap!important;opacity:1!important;visibility:visible!important;
+  box-shadow:0 2px 7px rgba(7,91,61,.08)!important;cursor:pointer!important;
+}
+html[data-theme="green"] .student-form-footer button.student-next{color:#14563b!important;background:#e5f3e9!important}
+.student-form-footer .student-next:hover,
+.student-form-footer a.student-next:hover{background:#d5ecdd!important;border-color:#80bb96!important}
+.student-form-footer .student-next:focus-visible,
+.student-form-footer a.student-next:focus-visible{outline:3px solid rgba(8,122,75,.28)!important;outline-offset:2px!important}
+.student-form-footer .student-next:disabled,
+.student-form-footer .student-next[disabled]{background:#eef2ef!important;color:#68796f!important;border-color:#d8e1da!important;opacity:1!important;cursor:not-allowed!important;box-shadow:none!important}
+.student-form-footer button[hidden],
+.student-form-footer a[hidden]{display:none!important}
+@media(max-width:650px){
+ .student-form-footer>div{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;width:100%!important}
+ .student-form-footer .student-next,.student-form-footer a.student-next{width:100%!important;min-width:0!important;min-height:46px!important}
+}
 </style>
 <script>
 (function(){
