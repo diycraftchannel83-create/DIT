@@ -1629,4 +1629,128 @@ html[data-theme="green"] .student-tab-panel[hidden] {display:none!important}
 }
 
 
+
+/* COMPACT ALL-MENU VIEW — show every permitted menu without drawer scrolling */
+@media (max-width:760px) {
+  #mobileMenuSheet:not([hidden]) {
+    width:min(94vw,480px)!important;
+    max-width:100vw!important;
+    height:100dvh!important;
+    max-height:100dvh!important;
+    overflow:hidden!important;
+    padding:calc(8px + env(safe-area-inset-top)) 12px calc(8px + env(safe-area-inset-bottom))!important;
+    gap:0!important;
+  }
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-brand {
+    min-height:54px!important;
+    padding:2px 0 7px!important;
+    margin:0!important;
+    gap:9px!important;
+  }
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-brand img {
+    width:38px!important;height:38px!important;
+  }
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-brand strong {font-size:12px!important}
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-brand span {font-size:9px!important}
+  #mobileMenuSheet:not([hidden]) .mobile-menu-close {
+    width:34px!important;height:34px!important;flex:0 0 34px!important;
+  }
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-profile {
+    padding:7px 2px 7px!important;
+    margin:0 0 6px!important;
+    gap:8px!important;
+  }
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-avatar {
+    width:30px!important;height:30px!important;flex:0 0 30px!important;
+  }
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-avatar svg {width:17px!important;height:17px!important}
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-profile strong {font-size:11px!important}
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-profile span {font-size:9px!important}
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-home {
+    min-height:34px!important;padding:5px 9px!important;margin:0 0 7px!important;
+    border-radius:9px!important;font-size:11px!important;
+  }
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-groups {
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    align-content:start!important;
+    align-items:start!important;
+    gap:7px!important;
+    min-height:0!important;
+    overflow:hidden!important;
+    flex:1 1 auto!important;
+  }
+  #mobileMenuSheet:not([hidden]) .mobile-menu-group {
+    min-width:0!important;
+    padding:6px!important;
+    border:1px solid #dcece1!important;
+    border-radius:10px!important;
+    background:#fbfefc!important;
+  }
+  #mobileMenuSheet:not([hidden]) .mobile-menu-group:first-child {
+    grid-column:1 / -1!important;
+  }
+  #mobileMenuSheet:not([hidden]) .mobile-menu-group h3 {
+    margin:0 0 5px!important;
+    font-size:9px!important;
+    line-height:1.2!important;
+    letter-spacing:.06em!important;
+  }
+  #mobileMenuSheet:not([hidden]) .mobile-menu-grid {
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:4px!important;
+  }
+  #mobileMenuSheet:not([hidden]) .mobile-menu-group:first-child .mobile-menu-grid {
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  }
+  #mobileMenuSheet:not([hidden]) .mobile-menu-grid a {
+    min-width:0!important;
+    min-height:31px!important;
+    height:31px!important;
+    padding:3px 5px!important;
+    gap:4px!important;
+    border-radius:7px!important;
+    font-size:9px!important;
+    line-height:1.1!important;
+    white-space:normal!important;
+    overflow:hidden!important;
+  }
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-icon svg {
+    width:14px!important;height:14px!important;flex:0 0 14px!important;
+  }
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-label {
+    min-width:0!important;
+    font-size:9px!important;
+    line-height:1.1!important;
+    overflow-wrap:anywhere!important;
+  }
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-chevron {display:none!important}
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-logout {
+    flex:0 0 auto!important;
+    margin-top:6px!important;
+    padding-top:6px!important;
+  }
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-logout button {
+    min-height:32px!important;
+    margin:0!important;
+    padding:6px 10px!important;
+    font-size:10px!important;
+  }
+}
+@media (max-width:380px) {
+  #mobileMenuSheet:not([hidden]) {padding-left:8px!important;padding-right:8px!important}
+  #mobileMenuSheet:not([hidden]) .mobile-menu-group {padding:4px!important}
+  #mobileMenuSheet:not([hidden]) .mobile-menu-grid a {font-size:8px!important;padding:2px 3px!important}
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-label {font-size:8px!important}
+}
+@media (max-width:760px) and (max-height:700px) {
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-profile {display:none!important}
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-home {margin-bottom:4px!important}
+  #mobileMenuSheet:not([hidden]) .mobile-menu-groups {gap:4px!important}
+  #mobileMenuSheet:not([hidden]) .mobile-menu-group {padding:4px!important}
+  #mobileMenuSheet:not([hidden]) .mobile-menu-grid {gap:3px!important}
+  #mobileMenuSheet:not([hidden]) .mobile-menu-grid a {min-height:27px!important;height:27px!important}
+}
+
 </style></body></html>
