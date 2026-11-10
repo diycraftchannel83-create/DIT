@@ -957,9 +957,9 @@ html[data-theme="green"] .pagination .active{background:#087a4b!important;color:
 </style><link rel="stylesheet" href="../../website/assets/css/campus-theme.css?v=1"></head><body><div class="layout"><aside class="side"><div class="brand"><img src="<?=e($campusLogoUrl)?>" alt="Logo STIT Darul Ilmi"><span class="brand-copy">STIT DARUL ILMI<small>Academic Portal</small></span></div><nav class="nav" aria-label="Navigasi desktop"><a class="nav-dashboard <?=$page==='dashboard'?'active':''?>" href="?page=dashboard">Dashboard</a><?php foreach($visibleMenuGroups as $groupLabel=>$groupKeys): ?><div class="nav-group"><div class="nav-group-title"><?=e($groupLabel)?></div><?php foreach($groupKeys as $key): ?><a class="<?=$page===$key?'active':''?>" href="?page=<?=e($key)?>"><?=e($menus[$key])?></a><?php endforeach; ?></div><?php endforeach; ?></nav></aside>
 <nav class="mobile-bottom-nav" aria-label="Navigasi utama Android">
 <?php foreach($mobileQuick as $item): ?><a class="mobile-nav-item <?=$page===$item['page']?'active':''?>" href="?page=<?=e($item['page'])?>"><span class="mobile-nav-icon" aria-hidden="true"><?=e($item['icon'])?></span><span><?=e($item['label'])?></span></a><?php endforeach; ?>
-<button type="button" class="mobile-nav-item mobile-more-trigger" id="mobileMenuToggle" aria-expanded="false"><span class="mobile-nav-icon" aria-hidden="true">☰</span><span>Menu</span></button>
+
 </nav>
-<div class="mobile-menu-backdrop" id="mobileMenuBackdrop" hidden></div>
+
 <?php
 $mobileIconPaths = [
  'dashboard'=>'M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z',
@@ -987,33 +987,7 @@ $mobileIcon = static function(string $key) use ($mobileIconPaths): string {
  return '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="'.$path.'"/></svg>';
 };
 ?>
-<section class="mobile-menu-sheet" id="mobileMenuSheet" aria-label="Navigasi SIAKAD" hidden>
- <div class="mobile-drawer-brand">
-  <img src="<?=e($campusLogoUrl)?>" alt="Logo STIT Darul Ilmi">
-  <div><strong>STIT DARUL ILMI</strong><span>SIAKAD TERPADU</span></div>
-  <button type="button" class="mobile-menu-close" id="mobileMenuClose" aria-label="Tutup navigasi">×</button>
- </div>
- <div class="mobile-drawer-profile">
-  <div class="mobile-drawer-avatar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/></svg></div>
-  <div><strong><?=e($u['name']??$u['username']??'Pengguna')?></strong><span><?=e($labels[$u['role']]??$u['role'])?> · @<?=e($u['username']??'')?></span></div>
- </div>
- <a class="mobile-drawer-home <?=$page==='dashboard'?'active':''?>" href="?page=dashboard"><span class="mobile-drawer-icon"><?=$mobileIcon('dashboard')?></span><span>Beranda</span><span class="mobile-drawer-chevron">›</span></a>
- <div class="mobile-drawer-groups">
- <?php foreach($visibleMenuGroups as $groupLabel=>$groupKeys): ?>
-  <div class="mobile-menu-group">
-   <h3><?=e($groupLabel)?></h3>
-   <div class="mobile-menu-grid">
-    <?php foreach($groupKeys as $key): ?>
-     <a href="?page=<?=e($key)?>" class="<?=$page===$key?'active':''?>">
-      <span class="mobile-drawer-icon"><?=$mobileIcon($key)?></span><span class="mobile-drawer-label"><?=e($menus[$key])?></span><span class="mobile-drawer-chevron">›</span>
-     </a>
-    <?php endforeach; ?>
-   </div>
-  </div>
- <?php endforeach; ?>
- </div>
- <form class="mobile-drawer-logout" method="post"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="logout"><button type="submit"><span class="mobile-drawer-icon"><?=$mobileIcon('migrations')?></span>Keluar dari Sistem</button></form>
-</section>
+
 <main class="main"><header class="top"><strong><?=e($labels[$u['role']]??$u['role'])?></strong><form method="post"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="logout"><button class="logout">Keluar</button></form></header><section class="content"><?php if($flash):?><div class="alert <?=$flash['type']==='error'?'error':''?>"><?=e($flash['message'])?></div><?php endif;?>
 <?php if($page==='system'):?>
 <h1>Pengaturan Sistem</h1><p class="muted">Atur tampilan Dashboard SIAKAD sesuai kenyamanan Anda. Pilihan tema disimpan pada browser/perangkat ini.</p>
@@ -2064,6 +2038,14 @@ html[data-theme="green"] .student-tab-panel[hidden] {display:none!important}
   body > #mobileMenuSheet:not([hidden]) .mobile-drawer-logout button {
     width:100%!important; min-height:48px!important; height:auto!important;
   }
+}
+
+
+/* Admin Android navigation: no drawer/popup; retain four direct destinations. */
+@media screen and (max-width:760px) {
+  .mobile-bottom-nav { grid-template-columns:repeat(4,minmax(0,1fr))!important; }
+  .mobile-menu-sheet,.mobile-menu-backdrop,.mobile-more-trigger,
+  #mobileMenuSheet,#mobileMenuBackdrop,#mobileMenuToggle { display:none!important; }
 }
 
 </style></body></html>
