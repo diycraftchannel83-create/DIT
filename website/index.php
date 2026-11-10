@@ -96,6 +96,37 @@ img,svg,video,iframe{max-width:100%}
 }
 </style>
 <link rel="stylesheet" href="assets/css/campus-theme.css?v=2">
+<style id="campus-dark-fallback">
+:root{color-scheme:dark;--campus-bg:#080d12;--campus-line:rgba(178,204,218,.13);--campus-text:#edf4f7;--campus-muted:#9aabb5;--campus-accent:#39d6a0}
+html,body{max-width:100%;overflow-x:clip;background:#080d12!important;color:#edf4f7!important}
+.topline{background:#070c11!important;color:#a9bac3!important;border-bottom:1px solid var(--campus-line)!important}
+header{background:rgba(9,15,21,.97)!important;border-bottom:1px solid var(--campus-line)!important}
+.brand .brand-kicker,.brand strong,.brand small{color:#edf4f7!important}
+.links a{color:#c2d0d7!important}
+.hero{background:radial-gradient(ellipse at 82% 20%,rgba(20,151,111,.18),transparent 42%),linear-gradient(180deg,#0b141c,#080d12)!important;color:#edf4f7!important}
+.hero h1,.hero h1 span,.hero p{color:#edf4f7!important}
+.hero .eyebrow,.kicker{color:#39d6a0!important}
+section.content,section.soft{background:#080d12!important;color:#edf4f7!important}
+section.content:nth-of-type(even){background:#0c141b!important}
+section h1,section h2,section h3,section h4,.about-copy h2,.program h3,.feature h3{color:#edf4f7!important}
+.program,.feature,.quote,.news,.vm article,.stat-grid,.cta{background:linear-gradient(160deg,#14212b,#0f1820)!important;color:#edf4f7!important;border:1px solid var(--campus-line)!important;box-shadow:0 18px 50px rgba(0,0,0,.28)!important}
+.program p,.feature p,.quote p,.news p,.about-copy p,.section-head p,.stat span{color:#9aabb5!important}
+.news h3,.vm h3,.stat strong{color:#edf4f7!important}
+footer{background:#060b10!important;color:#b5c4cb!important;border-top:1px solid var(--campus-line)!important}
+footer h3{color:#edf4f7!important}
+.btn-outline{color:#edf4f7!important;background:#14212b!important;border-color:var(--campus-line)!important}
+@media(min-width:781px) and (max-width:1400px){
+ .nav{flex-wrap:wrap;gap:10px 18px;padding-top:12px;padding-bottom:12px}
+ .brand{min-width:270px;flex:1 1 270px}
+ .nav-cta{flex:0 1 230px;max-width:230px;text-align:center;padding:10px 13px;white-space:normal}
+ .links{order:3;flex:1 0 100%;justify-content:space-between;flex-wrap:wrap;gap:8px 14px;padding:2px 0 5px}
+ .links a{font-size:12px}
+}
+@media(max-width:780px){
+ .nav{flex-wrap:nowrap}.links{max-width:100%;max-height:calc(100vh - 90px);overflow-y:auto;overflow-x:hidden}
+ .nav-cta{max-width:46%;white-space:normal;text-align:center}
+}
+</style>
 <meta name="theme-color" content="#075b3d">
 </head>
 <body>
