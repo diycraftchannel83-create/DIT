@@ -2229,6 +2229,29 @@ html[data-theme="green"] .student-edit-page .student-form-heading .tag{
   background:#e5f3e9!important;color:#145d45!important;border:1px solid #cfe5d6!important;
 }
 
+/* Final contrast fix for edit-student action buttons (Batal / Lanjutkan / Kembali). */
+html[data-theme="green"] .student-edit-page .student-form-footer a.student-next{
+  background:#fff!important;background-image:none!important;color:#087a4b!important;
+  border:1px solid #087a4b!important;box-shadow:none!important;
+}
+html[data-theme="green"] .student-edit-page .student-form-footer button#studentNext,
+html[data-theme="green"] .student-edit-page .student-form-footer button#studentSubmit{
+  background:#087a4b!important;background-image:linear-gradient(135deg,#0a8a53,#05613e)!important;
+  color:#fff!important;border:1px solid #05613e!important;
+  box-shadow:0 3px 10px rgba(8,122,75,.2)!important;
+}
+html[data-theme="green"] .student-edit-page .student-form-footer button#studentPrev{
+  background:#e5f3e9!important;background-image:none!important;color:#145d45!important;
+  border:1px solid #b8d8c4!important;
+}
+html[data-theme="green"] .student-edit-page .student-form-footer a.student-next:hover{
+  background:#edf7f0!important;color:#05613e!important;
+}
+html[data-theme="green"] .student-edit-page .student-form-footer button#studentNext:hover,
+html[data-theme="green"] .student-edit-page .student-form-footer button#studentSubmit:hover{
+  background:#05613e!important;background-image:none!important;color:#fff!important;
+}
+
 <script>
 (function(){
   function mountStudentEditor(){
