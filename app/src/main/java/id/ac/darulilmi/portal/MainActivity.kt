@@ -68,8 +68,8 @@ class MainActivity : ComponentActivity() {
             if (result.resultCode == RESULT_OK) deliverSelectedFiles(result.data)
             else deliverSelectedFiles(null)
         }
-        window.statusBarColor = android.graphics.Color.rgb(36, 92, 58)
-        window.navigationBarColor = android.graphics.Color.rgb(36, 92, 58)
+        window.statusBarColor = android.graphics.Color.rgb(8, 14, 23)
+        window.navigationBarColor = android.graphics.Color.rgb(8, 14, 23)
 
         setContent {
             var loading by remember { mutableStateOf(true) }
@@ -94,7 +94,7 @@ class MainActivity : ComponentActivity() {
                                     javaScriptEnabled = true
                                     domStorageEnabled = true
                                     databaseEnabled = true
-                                    cacheMode = WebSettings.LOAD_DEFAULT
+                                    cacheMode = WebSettings.LOAD_NO_CACHE
                                     loadWithOverviewMode = true
                                     useWideViewPort = true
                                     javaScriptCanOpenWindowsAutomatically = false
@@ -226,6 +226,8 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
 
+                                clearCache(true)
+                                clearHistory()
                                 loadUrl(CAMPUS_WEBSITE_URL)
                             }
                         },
