@@ -1506,4 +1506,20 @@ html[data-theme="green"] body{background:#f3faf5!important;color:#174b35!importa
  html[data-theme="green"] #mobileMenuSheet:not([hidden]) .mobile-drawer-logout{border-color:#d5e9dc!important}
  html[data-theme="green"] #mobileMenuSheet:not([hidden]) .mobile-drawer-logout button{background:#fff1ee!important;border-color:#f2c8bf!important;color:#a23a2a!important}
 }
+
+/* LAST OVERRIDE: remove legacy dark surfaces only when GREEN theme is active */
+html[data-theme="green"],html[data-theme="green"] body,html[data-theme="green"] .app,html[data-theme="green"] .layout,html[data-theme="green"] .main,html[data-theme="green"] .main-content,html[data-theme="green"] .content,html[data-theme="green"] .page-content,html[data-theme="green"] .dashboard,html[data-theme="green"] .dashboard-content,html[data-theme="green"] .workspace{background:#f3faf5!important;background-color:#f3faf5!important;color:#174b35!important}
+html[data-theme="green"] .card,html[data-theme="green"] .panel,html[data-theme="green"] .stat,html[data-theme="green"] .stat-card,html[data-theme="green"] .widget,html[data-theme="green"] .item,html[data-theme="green"] .table-wrap,html[data-theme="green"] .content-box,html[data-theme="green"] .section-card,html[data-theme="green"] .modal-content,html[data-theme="green"] .dialog{background:#fff!important;background-color:#fff!important;color:#174b35!important;border-color:#d5e9dc!important}
+@media(max-width:760px){
+html[data-theme="green"] .mobile-bottom-nav{background:#fff!important;background-color:#fff!important;border-color:#cfe5d6!important}
+html[data-theme="green"] .mobile-nav-item{background:transparent!important;color:#547564!important}
+html[data-theme="green"] .mobile-nav-item.active{background:#e4f5e9!important;color:#087a4b!important}
+html[data-theme="green"] .mobile-menu-backdrop{background:rgba(7,65,43,.35)!important}
+html[data-theme="green"] .mobile-menu-sheet,html[data-theme="green"] #mobileMenuSheet:not([hidden]){background:#fff!important;background-image:none!important;color:#174b35!important;border-color:#cfe5d6!important}
+html[data-theme="green"] #mobileMenuSheet:not([hidden]) .mobile-menu-group,html[data-theme="green"] #mobileMenuSheet:not([hidden]) .mobile-drawer-profile,html[data-theme="green"] #mobileMenuSheet:not([hidden]) .mobile-drawer-logout{border-color:#d5e9dc!important}
+html[data-theme="green"] #mobileMenuSheet:not([hidden]) .mobile-menu-grid a{background:#f4faf6!important;color:#175b3d!important;border-color:#d8ebdf!important}
+html[data-theme="green"] #mobileMenuSheet:not([hidden]) .mobile-menu-grid a.active{background:#dff3e5!important;color:#05613e!important}
+html[data-theme="green"] #mobileMenuSheet:not([hidden]) .mobile-drawer-profile strong,html[data-theme="green"] #mobileMenuSheet:not([hidden]) .mobile-drawer-label{color:#174b35!important}
+html[data-theme="green"] #mobileMenuSheet:not([hidden]) .mobile-drawer-profile span,html[data-theme="green"] #mobileMenuSheet:not([hidden]) .mobile-drawer-chevron{color:#60796b!important}
+}
 </style></body></html>
