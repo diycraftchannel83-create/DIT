@@ -644,13 +644,36 @@ if ($page==='login') {
 ?><!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Login Admin - STIT Darul Ilmi</title><style>
 *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at 12% 12%,#16885b 0,transparent 34%),linear-gradient(135deg,#03452f,#087a4b 58%,#b9e66b);font:15px system-ui;color:#173b2b}.login{width:min(460px,94vw);background:#fff;padding:36px;border:1px solid #e1eee5;border-radius:28px;box-shadow:0 24px 80px #002b1c66}.mark-wrap{display:flex;justify-content:center;align-items:center;margin:0 auto 22px}.campus-logo{display:block;width:142px;height:142px;max-width:48%;object-fit:contain}.login h1{font-size:27px;line-height:1.15;color:#075b3d;margin:22px 0 8px}.muted{color:#64756b;line-height:1.55}label{display:block;font-weight:700;margin:17px 0 7px;color:#234b37}input{width:100%;padding:14px 15px;border:1px solid #d4e5d9;border-radius:13px;font:inherit;background:#fbfefc;outline:none}input:focus{border-color:#078653;box-shadow:0 0 0 3px #07865320}button{width:100%;margin-top:24px;padding:14px;border:0;border-radius:30px;background:linear-gradient(90deg,#087a4b,#03452f);color:white;font-weight:800;font-size:15px;cursor:pointer;box-shadow:0 8px 20px #075b3d30}.alert{padding:12px 14px;border-radius:12px;background:#fff0ee;color:#a32118;margin:14px 0}.login-foot{border-top:1px solid #e8f1eb;margin-top:24px;padding-top:16px;font-size:12px}@media(max-width:760px){
   #mobileMenuSheet:not([hidden]){
-    position:fixed!important;z-index:1002!important;top:0!important;right:0!important;bottom:0!important;left:auto!important;
-    width:min(86vw,380px)!important;max-width:380px!important;height:100vh!important;height:100dvh!important;min-height:100dvh!important;max-height:100dvh!important;
-    box-sizing:border-box!important;margin:0!important;padding:calc(14px + env(safe-area-inset-top)) 16px calc(14px + env(safe-area-inset-bottom))!important;
+    position:fixed!important;z-index:1002!important;top:0!important;left:0!important;right:auto!important;bottom:0!important;
+    width:clamp(300px,59vw,410px)!important;max-width:88vw!important;height:100vh!important;height:100dvh!important;min-height:100dvh!important;max-height:100dvh!important;
+    box-sizing:border-box!important;margin:0!important;padding:calc(14px + env(safe-area-inset-top)) 22px calc(14px + env(safe-area-inset-bottom))!important;
     display:flex!important;flex-direction:column!important;gap:0!important;overflow:hidden!important;
-    color:#eaf4ef!important;background:#101820!important;border:1px solid rgba(170,205,188,.12)!important;border-right:0!important;
-    border-radius:20px 0 0 20px!important;box-shadow:-18px 0 48px rgba(0,0,0,.30)!important;
+    color:#eaf4ef!important;background:linear-gradient(160deg,#111820 0%,#0b1118 58%,#080e14 100%)!important;
+    border:1px solid rgba(170,205,188,.12)!important;border-left:0!important;border-radius:0 22px 22px 0!important;
+    box-shadow:18px 0 48px rgba(0,0,0,.34)!important;
   }
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-brand{
+    position:relative;isolation:isolate;min-height:112px!important;padding:14px 4px 18px!important;margin:calc(-1 * (14px + env(safe-area-inset-top))) -22px 0!important;
+    padding-top:calc(14px + env(safe-area-inset-top))!important;padding-left:22px!important;padding-right:22px!important;
+    background:radial-gradient(ellipse at 82% 20%,rgba(49,226,172,.36),transparent 48%),linear-gradient(130deg,#064d43 0%,#08785e 62%,#0b4b45 100%)!important;
+    border:0!important;overflow:hidden;
+  }
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-brand:after{content:"";position:absolute;z-index:-1;right:-28px;bottom:-54px;width:190px;height:110px;border-radius:50%;background:rgba(4,43,43,.28);transform:rotate(-18deg)}
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-brand img{width:58px!important;height:58px!important;border-radius:50%!important;background:rgba(255,255,255,.12)!important;border:1px solid rgba(255,255,255,.22)!important;padding:3px!important}
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-brand strong{font-size:14px!important;letter-spacing:.045em!important}
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-brand span{font-size:10px!important;letter-spacing:.04em!important;color:#d1f7e8!important}
+  #mobileMenuSheet:not([hidden]) .mobile-menu-close{background:rgba(255,255,255,.12)!important;border-color:rgba(255,255,255,.2)!important;color:#fff!important}
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-profile{padding:15px 4px!important;margin:0 0 12px!important;border-bottom:1px solid #2a3840!important}
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-home{min-height:48px!important;margin-bottom:14px!important;border-radius:11px!important;background:linear-gradient(100deg,#075b4a,#103c3a)!important;border-color:#176b57!important}
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-groups{flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important;overscroll-behavior:contain!important}
+  #mobileMenuSheet:not([hidden]) .mobile-menu-group{margin-bottom:13px!important;padding-bottom:11px!important;border-bottom:1px solid #2a3840!important}
+  #mobileMenuSheet:not([hidden]) .mobile-menu-group h3{font-size:10px!important;margin-bottom:7px!important}
+  #mobileMenuSheet:not([hidden]) .mobile-menu-grid a{min-height:42px!important;font-size:13px!important;padding:8px 10px!important}
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-icon{width:23px!important;height:23px!important;flex-basis:23px!important;color:#38dcae!important}
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-icon svg{width:21px!important;height:21px!important}
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-logout{margin-top:8px!important;padding-top:12px!important}
+  #mobileMenuSheet:not([hidden]) .mobile-drawer-logout button{min-height:46px!important;font-size:13px!important}
+}
   #mobileMenuSheet:not([hidden]) .mobile-drawer-brand{flex:0 0 auto;min-height:64px;align-items:center;padding:4px 0 14px;border-bottom:1px solid #2a3840}
   #mobileMenuSheet:not([hidden]) .mobile-drawer-brand img{width:46px;height:46px;border-radius:12px}
   #mobileMenuSheet:not([hidden]) .mobile-drawer-brand strong{font-size:12px;letter-spacing:.07em}
@@ -675,6 +698,9 @@ if ($page==='login') {
   #mobileMenuSheet:not([hidden]) .mobile-menu-grid a.active .mobile-drawer-icon{color:#68efc2}
   #mobileMenuSheet:not([hidden]) .mobile-drawer-logout{flex:0 0 auto;margin:8px 0 0;padding-top:10px;border-top:1px solid #2a3840}
   #mobileMenuSheet:not([hidden]) .mobile-drawer-logout button{min-height:42px;margin:0;border-radius:10px;background:#351d27;border:1px solid #5c2a3a;color:#ff8798;font-size:12px}
+}
+@media(max-width:760px){
+#mobileMenuSheet:not([hidden]){left:0!important;right:auto!important;width:clamp(300px,59vw,410px)!important;max-width:88vw!important;border-radius:0 22px 22px 0!important;border-left:0!important;border-right:1px solid rgba(170,205,188,.12)!important;box-shadow:18px 0 48px rgba(0,0,0,.34)!important}
 }
 </style></head><body><main class="login"><div class="mark-wrap"><img class="campus-logo" src="<?=e($campusLogoUrl)?>" alt="Logo STIT Darul Ilmi Tasikmalaya"></div><p style="color:#078653;font-weight:800;letter-spacing:.12em;font-size:11px;margin:20px 0 0">PORTAL AKADEMIK TERPADU</p><h1>Selamat Datang<br>Admin STIT Darul Ilmi</h1><p class="muted">Masuk untuk mengelola layanan akademik dan informasi kampus STIT Darul Ilmi Tasikmalaya.</p><?php if($flash):?><div class="alert"><?=e($flash['message'])?></div><?php endif;?><form method="post"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="login"><label>Username</label><input name="username" autocomplete="username" placeholder="Masukkan username" required><label>Password</label><input type="password" name="password" autocomplete="current-password" placeholder="Masukkan password" required><button type="submit">Masuk ke Dashboard　›</button></form><div class="login-foot muted">Gunakan akun admin yang dibuat melalui prosedur setup backend. Tidak ada akun bawaan.<br><a href="../../portal/public/?page=login" style="display:inline-block;margin-top:12px;color:#087a4b;font-weight:800">Login Mahasiswa / Dosen →</a></div></main></body></html><?php exit;
 }
