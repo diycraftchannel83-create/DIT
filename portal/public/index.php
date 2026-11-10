@@ -43,9 +43,10 @@ function sendPasswordChangeNotification(array $cfg, string $email, string $name,
     if($url==='' || $token==='' || !filter_var($email,FILTER_VALIDATE_EMAIL)) return false;
     $payload=json_encode(['token'=>$token,'email'=>$email,'name'=>$name,'username'=>$username,'changed_at'=>date(DATE_ATOM),'app'=>'SIAKAD STIT Darul Ilmi'],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
     if($payload===false) return false;
-    $context=stream_context_create(['http'=>['method'=>'POST','header'=>"Content-Type: application/json\\r\\n",'content'=>$payload,'timeout'=>12,'ignore_errors'=>true]]);
+    $context=stream_context_create(['http'=>['method'=>'POST','header'=>"Content-Type: application/json\r\n",'content'=>$payload,'timeout'=>12,'ignore_errors'=>true]]);
     $response=@file_get_contents($url,false,$context);
-    if($response===false || !isset($http_response_header[0]) || !preg_match('/\\s2\\d\\d\\s/',$http_response_header[0])) {
+    $statusLine=is_array($http_response_header??null)?end($http_response_header):'';
+    if($response===false || !preg_match('/\\s2\\d\\d\\s/',(string)$statusLine)) {
         error_log('[STIT PASSWORD NOTICE] Google Apps Script notification request failed.');
         return false;
     }
