@@ -878,6 +878,56 @@ html[data-theme="black"] #mobileMenuSheet:not([hidden]){background:linear-gradie
 html[data-theme="black"] .theme-option[aria-pressed="true"]{border-color:#39d6a0!important;box-shadow:0 0 0 3px rgba(57,214,160,.14)}
 html[data-theme="black"] .theme-check{background:#12382f;color:#45e2b2}
 @media(max-width:760px){.theme-settings{grid-template-columns:1fr}.theme-option{padding:14px}.theme-preview{width:94px;flex-basis:94px}}
+
+/* Full green-and-white dashboard theme: no dark/black surfaces */
+html[data-theme="green"]{color-scheme:light;--bg:#f3faf5;--ink:#174b35;--muted:#547564;--line:#cfe5d6;--mint:#e5f4e9;--lime:#b9e66b}
+html[data-theme="green"] body,html[data-theme="green"] .main{background:#f3faf5!important;color:#174b35!important}
+html[data-theme="green"] .side{background:linear-gradient(180deg,#075b3d 0%,#087a4b 58%,#11945c 100%)!important;color:#fff!important;border-right:1px solid #0b744a!important;box-shadow:8px 0 28px rgba(7,91,61,.12)!important}
+html[data-theme="green"] .side .brand,html[data-theme="green"] .side .brand strong{color:#fff!important}
+html[data-theme="green"] .side .brand small,html[data-theme="green"] .nav-group-title{color:#d5f3df!important}
+html[data-theme="green"] .nav a{color:#e9f8ee!important}
+html[data-theme="green"] .nav a.active,html[data-theme="green"] .nav a:hover{background:rgba(255,255,255,.19)!important;color:#fff!important;box-shadow:inset 4px 0 #c9f27b!important}
+html[data-theme="green"] .top{background:#fff!important;color:#175b3d!important;border-bottom:1px solid #d5e9dc!important;box-shadow:0 4px 18px rgba(7,91,61,.05)!important}
+html[data-theme="green"] .content{background:#f3faf5!important;color:#174b35!important}
+html[data-theme="green"] .content h1,html[data-theme="green"] .content h2,html[data-theme="green"] .content h3,html[data-theme="green"] .content h4{color:#075b3d!important}
+html[data-theme="green"] .muted,html[data-theme="green"] .content small{color:#547564!important}
+html[data-theme="green"] .card,html[data-theme="green"] .panel,html[data-theme="green"] .stat,html[data-theme="green"] .item,html[data-theme="green"] .theme-option,html[data-theme="green"] .modal,html[data-theme="green"] .modal-content,html[data-theme="green"] .dialog{background:#fff!important;color:#174b35!important;border:1px solid #d5e9dc!important;box-shadow:0 10px 28px rgba(7,91,61,.07)!important}
+html[data-theme="green"] .card strong,html[data-theme="green"] .panel strong,html[data-theme="green"] .stat strong{color:#087a4b!important}
+html[data-theme="green"] input,html[data-theme="green"] select,html[data-theme="green"] textarea{background:#fff!important;color:#174b35!important;border:1px solid #bddbc8!important}
+html[data-theme="green"] input::placeholder,html[data-theme="green"] textarea::placeholder{color:#819b8c!important}
+html[data-theme="green"] input:focus,html[data-theme="green"] select:focus,html[data-theme="green"] textarea:focus{border-color:#087a4b!important;box-shadow:0 0 0 3px rgba(8,122,75,.13)!important}
+html[data-theme="green"] table{background:#fff!important;color:#174b35!important}
+html[data-theme="green"] th{background:#e2f3e7!important;color:#075b3d!important}
+html[data-theme="green"] td,html[data-theme="green"] th{border-color:#d5e9dc!important}
+html[data-theme="green"] tr:nth-child(even) td{background:#f7fcf8!important}
+html[data-theme="green"] button:not(.mobile-menu-toggle):not(.mobile-menu-close){color:#fff}
+html[data-theme="green"] button.primary,html[data-theme="green"] .btn-primary,html[data-theme="green"] .logout,html[data-theme="green"] .theme-option[aria-pressed="true"] .theme-check{background:linear-gradient(135deg,#0a8a53,#05613e)!important;color:#fff!important}
+html[data-theme="green"] .mobile-bottom-nav{background:#fff!important;border-top:1px solid #cfe5d6!important;box-shadow:0 -8px 24px rgba(7,91,61,.08)!important}
+html[data-theme="green"] .mobile-nav-item{color:#547564!important}
+html[data-theme="green"] .mobile-nav-item.active{background:#e4f5e9!important;color:#087a4b!important}
+html[data-theme="green"] #mobileMenuBackdrop{background:rgba(7,65,43,.35)!important}
+html[data-theme="green"] #mobileMenuSheet:not([hidden]){background:#fff!important;color:#174b35!important;border:1px solid #cfe5d6!important;box-shadow:18px 0 48px rgba(7,91,61,.18)!important}
+html[data-theme="green"] #mobileMenuSheet:not([hidden]) .mobile-drawer-brand{background:linear-gradient(135deg,#075b3d,#0b955d)!important;color:#fff!important}
+html[data-theme="green"] #mobileMenuSheet:not([hidden]) .mobile-drawer-brand strong{color:#fff!important}
+html[data-theme="green"] #mobileMenuSheet:not([hidden]) .mobile-drawer-brand span{color:#dff7e8!important}
+html[data-theme="green"] #mobileMenuSheet:not([hidden]) .mobile-menu-close{background:#e5f4e9!important;border-color:#c6e2d0!important;color:#075b3d!important}
+html[data-theme="green"] #mobileMenuSheet:not([hidden]) .mobile-menu-group h3{color:#087a4b!important}
+html[data-theme="green"] #mobileMenuSheet:not([hidden]) .mobile-menu-grid a{background:#f4faf6!important;color:#175b3d!important;border:1px solid #d8ebdf!important}
+html[data-theme="green"] #mobileMenuSheet:not([hidden]) .mobile-menu-grid a.active{background:#dff3e5!important;color:#05613e!important;border-color:#9bcfae!important}
+html[data-theme="green"] #mobileMenuSheet:not([hidden]) .mobile-menu-grid a span{color:inherit!important}
+html[data-theme="green"] .theme-option{background:#fff!important;color:#174b35!important}
+html[data-theme="green"] .theme-option-copy strong{color:#075b3d!important}
+html[data-theme="green"] .theme-option-copy small,html[data-theme="green"] .theme-status{color:#547564!important}
+html[data-theme="green"] .theme-preview-green{background:#e7f5eb}
+html[data-theme="green"] .theme-preview-green i:first-child{background:#087a4b}
+html[data-theme="green"] .theme-preview-green i:nth-child(2),html[data-theme="green"] .theme-preview-green i:nth-child(3){background:#fff;border:1px solid #d1e7d8}
+html[data-theme="green"] .theme-preview-green b{background:#0b955d}
+html[data-theme="green"] .alert{background:#e7f6eb!important;color:#075b3d!important;border:1px solid #c5e4cf!important}
+html[data-theme="green"] .alert.error{background:#fff1ee!important;color:#a23a2a!important;border-color:#f2c8bf!important}
+html[data-theme="green"] .badge,html[data-theme="green"] .status{background:#e5f4e9!important;color:#087a4b!important}
+html[data-theme="green"] .pagination a,html[data-theme="green"] .pagination button{background:#fff!important;color:#087a4b!important;border-color:#cfe5d6!important}
+html[data-theme="green"] .pagination .active{background:#087a4b!important;color:#fff!important}
+
 </style><link rel="stylesheet" href="../../website/assets/css/campus-theme.css?v=1"></head><body><div class="layout"><aside class="side"><div class="brand"><img src="<?=e($campusLogoUrl)?>" alt="Logo STIT Darul Ilmi"><span class="brand-copy">STIT DARUL ILMI<small>Academic Portal</small></span></div><nav class="nav" aria-label="Navigasi desktop"><a class="nav-dashboard <?=$page==='dashboard'?'active':''?>" href="?page=dashboard">Dashboard</a><?php foreach($visibleMenuGroups as $groupLabel=>$groupKeys): ?><div class="nav-group"><div class="nav-group-title"><?=e($groupLabel)?></div><?php foreach($groupKeys as $key): ?><a class="<?=$page===$key?'active':''?>" href="?page=<?=e($key)?>"><?=e($menus[$key])?></a><?php endforeach; ?></div><?php endforeach; ?></nav></aside>
 <nav class="mobile-bottom-nav" aria-label="Navigasi utama Android">
 <?php foreach($mobileQuick as $item): ?><a class="mobile-nav-item <?=$page===$item['page']?'active':''?>" href="?page=<?=e($item['page'])?>"><span class="mobile-nav-icon" aria-hidden="true"><?=e($item['icon'])?></span><span><?=e($item['label'])?></span></a><?php endforeach; ?>
@@ -948,7 +998,7 @@ $mobileIcon = static function(string $key) use ($mobileIconPaths): string {
  </button>
  <button type="button" class="theme-option" data-theme-choice="green" aria-pressed="false">
   <span class="theme-preview theme-preview-green"><i></i><i></i><i></i><b></b></span>
-  <span class="theme-option-copy"><strong>Tema Hijau</strong><small>Tampilan hijau kampus dengan latar terang</small></span><span class="theme-check">✓</span>
+  <span class="theme-option-copy"><strong>Tema Hijau Putih</strong><small>Dominasi hijau kampus dan putih bersih di seluruh dashboard</small></span><span class="theme-check">✓</span>
  </button>
  <p class="theme-status" id="themeStatus" aria-live="polite">Tema yang dipilih akan langsung diterapkan.</p>
 </div>
