@@ -61,6 +61,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
     }
     if ($action==='update_student_profile' && ($user=portalUser()) && $user['role']==='mahasiswa') {
         $student=queryOne($pdo,'SELECT id,photo_url FROM students WHERE user_id=:uid LIMIT 1',['uid'=>$user['id']]);
+        $studentColumns=[];foreach($pdo->query('SHOW COLUMNS FROM students')->fetchAll(PDO::FETCH_COLUMN) as $columnName)$studentColumns[$columnName]=true;
         if (!$student) { http_response_code(403); exit('Profil mahasiswa tidak ditemukan.'); }
         $fullName=trim((string)($_POST['full_name']??''));$email=trim((string)($_POST['email']??''));
         $fields=['phone'=>30,'address'=>5000,'national_id'=>32,'birth_place'=>100,'religion'=>40,'marital_status'=>30,'province'=>100,'city'=>100,'district'=>100,'village'=>100,'postal_code'=>10,'father_name'=>160,'mother_name'=>160,'guardian_name'=>160,'guardian_phone'=>30,'emergency_contact_name'=>160,'emergency_contact_phone'=>30,'admission_pathway'=>60];
