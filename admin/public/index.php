@@ -1522,4 +1522,35 @@ html[data-theme="green"] #mobileMenuSheet:not([hidden]) .mobile-menu-grid a.acti
 html[data-theme="green"] #mobileMenuSheet:not([hidden]) .mobile-drawer-profile strong,html[data-theme="green"] #mobileMenuSheet:not([hidden]) .mobile-drawer-label{color:#174b35!important}
 html[data-theme="green"] #mobileMenuSheet:not([hidden]) .mobile-drawer-profile span,html[data-theme="green"] #mobileMenuSheet:not([hidden]) .mobile-drawer-chevron{color:#60796b!important}
 }
+
+/* FIX FORM TAB PANELS: student and lecturer forms must never inherit dark theme */
+html[data-theme="green"] .student-tab-panel,
+html[data-theme="green"] .lecturer-create-panel .student-tab-panel,
+html[data-theme="green"] #studentCreateForm .student-tab-panel,
+html[data-theme="green"] #lecturerCreateForm .student-tab-panel {
+  background:#ffffff!important;
+  background-color:#ffffff!important;
+  color:#174b35!important;
+  border:1px solid #d5e9dc!important;
+  border-radius:14px!important;
+  padding:18px!important;
+}
+html[data-theme="green"] .student-tab-panel h3,
+html[data-theme="green"] .student-tab-panel h4 {color:#075b3d!important}
+html[data-theme="green"] .student-tab-panel p,
+html[data-theme="green"] .student-tab-panel .muted {color:#60796b!important}
+html[data-theme="green"] .student-tab-panel label,
+html[data-theme="green"] .student-tab-panel .student-fields label,
+html[data-theme="green"] .student-tab-panel .student-photo-control label {color:#315b43!important}
+html[data-theme="green"] .student-tab-panel input,
+html[data-theme="green"] .student-tab-panel select,
+html[data-theme="green"] .student-tab-panel textarea {
+  background:#ffffff!important;background-color:#ffffff!important;color:#174b35!important;border:1px solid #bddbc8!important;
+}
+html[data-theme="green"] .student-tab-panel input::placeholder,
+html[data-theme="green"] .student-tab-panel textarea::placeholder {color:#819b8c!important}
+html[data-theme="green"] .student-tab-panel .student-security-note,
+html[data-theme="green"] .student-tab-panel .student-profile-upload {background:#f2faf4!important;color:#47624e!important;border-color:#d5e9dc!important}
+html[data-theme="green"] .student-tab-panel[hidden] {display:none!important}
+
 </style></body></html>
