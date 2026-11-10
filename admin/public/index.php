@@ -446,8 +446,8 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
         try { $uploadedPhoto=saveStudentPhotoUpload(); } catch(Throwable $e) { flash($e->getMessage(),'error'); go('students'); }
         
         $id=(int)($_POST['student_id']??0);$uid=(int)($_POST['user_id']??0);
-        $name=trim((string)($_POST['full_name']??''));$email=trim((string)($_POST['email']??''));$nim=trim((string)($_POST['nim']??''));$program=(int)($_POST['study_program_id']??0);$entry=(int)($_POST['entry_year']??0);
-        if($id<1||$uid<1||$name===''||$nim===''||$program<1||$entry<2000||$entry>2100||strlen($name)>160||strlen($nim)>40||($email!==''&&!filter_var($email,FILTER_VALIDATE_EMAIL))){flash('Data utama mahasiswa tidak valid.','error');go('students');}
+        $name=trim((string)($_POST['full_name']??''));$email=trim((string)($_POST['email']??''));$username=trim((string)($_POST['username']??''));$password=(string)($_POST['password']??'');$nim=trim((string)($_POST['nim']??''));$program=(int)($_POST['study_program_id']??0);$entry=(int)($_POST['entry_year']??0);
+        if($id<1||$uid<1||$name===''||$username===''||strlen($username)>100||($password!==''&&strlen($password)<10)||strlen($password)>200||$nim===''||$program<1||$entry<2000||$entry>2100||strlen($name)>160||strlen($nim)>40||($email!==''&&!filter_var($email,FILTER_VALIDATE_EMAIL))){flash('Data utama mahasiswa tidak valid.','error');go('students');}
         $fields=['phone'=>30,'address'=>5000,'national_id'=>32,'birth_place'=>100,'religion'=>40,'marital_status'=>30,'province'=>100,'city'=>100,'district'=>100,'village'=>100,'postal_code'=>10,'father_name'=>160,'mother_name'=>160,'guardian_name'=>160,'guardian_phone'=>30,'emergency_contact_name'=>160,'emergency_contact_phone'=>30,'admission_pathway'=>60,'photo_url'=>500];
         $values=[];foreach($fields as $field=>$max){$v=trim((string)($_POST[$field]??''));if(strlen($v)>$max){flash('Panjang field '.$field.' melebihi batas.','error');go('students');}$values[$field]=$v===''?null:$v;}
         foreach(['birth_date','registration_date'] as $field){$v=trim((string)($_POST[$field]??''));if($v!==''&&!preg_match('/^\\d{4}-\\d{2}-\\d{2}$/',$v)){flash('Format tanggal tidak valid.','error');go('students');}$values[$field]=$v===''?null:$v;}
@@ -455,7 +455,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
         if($values['national_id']!==null&&!preg_match('/^\\d{16}$/',$values['national_id'])){flash('NIK harus 16 digit.','error');go('students');}
         if($values['photo_url']!==null&&!str_starts_with($values['photo_url'],'uploads/students/')&&(!filter_var($values['photo_url'],FILTER_VALIDATE_URL)||!in_array(strtolower((string)parse_url($values['photo_url'],PHP_URL_SCHEME)),['http','https'],true))){flash('URL foto tidak valid.','error');go('students');}
         if($uploadedPhoto!==null)$values['photo_url']=$uploadedPhoto;
-        try{$pdo->beginTransaction();$q=$pdo->prepare('UPDATE users SET full_name=:name,email=:email WHERE id=:uid');$q->execute(['name'=>$name,'email'=>$email?:null,'uid'=>$uid]);
+        try{$pdo->beginTransaction();if($password!==''){$q=$pdo->prepare('UPDATE users SET full_name=:name,email=:email,username=:username,password_hash=:hash WHERE id=:uid');$q->execute(['name'=>$name,'email'=>$email?:null,'username'=>$username,'hash'=>password_hash($password,PASSWORD_DEFAULT),'uid'=>$uid]);}else{$q=$pdo->prepare('UPDATE users SET full_name=:name,email=:email,username=:username WHERE id=:uid');$q->execute(['name'=>$name,'email'=>$email?:null,'username'=>$username,'uid'=>$uid]);}
         $sql='UPDATE students SET nim=:nim,study_program_id=:program,entry_year=:entry,phone=:phone,address=:address,national_id=:national_id,birth_place=:birth_place,birth_date=:birth_date,gender=:gender,religion=:religion,marital_status=:marital_status,province=:province,city=:city,district=:district,village=:village,postal_code=:postal_code,father_name=:father_name,mother_name=:mother_name,guardian_name=:guardian_name,guardian_phone=:guardian_phone,emergency_contact_name=:emergency_contact_name,emergency_contact_phone=:emergency_contact_phone,admission_pathway=:admission_pathway,registration_date=:registration_date,photo_url=:photo_url WHERE id=:id AND user_id=:uid';
         $q=$pdo->prepare($sql);$q->execute(['nim'=>$nim,'program'=>$program,'entry'=>$entry]+$values+['id'=>$id,'uid'=>$uid]);if($q->rowCount()===0){$check=$pdo->prepare('SELECT id FROM students WHERE id=:id AND user_id=:uid');$check->execute(['id'=>$id,'uid'=>$uid]);if(!$check->fetchColumn())throw new RuntimeException('Mahasiswa tidak ditemukan.');}
         $pdo->commit();flash('Data mahasiswa berhasil diperbarui.');}catch(Throwable $e){if($pdo->inTransaction())$pdo->rollBack();error_log('[STIT UPDATE STUDENT] '.$e->getMessage());flash('Gagal memperbarui. Periksa NIM/email duplikat dan data yang dimasukkan.','error');}go('students');
@@ -1119,39 +1119,51 @@ $pendingCount=0;foreach($availableMigrations as $migrationName=>$migrationFile){
 <?php if($page==='students'):?><div class="panel"><form method="get" class="inline"><input type="hidden" name="page" value="students"><div><label>Cari nama, NIM, atau email</label><input name="q" value="<?=e($_GET['q']??'')?>" placeholder="Masukkan kata kunci"></div><button type="submit">Cari</button><a href="?page=students">Reset</a> <a href="?page=students&export=csv">Ekspor CSV</a></form></div><?php endif;?>
 <?php if($page==='news'&&in_array($u['role'],$academicRoles,true)): $editId=(int)($_GET['edit']??0);$editNews=[];if($editId){$eq=$pdo->prepare('SELECT * FROM news_posts WHERE id=:id');$eq->execute(['id'=>$editId]);$editNews=$eq->fetch()?:[];}?><div class="panel"><h2><?= $editNews?'Edit Berita':'Tambah Berita' ?></h2><form method="post"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="save_news"><input type="hidden" name="id" value="<?=e($editNews['id']??0)?>"><div><label>Judul</label><input style="width:100%" name="title" maxlength="200" value="<?=e($editNews['title']??'')?>" required></div><div><label>Kategori</label><input name="category" maxlength="60" value="<?=e($editNews['category']??'Berita')?>"></div><div><label>Ringkasan</label><input style="width:100%" name="excerpt" maxlength="400" value="<?=e($editNews['excerpt']??'')?>"></div><div><label>URL gambar (opsional)</label><input style="width:100%" name="image_url" maxlength="500" value="<?=e($editNews['image_url']??'')?>" placeholder="https://..."></div><div><label>Isi Berita</label><textarea name="body" rows="8" style="width:100%;padding:10px;border:1px solid #d0d5dd;border-radius:7px" required><?=e($editNews['body']??'')?></textarea></div><button>Simpan Draft</button></form></div><?php endif;?>
 <?php if($page==='news'):?><div class="panel"><h2>Daftar Berita</h2><?php if(!$rows):?><p class="muted">Belum ada berita tersimpan.</p><?php else:?><table><thead><tr><th>Judul</th><th>Kategori</th><th>Status</th><th>Aksi</th></tr></thead><tbody><?php foreach($rows as $nr):?><tr><td><?=e($nr['title'])?></td><td><?=e($nr['category'])?></td><td><?=e($nr['published_at']?'Terbit':'Draft')?></td><td><a href="?page=news&edit=<?=$nr['id']?>">Edit</a> <form method="post" style="display:inline"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="publish_news"><input type="hidden" name="id" value="<?=$nr['id']?>"><input type="hidden" name="publish" value="<?=$nr['published_at']?0:1?>"><button><?=$nr['published_at']?'Tarik':'Terbitkan'?></button></form></td></tr><?php endforeach;?></tbody></table><?php endif;?></div><?php endif;?>
-<?php if($page==='students'&&isset($_GET['edit'])):$editQ=$pdo->prepare('SELECT s.*,u.id AS account_user_id,u.full_name,u.email FROM students s JOIN users u ON u.id=s.user_id WHERE s.id=:id');$editQ->execute(['id'=>(int)$_GET['edit']]);$editStudent=$editQ->fetch();$programs=$pdo->query('SELECT id,name FROM study_programs WHERE is_active=1 ORDER BY name')->fetchAll();if($editStudent):?><div class="student-detail-backdrop" id="studentEditModal" role="dialog" aria-modal="true" aria-labelledby="studentEditTitle"><div class="panel student-detail-modal"><div class="student-detail-heading"><div><span class="eyebrow">PROFIL MAHASISWA</span><h2 id="studentEditTitle">Detail & Edit Mahasiswa — <?=e($editStudent['nim'])?></h2></div><a class="student-detail-close" href="?page=students" aria-label="Tutup detail">×</a></div><form method="post" enctype="multipart/form-data" class="student-edit-form" autocomplete="on">
-<input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="update_student"><input type="hidden" name="student_id" value="<?=$editStudent['id']?>"><input type="hidden" name="user_id" value="<?=$editStudent['account_user_id']?>">
-<section class="student-edit-section"><h3>Data Akademik</h3><div class="student-edit-grid">
-<div><label>Nama Lengkap</label><input name="full_name" maxlength="160" value="<?=e($editStudent['full_name']??'')?>" required></div>
-<div><label>Email</label><input type="email" name="email" value="<?=e($editStudent['email']??'')?>"></div>
-<div><label>NIM</label><input name="nim" maxlength="40" value="<?=e($editStudent['nim']??'')?>" required></div>
-<div><label>Program Studi</label><select name="study_program_id" required><?php foreach($programs as $pr):?><option value="<?=$pr['id']?>" <?=$editStudent['study_program_id']==$pr['id']?'selected':''?>><?=e($pr['name'])?></option><?php endforeach;?></select></div>
-<div><label>Tahun Masuk</label><input type="number" name="entry_year" min="2000" max="2100" value="<?=e($editStudent['entry_year']??'')?>" required></div>
-<div><label>Jalur Masuk</label><select name="admission_pathway"><option value="">Pilih jalur masuk</option><?php foreach(['Reguler','Beasiswa','Pindahan'] as $path):?><option value="<?=e($path)?>" <?=($editStudent['admission_pathway']??'')===$path?'selected':''?>><?=e($path)?></option><?php endforeach;?></select></div>
-<div><label>Tanggal Registrasi</label><input type="date" name="registration_date" value="<?=e($editStudent['registration_date']??'')?>"></div>
-</div></section>
-<section class="student-edit-section"><h3>Data Pribadi</h3><div class="student-edit-grid">
-<div><label>NIK</label><input name="national_id" inputmode="numeric" maxlength="16" value="<?=e($editStudent['national_id']??'')?>"></div>
-<div><label>Tempat Lahir</label><input name="birth_place" value="<?=e($editStudent['birth_place']??'')?>"></div>
-<div><label>Tanggal Lahir</label><input type="date" name="birth_date" value="<?=e($editStudent['birth_date']??'')?>"></div>
-<div><label>Jenis Kelamin</label><select name="gender"><option value="">Belum diisi</option><option value="male" <?=($editStudent['gender']??'')==='male'?'selected':''?>>Laki-laki</option><option value="female" <?=($editStudent['gender']??'')==='female'?'selected':''?>>Perempuan</option></select></div>
-<div><label>Agama</label><input name="religion" value="<?=e($editStudent['religion']??'')?>"></div>
-<div><label>Status Perkawinan</label><input name="marital_status" value="<?=e($editStudent['marital_status']??'')?>"></div>
-<div><label>Nomor Telepon</label><input type="tel" name="phone" value="<?=e($editStudent['phone']??'')?>"></div>
-<div><label>Alamat</label><textarea name="address" rows="3"><?=e($editStudent['address']??'')?></textarea></div>
-</div></section>
-<section class="student-edit-section"><h3>Alamat & Keluarga</h3><div class="student-edit-grid">
-<div><label>Provinsi</label><input name="province" value="<?=e($editStudent['province']??'')?>"></div><div><label>Kabupaten/Kota</label><input name="city" value="<?=e($editStudent['city']??'')?>"></div>
-<div><label>Kecamatan</label><input name="district" value="<?=e($editStudent['district']??'')?>"></div><div><label>Desa/Kelurahan</label><input name="village" value="<?=e($editStudent['village']??'')?>"></div>
-<div><label>Kode Pos</label><input name="postal_code" inputmode="numeric" value="<?=e($editStudent['postal_code']??'')?>"></div>
-<div><label>Nama Ayah</label><input name="father_name" value="<?=e($editStudent['father_name']??'')?>"></div><div><label>Nama Ibu</label><input name="mother_name" value="<?=e($editStudent['mother_name']??'')?>"></div>
-<div><label>Nama Wali</label><input name="guardian_name" value="<?=e($editStudent['guardian_name']??'')?>"></div><div><label>Telepon Wali</label><input type="tel" name="guardian_phone" value="<?=e($editStudent['guardian_phone']??'')?>"></div>
-<div><label>Kontak Darurat</label><input name="emergency_contact_name" value="<?=e($editStudent['emergency_contact_name']??'')?>"></div><div><label>Telepon Darurat</label><input type="tel" name="emergency_contact_phone" value="<?=e($editStudent['emergency_contact_phone']??'')?>"></div>
-</div></section>
-<section class="student-edit-section"><h3>Foto Mahasiswa</h3><div class="student-edit-grid"><div><label>URL Foto (opsional)</label><input name="photo_url" value="<?=e($editStudent['photo_url']??'')?>"></div><div><label>Unggah Foto Baru (JPG/PNG/WebP, maks. 2 MB)</label><input type="file" name="photo_file" accept="image/jpeg,image/png,image/webp"></div></div></section>
-<div class="student-detail-actions"><button type="submit">Simpan Perubahan</button><a class="student-detail-cancel" href="?page=students">Batal</a></div>
-</form></div></div><?php endif;endif;?><?php if($page==='students'&&in_array($u['role'],$academicRoles,true)): $programs=$pdo->query('SELECT id,name FROM study_programs WHERE is_active=1 ORDER BY name')->fetchAll();?>
-<div class="panel student-create-panel">
+<?php if($page==='students'&&isset($_GET['edit'])&&in_array($u['role'],$academicRoles,true)):$editQ=$pdo->prepare('SELECT s.*,u.id AS account_user_id,u.full_name,u.email,u.username FROM students s JOIN users u ON u.id=s.user_id WHERE s.id=:id');$editQ->execute(['id'=>(int)$_GET['edit']]);$editStudent=$editQ->fetch();$programs=$pdo->query('SELECT id,name FROM study_programs WHERE is_active=1 ORDER BY name')->fetchAll();if($editStudent):?>
+<div class="panel student-create-panel student-edit-page">
+  <div class="student-form-heading"><div><span class="eyebrow">DATA AKADEMIK</span><h2>Edit Data Mahasiswa</h2><p class="muted">Perubahan data untuk <?=e($editStudent['full_name'])?> — NIM <?=e($editStudent['nim'])?>. Semua isian dimuat dari data mahasiswa yang dipilih.</p></div><span class="tag">Mode Edit</span></div>
+  <form id="studentCreateForm" class="student-edit-form" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="update_student"><input type="hidden" name="student_id" value="<?=$editStudent['id']?>"><input type="hidden" name="user_id" value="<?=$editStudent['account_user_id']?>">
+    <div class="student-tabs" role="tablist" aria-label="Bagian edit data mahasiswa">
+      <button type="button" class="student-tab active" data-tab="academic" role="tab" aria-selected="true">1. Akademik</button>
+      <button type="button" class="student-tab" data-tab="personal" role="tab" aria-selected="false">2. Data Pribadi</button>
+      <button type="button" class="student-tab" data-tab="family" role="tab" aria-selected="false">3. Alamat & Keluarga</button>
+      <button type="button" class="student-tab" data-tab="account" role="tab" aria-selected="false">4. Akun Login</button>
+    </div>
+    <section class="student-tab-panel active" data-tab-panel="academic" role="tabpanel"><h3>Informasi Akademik</h3><div class="student-fields">
+      <div><label>Nama Lengkap</label><input name="full_name" maxlength="160" value="<?=e($editStudent['full_name']??'')?>" required></div>
+      <div><label>NIM</label><input name="nim" maxlength="40" value="<?=e($editStudent['nim']??'')?>" required></div>
+      <div><label>Program Studi</label><select name="study_program_id" required><?php foreach($programs as $p):?><option value="<?=$p['id']?>" <?=$editStudent['study_program_id']==$p['id']?'selected':''?>><?=e($p['name'])?></option><?php endforeach;?></select></div>
+      <div><label>Tahun Masuk</label><input type="number" name="entry_year" min="2000" max="2100" value="<?=e($editStudent['entry_year']??date('Y'))?>" required></div>
+      <div><label>Jalur Masuk</label><input name="admission_pathway" maxlength="60" value="<?=e($editStudent['admission_pathway']??'')?>" placeholder="Reguler / Beasiswa / Pindahan"></div>
+      <div><label>Tanggal Registrasi</label><input type="date" name="registration_date" value="<?=e($editStudent['registration_date']??'')?>"></div>
+    </div></section>
+    <section class="student-tab-panel" data-tab-panel="personal" role="tabpanel" hidden><h3>Data Pribadi & Foto Profil</h3><div class="student-fields">
+      <div><label>NIK</label><input name="national_id" maxlength="16" value="<?=e($editStudent['national_id']??'')?>"></div>
+      <div><label>Tempat Lahir</label><input name="birth_place" value="<?=e($editStudent['birth_place']??'')?>"></div>
+      <div><label>Tanggal Lahir</label><input type="date" name="birth_date" value="<?=e($editStudent['birth_date']??'')?>"></div>
+      <div><label>Jenis Kelamin</label><select name="gender"><option value="">Belum diisi</option><option value="male" <?=($editStudent['gender']??'')==='male'?'selected':''?>>Laki-laki</option><option value="female" <?=($editStudent['gender']??'')==='female'?'selected':''?>>Perempuan</option></select></div>
+      <div><label>Agama</label><input name="religion" value="<?=e($editStudent['religion']??'')?>"></div>
+      <div><label>Status Perkawinan</label><input name="marital_status" value="<?=e($editStudent['marital_status']??'')?>"></div>
+      <div><label>Telepon / WhatsApp</label><input name="phone" value="<?=e($editStudent['phone']??'')?>"></div>
+      <div><label>Alamat</label><textarea name="address" rows="3"><?=e($editStudent['address']??'')?></textarea></div>
+      <div><label>URL Foto</label><input name="photo_url" value="<?=e($editStudent['photo_url']??'')?>"></div>
+      <div><label>Unggah Foto Baru</label><input type="file" name="photo_file" accept="image/jpeg,image/png,image/webp"></div>
+    </div></section>
+    <section class="student-tab-panel" data-tab-panel="family" role="tabpanel" hidden><h3>Alamat & Data Keluarga</h3><div class="student-fields">
+      <?php foreach(['province'=>'Provinsi','city'=>'Kabupaten/Kota','district'=>'Kecamatan','village'=>'Desa/Kelurahan','postal_code'=>'Kode Pos','father_name'=>'Nama Ayah','mother_name'=>'Nama Ibu','guardian_name'=>'Nama Wali','guardian_phone'=>'Telepon Wali','emergency_contact_name'=>'Nama Kontak Darurat','emergency_contact_phone'=>'Telepon Darurat'] as $field=>$label):?><div><label><?=e($label)?></label><input name="<?=e($field)?>" value="<?=e($editStudent[$field]??'')?>"></div><?php endforeach;?>
+    </div></section>
+    <section class="student-tab-panel" data-tab-panel="account" role="tabpanel" hidden><h3>Akun Login Mahasiswa</h3><div class="student-fields">
+      <div><label>Username</label><input name="username" maxlength="100" value="<?=e($editStudent['username']??'')?>" required></div>
+      <div><label>Email</label><input type="email" name="email" value="<?=e($editStudent['email']??'')?>"></div>
+      <div><label>Password Baru (opsional, minimal 10 karakter)</label><input type="password" name="password" minlength="10" maxlength="200" autocomplete="new-password" placeholder="Kosongkan jika tidak ingin mengganti"></div>
+    </div></section>
+    <div class="student-form-footer"><span class="muted">Periksa perubahan sebelum menyimpan.</span><div><a class="student-next" href="?page=students">Batal</a><button type="button" class="student-next" id="studentPrev" hidden>Kembali</button><button type="button" class="student-next" id="studentNext">Lanjutkan →</button><button type="submit" id="studentSubmit" hidden>Simpan Perubahan</button></div></div>
+  </form>
+</div>
+<?php endif;endif;?>
+<?php if($page==='students'&&in_array($u['role'],$academicRoles,true)): $programs=$pdo->query('SELECT id,name FROM study_programs WHERE is_active=1 ORDER BY name')->fetchAll();?>
+<?php if(!isset($_GET['edit'])): ?><div class="panel student-create-panel">
   <div class="student-form-heading"><div><span class="eyebrow">DATA AKADEMIK</span><h2>Tambah Mahasiswa + Akun Login</h2><p class="muted">Isi data secara bertahap melalui tab berikut agar formulir lebih ringkas dan mudah dikelola.</p></div><span class="tag">Formulir Mahasiswa</span></div>
   <form id="studentCreateForm" method="post" enctype="multipart/form-data" novalidate>
     <input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="save_student">
@@ -1211,7 +1223,7 @@ $pendingCount=0;foreach($availableMigrations as $migrationName=>$migrationFile){
     <div class="student-form-footer"><span class="muted">Pastikan data utama dan akun login sudah benar sebelum disimpan.</span><div><button type="button" class="student-next" id="studentPrev" hidden>Kembali</button><button type="button" class="student-next" id="studentNext">Lanjutkan <span aria-hidden="true">→</span></button><button type="submit" id="studentSubmit" hidden>Simpan Mahasiswa</button></div></div>
   </form>
 </div>
-<?php endif;?><?php if($page==='lecturers'&&in_array($u['role'],$academicRoles,true)): $lecturerPrograms=$pdo->query('SELECT id,name FROM study_programs WHERE is_active=1 ORDER BY name')->fetchAll();?>
+<?php endif;?><?php endif;?><?php if($page==='lecturers'&&in_array($u['role'],$academicRoles,true)): $lecturerPrograms=$pdo->query('SELECT id,name FROM study_programs WHERE is_active=1 ORDER BY name')->fetchAll();?>
 <div class="panel student-create-panel lecturer-create-panel">
   <div class="student-form-heading"><div><span class="eyebrow">DATA TENAGA PENDIDIK</span><h2>Tambah Dosen + Akun Login</h2><p class="muted">Lengkapi identitas, data pribadi, alamat, dan riwayat akademik dosen melalui tab berikut.</p></div><span class="tag">Formulir Dosen</span></div>
   <form id="lecturerCreateForm" method="post" enctype="multipart/form-data" novalidate>
@@ -2141,6 +2153,13 @@ body>.student-detail-backdrop>.student-detail-modal{position:relative!important;
 .student-edit-form .student-detail-actions{display:flex!important;gap:10px!important;align-items:center!important;justify-content:flex-end!important;padding:14px 0 calc(8px + env(safe-area-inset-bottom))!important;position:sticky!important;bottom:0!important;background:#fff!important;border-top:1px solid #e1eee6!important;z-index:2!important}
 .student-edit-form .student-detail-actions button{min-height:46px!important;padding:11px 22px!important;border:0!important;border-radius:11px!important;background:#176b50!important;color:#fff!important;font-weight:800!important}
 @media(max-width:600px){.student-detail-modal{max-height:94dvh!important;padding:16px 12px calc(16px + env(safe-area-inset-bottom))!important}.student-edit-grid{grid-template-columns:minmax(0,1fr)!important}.student-edit-section{padding:13px!important}.student-edit-form .student-detail-actions{justify-content:stretch!important}.student-edit-form .student-detail-actions button{flex:1!important}}
+
+/* Student edit uses the same multi-step form as create, prefilled from selected record. */
+.student-edit-page{scroll-margin-top:18px}
+.student-edit-page .student-form-heading h2{color:#145d45}
+.student-edit-page .student-edit-form .student-fields input,.student-edit-page .student-edit-form .student-fields select,.student-edit-page .student-edit-form .student-fields textarea{width:100%;box-sizing:border-box}
+.student-edit-page .student-form-footer{position:sticky;bottom:0;z-index:5;background:#fff;padding:14px 0 calc(10px + env(safe-area-inset-bottom));border-top:1px solid #e0ece5}
+.student-edit-page .student-form-footer>div{display:flex;gap:8px;flex-wrap:wrap}
 </style>
 <script>
 (function(){
