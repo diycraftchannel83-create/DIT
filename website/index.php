@@ -77,6 +77,7 @@ footer{background:#245c3a;color:#e9f4e9;padding:54px 0 20px}.foot-grid{display:g
 </style>
 <link rel="icon" href="<?=h($logo)?>">
 <link rel="alternate icon" href="<?=h($logo)?>">
+<link rel="stylesheet" href="assets/css/campus-theme.css?v=1">
 <meta name="theme-color" content="#075b3d">
 </head>
 <body>
