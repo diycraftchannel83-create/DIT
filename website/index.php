@@ -168,6 +168,58 @@ footer h3{color:#fff!important}footer a{color:#d8f5a8!important}
 
 </style>
 
+
+<style id="mobile-navigation-full-list">
+/* Keep the mobile navigation in normal document flow so every item is visible. */
+@media (max-width:780px){
+  header{position:sticky!important;top:0!important;z-index:1000!important;overflow:visible!important}
+  header .container.nav{
+    display:flex!important;flex-wrap:wrap!important;align-items:center!important;
+    min-height:0!important;height:auto!important;overflow:visible!important;
+    gap:8px!important;padding-top:12px!important;padding-bottom:12px!important;
+  }
+  header .brand{order:1!important;flex:1 1 0!important;min-width:0!important;max-width:none!important}
+  header .hamb{order:2!important;position:static!important;z-index:2!important;flex:0 0 44px!important;width:44px!important;height:44px!important}
+  header .nav-cta{order:3!important;flex:0 1 44%!important;max-width:44%!important;min-width:0!important}
+  header .links,
+  header .links.open{
+    position:static!important;inset:auto!important;top:auto!important;left:auto!important;right:auto!important;
+    order:4!important;flex:1 0 100%!important;width:100%!important;max-width:100%!important;
+    max-height:none!important;height:auto!important;min-height:0!important;
+    overflow:visible!important;overflow-y:visible!important;overflow-x:visible!important;
+    overscroll-behavior:auto!important;
+    flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;
+    gap:0!important;margin:8px 0 0!important;
+    padding:10px 12px calc(12px + env(safe-area-inset-bottom))!important;
+    box-sizing:border-box!important;background:#fff!important;color:#174b35!important;
+    border:1px solid #d7e9dc!important;border-radius:16px!important;
+    box-shadow:0 12px 28px rgba(7,91,61,.12)!important;
+    z-index:auto!important;
+  }
+  header .links{display:none!important}
+  header .links.open{display:flex!important}
+  header .links a{
+    display:flex!important;align-items:center!important;width:100%!important;
+    min-height:48px!important;height:auto!important;padding:12px 12px!important;margin:0!important;
+    white-space:normal!important;overflow:visible!important;text-overflow:clip!important;
+    line-height:1.4!important;font-size:14px!important;color:#245c3a!important;
+    background:transparent!important;border:0!important;border-bottom:1px solid #e5f0e8!important;
+    border-radius:8px!important;
+  }
+  header .links a:last-child{border-bottom:0!important}
+  header .links a.admin-login{margin-top:8px!important;background:#e8f5e9!important;color:#075b3d!important}
+}
+@media (max-width:520px){
+  header .container.nav{gap:7px!important;padding-top:10px!important;padding-bottom:10px!important}
+  header .brand{max-width:none!important;flex:1 1 0!important}
+  header .brand img{width:40px!important;height:40px!important}
+  header .brand .brand-kicker{font-size:7px!important}
+  header .brand strong{font-size:10px!important;white-space:normal!important}
+  header .brand small{font-size:7px!important}
+  header .nav-cta{flex:0 1 42%!important;max-width:42%!important;font-size:10px!important;padding:8px 7px!important}
+}
+</style>
+
 <meta name="theme-color" content="#075b3d">
 </head>
 <body>
