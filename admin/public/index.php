@@ -759,7 +759,7 @@ if ($u['role']==='ketua_prodi') {
     $programScopeId=(int)$scopeValue;
 }
 if ($page==='system') allow(['super_admin','admin_akademik','admin_keuangan','ketua_prodi','ketua_stit','dosen']); elseif ($page==='migrations') allow(['super_admin']); elseif (in_array($page,['programs','years','semesters','courses','classes','schedules','students','lecturers','accounts','krs','news','pmb'],true)) allow($academicRoles); elseif (in_array($page,['grades','attendance'],true)) allow(['super_admin','admin_akademik','dosen']); elseif (in_array($page,['khs','ipk'],true)) allow(['super_admin','admin_akademik','ketua_prodi','ketua_stit']); elseif ($page==='dashboard') allow(['super_admin','admin_akademik','admin_keuangan','ketua_prodi','ketua_stit','dosen']); else allow($viewRoles);
-?><!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><script>try{document.documentElement.dataset.theme=localStorage.getItem('stit-admin-theme')||'green'}catch(e){document.documentElement.dataset.theme='green'}</script><title><?=e($menus[$page]??'Dashboard')?> - STIT Darul Ilmi</title><link rel="icon" href="<?=e($campusLogoUrl)?>"><style>
+?><!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><script>try{document.documentElement.dataset.theme=localStorage.getItem('stit-admin-theme')||'green'}catch(e){document.documentElement.dataset.theme='green'}</script><title><?=e($menus[$page]??'Dashboard')?> - STIT Darul Ilmi</title><link rel="icon" href="<?=e($campusLogoUrl)?>"><style>
 :root{--navy:#03452f;--teal:#087a4b;--bg:#f5faf6;--ink:#173b2b;--muted:#64756b;--line:#e1eee5;--mint:#eaf6ef;--lime:#b9e66b}*{box-sizing:border-box}body{margin:0;background:var(--bg);font:14px system-ui;color:var(--ink)}.layout{display:flex;min-height:100vh}.side{width:255px;background:linear-gradient(180deg,#03452f,#075b3d 70%,#087a4b);color:#fff;padding:24px 16px;flex-shrink:0;box-shadow:8px 0 28px #03452f12}.brand{display:flex;align-items:center;gap:11px;font-size:15px;font-weight:850;padding:5px 10px 25px;letter-spacing:.02em}.brand img{width:44px;height:44px;object-fit:contain;flex:0 0 44px;background:#fff;border-radius:10px;padding:3px}.brand-copy{min-width:0}.brand small{display:block;color:#c5e4d2;font-weight:500;font-size:12px;margin:5px 0 0}.nav a{display:block;color:#e0f0e6;text-decoration:none;padding:12px 14px;border-radius:12px;margin:4px 0;transition:.15s}.nav a.active,.nav a:hover{background:#ffffff20;color:#fff;box-shadow:inset 3px 0 #b9e66b}.nav-dashboard{margin-bottom:14px!important}.nav-group{margin:14px 0 18px;padding-top:12px;border-top:1px solid #ffffff24}.nav-group-title{padding:0 14px 7px;color:#b9e6ca;font-size:10px;font-weight:850;letter-spacing:.12em;text-transform:uppercase}.nav-group a{padding:10px 14px;margin:3px 0;font-size:13px}.mobile-menu-group{margin:0 0 22px}.mobile-menu-group h3{display:flex;align-items:center;gap:9px;margin:0 0 10px;padding:0 2px;color:#087a4b;font-size:11px;font-weight:900;letter-spacing:.11em;text-transform:uppercase}.mobile-menu-group h3:before{content:'';width:4px;height:15px;border-radius:4px;background:#36a66d}.mobile-menu-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:9px}.mobile-menu-grid a{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:52px;padding:12px 14px;border:1px solid #e5eee8;border-radius:14px;background:#fbfdfb;color:#234b37;text-decoration:none;font-weight:700;font-size:13px;box-shadow:0 2px 8px rgba(20,70,42,.035);transition:background .16s,border-color .16s,transform .16s}.mobile-menu-grid a:active{transform:scale(.985)}.mobile-menu-grid a span:last-child{color:#8aa694;font-size:21px;font-weight:500}.mobile-menu-grid a.active{background:#eaf6ef;border-color:#8fc5a3;color:#075b3d;box-shadow:inset 3px 0 #087a4b,0 3px 10px rgba(8,122,75,.07)}.mobile-menu-grid a.active span:last-child{color:#087a4b}.main{flex:1;min-width:0}.top{height:72px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 30px;box-shadow:0 3px 16px #03452f08}.content{padding:28px 30px;max-width:1400px;margin:auto}h1{font-size:25px;margin:0 0 7px;color:var(--navy)}.muted{color:var(--muted)}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:15px;margin:24px 0}.card,.panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:19px;box-shadow:0 5px 18px #03452f08}.card strong{display:block;font-size:28px;margin-top:7px;color:var(--teal)}.panel{margin-top:20px;overflow:auto}.panel h2{font-size:17px;margin:0 0 16px;color:var(--navy)}table{border-collapse:collapse;width:100%;min-width:580px}th,td{text-align:left;padding:12px 13px;border-bottom:1px solid #edf3ee}th{background:var(--mint);color:#315b43;font-size:12px;text-transform:uppercase;letter-spacing:.03em}form.inline{display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin-bottom:18px}form.inline label{display:block;font-size:12px;color:#475d50;margin-bottom:5px}input,select{padding:10px;border:1px solid #d4e5d9;border-radius:10px;font:inherit;background:#fcfefc}input:focus,select:focus{outline:0;border-color:var(--teal);box-shadow:0 0 0 3px #087a4b18}button,.btn{padding:10px 14px;border:0;border-radius:11px;background:var(--teal);color:white;font-weight:700;cursor:pointer;text-decoration:none}.alert{padding:12px 14px;border-radius:12px;margin:0 0 18px;background:#e8f6ee;color:#17663a}.alert.error{background:#fff0ee;color:#a32118}.logout{background:var(--mint);color:var(--navy)}.tag{background:var(--mint);color:var(--teal);border-radius:20px;padding:4px 9px;font-size:12px}.student-create-panel{padding:24px;overflow:visible}.student-form-heading{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:20px}.student-form-heading h2{font-size:21px;margin:5px 0}.student-form-heading p{margin:0}.eyebrow{font-size:10px;letter-spacing:.14em;font-weight:850;color:var(--teal)}.student-tabs{display:flex;gap:8px;overflow-x:auto;padding:5px 2px 14px;border-bottom:1px solid var(--line);margin-bottom:22px}.student-tab{white-space:nowrap;background:#f2f8f4;color:#466451;border:1px solid #e0ece3;border-radius:12px;padding:11px 15px;margin:0}.student-tab.active{background:var(--navy);color:#fff;border-color:var(--navy);box-shadow:0 5px 14px #03452f20}.student-tab-panel{min-height:280px}.student-tab-panel[hidden]{display:none}.student-tab-panel h3{font-size:16px;margin:0 0 5px;color:var(--navy)}.student-tab-panel>p{margin:0 0 20px}.student-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.student-fields>div{min-width:0}.student-fields label,.student-photo-control label{display:block;font-size:12px;font-weight:750;color:#405b49;margin-bottom:7px}.student-fields input,.student-fields select{width:100%;min-height:43px}.student-profile-upload{display:flex;align-items:center;gap:20px;padding:16px;background:#f5faf6;border:1px dashed #bdd9c6;border-radius:15px;margin-bottom:20px}.student-avatar-preview{width:104px;height:104px;flex:0 0 104px;border-radius:50%;background:#e2f0e6;border:3px solid #fff;box-shadow:0 0 0 1px #cfe3d5;display:grid;place-items:center;overflow:hidden;color:#6a8a73;font-size:11px;font-weight:800}.student-avatar-preview img{width:100%;height:100%;object-fit:cover}.student-photo-control{flex:1;min-width:0}.student-photo-control input{display:block;width:100%;padding:9px;background:#fff;border:1px solid #d4e5d9;border-radius:10px}.student-photo-control small{display:block;margin-top:7px;line-height:1.5}.student-security-note{display:flex;flex-direction:column;gap:4px;background:#f0f8f2;border:1px solid #d7eadc;border-radius:12px;padding:13px;margin-top:20px;color:#47624e;font-size:12px}.student-form-footer{display:flex;justify-content:space-between;align-items:center;gap:14px;border-top:1px solid var(--line);padding-top:18px;margin-top:25px}.student-form-footer>div{display:flex;gap:8px}.student-form-footer button{margin:0;min-width:120px}.student-next{background:#eaf4ed;color:var(--navy)}.student-form-footer button[type=submit]{background:var(--teal)}@media(max-width:650px){.student-create-panel{padding:17px}.student-form-heading{display:block}.student-form-heading>.tag{display:inline-block;margin-top:10px}.student-fields{grid-template-columns:1fr}.student-tab{padding:10px 12px;font-size:12px}.student-profile-upload{align-items:flex-start;flex-direction:column}.student-form-footer{align-items:flex-start;flex-direction:column}.student-form-footer>div{width:100%}.student-form-footer button{flex:1}}@media(max-width:760px){.layout{display:block}.side{width:100%;padding:12px}.brand{padding:5px 8px 12px}.nav{display:flex;overflow:auto;gap:4px}.nav a{white-space:nowrap}.top{height:58px;padding:0 16px}.content{padding:20px 14px}}
 @media(min-width:761px){.mobile-bottom-nav,.mobile-menu-sheet,.mobile-menu-backdrop{display:none!important}}
 @media(max-width:760px){
@@ -2024,6 +2024,45 @@ html[data-theme="green"] .student-tab-panel[hidden] {display:none!important}
   }
 }
 
+
+
+/* Keep the admin header actions below Android's status/notification bar. */
+@media screen and (max-width:760px) {
+  .top {
+    position:relative!important;
+    z-index:5!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:92px!important;
+    padding:calc(24px + env(safe-area-inset-top, 0px)) 16px 10px!important;
+    gap:12px!important;
+  }
+  .top > strong {
+    min-width:0!important;
+    line-height:1.35!important;
+    overflow-wrap:anywhere!important;
+  }
+  .top > form {
+    display:flex!important;
+    flex:0 0 auto!important;
+    align-items:center!important;
+    margin:0!important;
+    padding:0!important;
+  }
+  .top .logout {
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    min-height:44px!important;
+    padding:10px 18px!important;
+    line-height:1.2!important;
+    white-space:nowrap!important;
+  }
+}
 
 /* Admin Android navigation: no drawer/popup; retain four direct destinations. */
 @media screen and (max-width:760px) {
