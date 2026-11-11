@@ -62,6 +62,11 @@ $flash = $_SESSION['portal_flash'] ?? null; unset($_SESSION['portal_flash']);
 $campusLogoUrl='../../website/assets/stit-darul-ilmi-icon.svg';
 try { $savedLogo=$pdo->query('SELECT logo_image_url FROM campus_profile WHERE id=1')->fetchColumn(); if(is_string($savedLogo)&&trim($savedLogo)!=='') $campusLogoUrl=trim($savedLogo); } catch(Throwable $logoError) { error_log('[STIT PORTAL LOGO] '.$logoError->getMessage()); }
 $page = (string)($_GET['page'] ?? (portalUser() ? 'dashboard' : 'login'));
+$ektmImageUrl=null;
+if (portalUser() && portalUser()['role']==='mahasiswa') {
+    try { $value=$pdo->query('SELECT ektm_image_url FROM campus_profile WHERE id=1')->fetchColumn(); if(is_string($value)&&trim($value)!=='') $ektmImageUrl=trim($value); }
+    catch(Throwable $ektmError) { error_log('[STIT PORTAL EKTM] '.$ektmError->getMessage()); }
+}
 if ($_SERVER['REQUEST_METHOD']==='POST') {
     verifyCsrf();
     $action=(string)($_POST['action']??'');
@@ -244,6 +249,13 @@ input,select,textarea,.profile-edit input,.profile-edit textarea,.profile-edit s
 <?php else: ?>
 <div class="shell"><header class="top"><div class="brand"><img src="<?=h($campusLogoUrl)?>" alt="Logo STIT Darul Ilmi"><span class="brand-copy">STIT DARUL ILMI<small>Portal Akademik · <?=h($roleLabel)?></small></span></div><div class="user"><div><strong><?=h($user['name'])?></strong><div class="muted" style="font-size:12px"><?=h($user['username'])?></div></div><form method="post"><input type="hidden" name="_csrf" value="<?=h(csrfToken())?>"><input type="hidden" name="action" value="logout"><button class="logout">Keluar</button></form></div></header>
 <section class="hero" id="dashboard"><h1>Selamat datang, <?=h($user['name'])?></h1><p><?= $user['role']==='mahasiswa' ? 'Pantau aktivitas akademik, KRS, hasil studi, presensi, dan informasi tagihan Anda.' : 'Pantau kelas yang Anda ampu, peserta kelas, dan ringkasan presensi akademik.' ?></p></section>
+<?php if($user['role']==='mahasiswa'): ?>
+<section class="panel ektm-card" aria-labelledby="ektm-title" style="margin:18px 0;padding:18px;border:1px solid #dce9df;border-radius:18px;background:#fff;box-shadow:0 8px 24px rgba(18,67,47,.06)">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><span aria-hidden="true" style="display:inline-flex;width:5px;height:26px;border-radius:8px;background:#e5c94f"></span><div><h2 id="ektm-title" style="margin:0;color:#174b35;font-size:18px">Kartu EKTM</h2><p style="margin:3px 0 0;color:#6c7e72;font-size:13px">Kartu mahasiswa STIT Darul Ilmi</p></div></div>
+  <?php if($ektmImageUrl): ?><img src="<?=h($ektmImageUrl)?>" alt="Kartu EKTM mahasiswa" style="display:block;width:100%;height:auto;max-height:520px;object-fit:contain;border-radius:12px;background:#f4f8f5">
+  <?php else: ?><div style="min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:24px;border:1px dashed #b9d5c3;border-radius:12px;background:#f5faf6;text-align:center;color:#557564"><span aria-hidden="true" style="font-size:34px">▤</span><strong style="color:#24583e">Gambar EKTM belum tersedia</strong><span style="font-size:13px;line-height:1.5">Admin akan mengunggah gambar kartu EKTM melalui Admin Dashboard.</span></div><?php endif; ?>
+</section>
+<?php endif; ?>
 <?php if($user['role']==='mahasiswa'): ?><section class="student-identity"><img src="<?=h($profile['photo_url']?:'assets/profile-placeholder.svg')?>" alt="Foto profil mahasiswa" onerror="this.src='assets/profile-placeholder.svg'"><div><strong><?=h($user['name'])?></strong><span><?=h($profile['nim'])?> · <?=h($profile['program']??'Mahasiswa')?></span><a href="?page=profile">Kelola data pribadi →</a></div></section><?php endif;?>
 <?php if($user['role']==='mahasiswa' && $page==='profile'): ?><section class="panel profile-edit" id="data-pribadi"><h2>Edit Data Pribadi</h2><p class="muted">Perbarui informasi kontak dan foto profil. Data akademik seperti NIM dan program studi dikelola oleh Admin Akademik.</p><form method="post" enctype="multipart/form-data"><input type="hidden" name="_csrf" value="<?=h(csrfToken())?>"><input type="hidden" name="action" value="update_student_profile"><div class="profile-tabs" role="tablist" aria-label="Bagian data pribadi">
 <button type="button" class="profile-tab active" role="tab" aria-selected="true" data-tab="akun">Akun & Akademik</button>
