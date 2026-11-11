@@ -1270,8 +1270,14 @@ try{$webRows=$pdo->query('SELECT content_key,content_value FROM website_content'
 <p class="muted" style="margin:4px 0 12px">Tambahkan beberapa foto gedung dan lingkungan kampus. Foto akan berganti otomatis setiap 5 detik. Format JPG, PNG, WebP — maksimal 5 MB per foto.</p>
 <?php $heroSlidesAdmin=json_decode($webSettings['hero_slides_json']??'[]',true);if(!is_array($heroSlidesAdmin))$heroSlidesAdmin=[];?>
 <?php if($heroSlidesAdmin):?><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:12px;margin:12px 0"><?php foreach($heroSlidesAdmin as $slideIndex=>$slide):if(!is_array($slide)||empty($slide['url']))continue;?><label style="display:block;padding:8px;background:#fff;border:1px solid #d7e9dc;border-radius:10px"><img src="<?=e($slide['url'])?>" alt="Foto slideshow <?=e($slideIndex+1)?>" style="width:100%;height:100px;object-fit:cover;border-radius:7px"><span style="display:flex;align-items:center;gap:6px;margin-top:7px;font-size:12px"><input type="checkbox" name="hero_slide_active[<?=e($slideIndex)?>]" value="1" <?=!array_key_exists("active",$slide)||!empty($slide["active"])?"checked":""?>> Tampilkan</span><span style="display:flex;align-items:center;gap:6px;margin-top:6px;font-size:12px">Urutan <select name="hero_slide_order[<?=e($slideIndex)?>]" style="max-width:72px;padding:4px"><?php for($order=1;$order<=count($heroSlidesAdmin);$order++):?><option value="<?=e($order)?>" <?=$order===$slideIndex+1?"selected":""?>><?=e($order)?></option><?php endfor;?></select></span><span style="display:flex;align-items:center;gap:6px;margin-top:6px;font-size:12px"><input type="checkbox" name="remove_hero_slides[]" value="<?=e($slideIndex)?>"> Hapus foto</span></label><?php endforeach;?></div><?php else:?><p class="muted">Belum ada foto tambahan. Foto gedung utama yang lama tetap digunakan sebagai cadangan.</p><?php endif;?>
-<input type="file" name="hero_slide_files[]" accept="image/jpeg,image/png,image/webp" multiple>
-<small class="muted">Pilih satu atau beberapa foto sekaligus. Foto baru akan ditambahkan setelah foto yang sudah ada.</small>
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:14px">
+<label for="heroSlideFiles" style="display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:12px 20px;border-radius:10px;background:#087a4b;color:#fff;font-weight:800;font-size:14px;cursor:pointer;box-shadow:0 5px 14px #087a4b25">
+<span aria-hidden="true" style="font-size:20px;line-height:1">＋</span> TAMBAH FOTO
+</label>
+<input id="heroSlideFiles" type="file" name="hero_slide_files[]" accept="image/jpeg,image/png,image/webp" multiple style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0">
+<span id="heroSlideFileNames" class="muted" aria-live="polite">Belum ada file baru dipilih</span>
+</div>
+<small class="muted" style="display:block;margin-top:8px">Klik tombol hijau <strong>Tambah Foto</strong>, pilih satu atau beberapa foto sekaligus. Foto baru akan ditambahkan setelah foto yang sudah ada. Setelah memilih, klik tombol <strong>Simpan Konten Website</strong> di bagian bawah formulir.</small>
 </div>
 <div style="flex-basis:100%;padding:14px;background:#f0f8f2;border:1px solid #cfe8d6;border-radius:12px">
 <label>Foto Kedua — Bagian “Mengenal Kampus” (JPG, PNG, WebP — maksimal 5 MB)</label>
@@ -2784,6 +2790,17 @@ html[data-theme="green"] .student-edit-page .student-form-footer button#studentS
 }
 html[data-theme="black"] .side nav.nav .nav-group{background:rgba(0,0,0,.2)!important}
 </style>
+<script id="hero-slide-upload-picker">
+(function(){
+ const input=document.getElementById('heroSlideFiles');
+ const output=document.getElementById('heroSlideFileNames');
+ if(!input||!output)return;
+ input.addEventListener('change',function(){
+  const files=Array.from(input.files||[]);
+  output.textContent=files.length?files.length+' foto dipilih: '+files.map(file=>file.name).join(', '):'Belum ada file baru dipilih';
+ });
+})();
+</script>
 <script id="admin-responsive-navigation-final-script">
 (function(){
   function init(){
