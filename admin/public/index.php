@@ -1660,6 +1660,18 @@ $pendingCount=0;foreach($availableMigrations as $migrationName=>$migrationFile){
     <div class="student-form-footer"><span class="muted">Pastikan data utama dan akun login sudah benar sebelum disimpan.</span><div><button type="button" class="student-next" id="studentPrev" hidden>Kembali</button><button type="button" class="student-next" id="studentNext">Lanjutkan <span aria-hidden="true">→</span></button><button type="submit" id="studentSubmit" hidden>Simpan Mahasiswa</button></div></div>
   </form>
 </div>
+<div class="panel" id="studentRegisteredList">
+  <div class="student-form-heading"><div><span class="eyebrow">DATA AKADEMIK</span><h2>Daftar Mahasiswa Terdaftar</h2><p class="muted">Daftar mahasiswa yang sudah didaftarkan dan tersimpan dalam database akademik.</p></div><span class="tag"><?=count($rows)?> mahasiswa</span></div>
+  <?php if(!$rows):?><p class="muted">Belum ada mahasiswa yang terdaftar.</p><?php else:?>
+  <div style="overflow-x:auto"><table><thead><tr><th>No.</th><th>NIM</th><th>Nama Mahasiswa</th><th>Program Studi</th><th>Tahun Masuk</th><th>Telepon</th><th>Status</th><th>Aksi</th></tr></thead><tbody>
+  <?php foreach($rows as $index=>$studentRow):?><tr>
+    <td><?=($index+1)?></td><td><?=e($studentRow['nim']??'—')?></td>
+    <td><a class="student-name-link" href="?page=students&amp;edit=<?=(int)$studentRow['id']?>#studentCreateForm"><?=e($studentRow['full_name']??'—')?></a></td>
+    <td><?=e($studentRow['program']??'—')?></td><td><?=e($studentRow['entry_year']??'—')?></td><td><?=e($studentRow['phone']??'—')?></td><td><?=e($studentRow['status']??'—')?></td>
+    <td><a href="?page=students&amp;edit=<?=(int)$studentRow['id']?>#studentCreateForm">Kelola</a></td>
+  </tr><?php endforeach;?>
+  </tbody></table></div><?php endif;?>
+</div>
 <?php endif;?><?php endif;?><?php if($page==='lecturers'&&in_array($u['role'],$academicRoles,true)): $lecturerPrograms=$pdo->query('SELECT id,name FROM study_programs WHERE is_active=1 ORDER BY name')->fetchAll();?>
 <div class="panel student-create-panel lecturer-create-panel">
   <div class="student-form-heading"><div><span class="eyebrow">DATA TENAGA PENDIDIK</span><h2>Tambah Dosen + Akun Login</h2><p class="muted">Lengkapi identitas, data pribadi, alamat, dan riwayat akademik dosen melalui tab berikut.</p></div><span class="tag">Formulir Dosen</span></div>
