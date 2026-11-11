@@ -2685,4 +2685,62 @@ html[data-theme="green"] .student-edit-page .student-form-footer button#studentS
  html body .mobile-bottom-nav,html body .admin-mobile-drawer,html body .admin-menu-trigger{display:none!important}
 }
 </style>
+
+<style id="android-sidebar-collapsible">
+@media(max-width:760px){
+ html body .layout>.side,html body .side{
+  display:block!important;height:auto!important;max-height:none!important;overflow:visible!important;
+  padding:9px 12px!important;border-radius:0 0 14px 14px!important;
+ }
+ html body .side .brand{display:flex!important;align-items:center!important;gap:9px!important;padding:2px 2px 8px!important;margin:0!important;border:0!important}
+ html body .side .brand img{width:38px!important;height:38px!important;flex:0 0 38px!important}
+ html body .side .brand-copy{flex:1 1 auto!important;min-width:0!important;font-size:13px!important}
+ html body .side .brand small{font-size:10px!important}
+ html body .side .android-nav-toggle{
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:7px!important;
+  flex:0 0 auto!important;min-height:38px!important;padding:8px 13px!important;
+  border:1px solid rgba(255,255,255,.32)!important;border-radius:10px!important;
+  background:rgba(255,255,255,.14)!important;color:#fff!important;font-size:12px!important;font-weight:800!important;
+ }
+ html body .side nav.nav{display:none!important}
+ html body .side.nav-expanded nav.nav{display:block!important;margin-top:8px!important}
+ html body .side.nav-expanded{max-height:55dvh!important;overflow-y:auto!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important}
+ html body .side nav.nav .nav-dashboard{display:flex!important;width:100%!important;min-height:40px!important;margin:0 0 8px!important}
+ html body .side nav.nav .nav-group{display:block!important;width:100%!important;margin:0 0 8px!important}
+ html body .side nav.nav .nav-group-title{display:block!important}
+ html body .side nav.nav .nav-group a{display:flex!important;width:100%!important;min-height:38px!important}
+ html body .mobile-bottom-nav,html body .admin-mobile-drawer,html body .admin-menu-trigger{display:none!important}
+}
+</style>
+<script id="android-sidebar-collapsible-script">
+(function(){
+ function setup(){
+  var side=document.querySelector('aside.side');
+  var brand=side&&side.querySelector('.brand');
+  var nav=side&&side.querySelector('nav.nav');
+  if(!side||!brand||!nav||brand.querySelector('.android-nav-toggle'))return;
+  var btn=document.createElement('button');
+  btn.type='button';btn.className='android-nav-toggle';
+  btn.setAttribute('aria-expanded','false');
+  btn.setAttribute('aria-controls','adminWebsiteNavigation');
+  btn.innerHTML='<span aria-hidden="true">☰</span><span>Menu</span>';
+  nav.id='adminWebsiteNavigation';
+  brand.appendChild(btn);
+  btn.addEventListener('click',function(){
+   var open=side.classList.toggle('nav-expanded');
+   btn.setAttribute('aria-expanded',open?'true':'false');
+   btn.lastElementChild.textContent=open?'Tutup':'Menu';
+  });
+  nav.addEventListener('click',function(e){
+   if(e.target.closest('a')) {
+    side.classList.remove('nav-expanded');
+    btn.setAttribute('aria-expanded','false');
+    btn.lastElementChild.textContent='Menu';
+   }
+  });
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup,{once:true});
+ else setup();
+})();
+</script>
 </body></html>
