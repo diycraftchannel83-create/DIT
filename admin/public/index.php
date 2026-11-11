@@ -2793,4 +2793,39 @@ html[data-theme="black"] .side nav.nav .nav-group{background:rgba(0,0,0,.2)!impo
  html body .main,html body .top{position:relative!important;z-index:1!important}
 }
 </style>
+
+<style id="android-drawer-height-to-requested-line">
+@media(max-width:760px){
+ html body .side.nav-expanded nav.nav{
+  position:fixed!important;
+  top:calc(env(safe-area-inset-top) + 76px)!important;
+  left:12px!important;right:12px!important;bottom:auto!important;
+  width:auto!important;
+  height:42dvh!important;min-height:280px!important;max-height:420px!important;
+  box-sizing:border-box!important;
+  display:block!important;overflow-x:hidden!important;overflow-y:auto!important;
+  padding:13px!important;margin:0!important;
+  border:1px solid #d9e8de!important;border-radius:16px!important;
+  background:#f8fcf9!important;
+  box-shadow:0 12px 34px rgba(4,37,23,.22)!important;
+  overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;
+  z-index:3002!important;
+ }
+ html body .side.nav-expanded::after{
+  position:fixed!important;top:calc(env(safe-area-inset-top) + 64px)!important;
+  left:0!important;right:0!important;bottom:0!important;z-index:3001!important;
+ }
+ html body .side.nav-expanded nav.nav .nav-group{
+  display:block!important;width:100%!important;height:auto!important;max-height:none!important;
+  overflow:visible!important;box-sizing:border-box!important;margin:0 0 9px!important;
+ }
+ html body .side.nav-expanded nav.nav .nav-group a{
+  display:flex!important;width:100%!important;min-height:40px!important;height:auto!important;
+  box-sizing:border-box!important;
+ }
+}
+@media(max-height:700px) and (max-width:760px){
+ html body .side.nav-expanded nav.nav{height:44dvh!important;min-height:220px!important;max-height:440px!important}
+}
+</style>
 </body></html>
