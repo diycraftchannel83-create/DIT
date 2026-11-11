@@ -29,12 +29,15 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
   $f=[];$keys=['full_name','national_id','email','phone','whatsapp','birth_place','religion','marital_status','postal_code','birth_date','gender','address','province','city','district','village','previous_school','school_major','diploma_number','father_name','father_occupation','father_phone','mother_name','mother_occupation','mother_phone','guardian_name','guardian_phone','emergency_contact_name','emergency_contact_phone','admission_pathway'];
   foreach($keys as $k)$f[$k]=trim((string)($_POST[$k]??''));
   $f['study_program_id']=(int)($_POST['study_program_id']??0);$f['entry_year']=(int)($_POST['entry_year']??date('Y'));$f['graduation_year']=(int)($_POST['graduation_year']??0);
-  $required=['full_name'];
+  $required=['full_name','national_id','email','phone','birth_place','birth_date','gender','address','province','city','district','village','previous_school','school_major','father_name','father_phone','mother_name','mother_phone'];
   foreach($required as $k)if($f[$k]===''){$pmbMessage='Lengkapi seluruh data wajib yang bertanda wajib.';break;}
+  if(!$pmbMessage&&(!preg_match('/^\\d{16}$/',$f['national_id'])||!filter_var($f['email'],FILTER_VALIDATE_EMAIL)||!in_array($f['gender'],['male','female'],true)))$pmbMessage='Periksa kembali NIK (16 digit), email, dan jenis kelamin.';
   if(!$pmbMessage&&mb_strlen($f['full_name'])<2)$pmbMessage='Nama lengkap minimal 2 karakter.';
-  if(!$pmbMessage&&$f['study_program_id']<1&&count($pmbPrograms)>0)$f['study_program_id']=(int)$pmbPrograms[0]['id'];
+  if(!$pmbMessage&&($f['study_program_id']<1||$f['graduation_year']<1980||$f['graduation_year']>(int)date('Y')+1))$pmbMessage='Program studi atau tahun lulus tidak valid.';
+  if(!$pmbMessage&&empty($_POST['declaration']))$pmbMessage='Pernyataan kebenaran data wajib dicentang.';
+
   $files=[];
-  foreach([] as $key=>$label){ // Mode pengujian: dokumen PMB dilewati.
+  foreach(['ktp'=>'Fotokopi KTP','kk'=>'Kartu Keluarga','ijazah'=>'Ijazah SMA/SMK/MA sederajat','pas_foto'=>'Pas foto terbaru ukuran 3x4'] as $key=>$label){
 
    if($pmbMessage)break;$up=$_FILES[$key]??null;
    if(!$up||($up['error']??UPLOAD_ERR_NO_FILE)===UPLOAD_ERR_NO_FILE){$pmbMessage='Dokumen wajib belum lengkap: '.$label.'.';break;}if(($up['error']??UPLOAD_ERR_OK)!==UPLOAD_ERR_OK){$pmbMessage='Unggahan '.$label.' gagal diproses.';break;}
@@ -52,9 +55,6 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
    $files[$key]=['tmp'=>$up['tmp_name'],'name'=>substr(basename((string)$up['name']),0,255),'mime'=>$mime,'size'=>(int)$up['size'],'ext'=>$ext];
   }
   if(!$pmbMessage){
-   // Nilai kontak sintetis dipakai khusus mode pengujian agar kunci konfirmasi selalu tersedia.
-   $f['email']=$f['email']?:('test+'.strtolower(bin2hex(random_bytes(4))).'@example.invalid');
-   $f['phone']=$f['phone']?:'0000000000';
    // Simpan berkas pada direktori privat proyek yang ikut ter-deploy, bukan
    // di luar DOCUMENT_ROOT yang umumnya tidak writable pada shared hosting.
    $storageCandidates=[
@@ -76,7 +76,7 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
     try{
      $pdo->beginTransaction();
      $sql="INSERT INTO pmb_applicants(registration_number,full_name,email,phone,whatsapp,study_program_id,status,registration_fee_amount,payment_status,national_id,birth_place,birth_date,gender,religion,marital_status,address,province,city,district,village,postal_code,previous_school,school_major,graduation_year,diploma_number,father_name,father_occupation,father_phone,mother_name,mother_occupation,mother_phone,guardian_name,guardian_phone,emergency_contact_name,emergency_contact_phone,entry_year,admission_pathway,document_status) VALUES(:reg,:name,:email,:phone,:whatsapp,:program,'registered',200000,'unpaid',:nik,:birth_place,:birth_date,:gender,:religion,:marital_status,:address,:province,:city,:district,:village,:postal_code,:school,:major,:grad,:diploma,:father,:father_job,:father_phone,:mother,:mother_job,:mother_phone,:guardian,:guardian_phone,:emergency_name,:emergency_phone,:entry_year,:pathway,'pending')";
-     $q=$pdo->prepare($sql);$q->execute(['reg'=>$pmbRegistration,'name'=>$f['full_name'],'email'=>$f['email'],'phone'=>$f['phone'],'whatsapp'=>$f['whatsapp']?:null,'program'=>$f['study_program_id'],'nik'=>$f['national_id']?:'TEST'.strtoupper(bin2hex(random_bytes(6))),'birth_place'=>$f['birth_place']?:'Data Uji','birth_date'=>$f['birth_date']?:'2000-01-01','gender'=>$f['gender']?:'male','religion'=>$f['religion']?:null,'marital_status'=>$f['marital_status']?:null,'address'=>$f['address']?:'Data pengujian','province'=>$f['province']?:'-','city'=>$f['city']?:'-','district'=>$f['district']?:'-','village'=>$f['village']?:'-','postal_code'=>$f['postal_code']?:null,'school'=>$f['previous_school']?:'Data pengujian','major'=>$f['school_major']?:null,'grad'=>$f['graduation_year']?:2000,'diploma'=>$f['diploma_number']?:null,'father'=>$f['father_name']?:'Data uji','father_job'=>$f['father_occupation']?:null,'father_phone'=>$f['father_phone']?:null,'mother'=>$f['mother_name']?:'Data uji','mother_job'=>$f['mother_occupation']?:null,'mother_phone'=>$f['mother_phone']?:null,'guardian'=>$f['guardian_name']?:null,'guardian_phone'=>$f['guardian_phone']?:null,'emergency_name'=>$f['emergency_contact_name']?:null,'emergency_phone'=>$f['emergency_contact_phone']?:null,'entry_year'=>$f['entry_year'],'pathway'=>$f['admission_pathway']?:'Pengujian']);
+     $q=$pdo->prepare($sql);$q->execute(['reg'=>$pmbRegistration,'name'=>$f['full_name'],'email'=>$f['email'],'phone'=>$f['phone'],'whatsapp'=>$f['whatsapp']?:null,'program'=>$f['study_program_id'],'nik'=>$f['national_id']?:'TEST'.strtoupper(bin2hex(random_bytes(6))),'birth_place'=>$f['birth_place']?:'Data Uji','birth_date'=>$f['birth_date']?:'2000-01-01','gender'=>$f['gender']?:'male','religion'=>$f['religion']?:null,'marital_status'=>$f['marital_status']?:null,'address'=>$f['address'],'province'=>$f['province'],'city'=>$f['city'],'district'=>$f['district'],'village'=>$f['village'],'postal_code'=>$f['postal_code']?:null,'school'=>$f['previous_school'],'major'=>$f['school_major'],'grad'=>$f['graduation_year'],'diploma'=>$f['diploma_number']?:null,'father'=>$f['father_name'],'father_job'=>$f['father_occupation']?:null,'father_phone'=>$f['father_phone'],'mother'=>$f['mother_name'],'mother_job'=>$f['mother_occupation']?:null,'mother_phone'=>$f['mother_phone'],'guardian'=>$f['guardian_name']?:null,'guardian_phone'=>$f['guardian_phone']?:null,'emergency_name'=>$f['emergency_contact_name']?:null,'emergency_phone'=>$f['emergency_contact_phone']?:null,'entry_year'=>$f['entry_year'],'pathway'=>$f['admission_pathway']?:'Reguler']);
      $appId=(int)$pdo->lastInsertId();
      foreach($files as $type=>$file){
       $filename=$pmbRegistration.'-'.$type.'-'.bin2hex(random_bytes(5)).'.'.$file['ext'];$dest=$storage.'/'.$filename;
