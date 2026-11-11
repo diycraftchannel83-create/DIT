@@ -29,4 +29,7 @@ jobs:
           php-version: '8.2'
       - name: Check PHP syntax
         run: |
-          find admin portal backend website -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+          find . -type f -name '*.php' \\
+            -not -path './.git/*' \\
+            -not -path './vendor/*' \\
+            -print0 | xargs -0 -n1 php -l
