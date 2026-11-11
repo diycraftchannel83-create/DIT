@@ -301,6 +301,50 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
     }
     if ($action==='logout') { auditLog($pdo,'admin.logout','user',(int)(user()['id']??0)); $_SESSION=[]; session_regenerate_id(true); go('login'); }
     $u=requireLogin();
+    if($action==='save_pmb_applicant'){
+        allow(['super_admin','admin_akademik']);
+        $id=(int)($_POST['id']??0);
+        $data=[];
+        $fields=['full_name'=>160,'national_id'=>32,'email'=>190,'phone'=>30,'whatsapp'=>30,'birth_place'=>100,'birth_date'=>10,'gender'=>10,'religion'=>40,'marital_status'=>30,'address'=>5000,'province'=>100,'city'=>100,'district'=>100,'village'=>100,'postal_code'=>10,'previous_school'=>180,'school_major'=>120,'diploma_number'=>100,'father_name'=>160,'father_occupation'=>120,'father_phone'=>30,'mother_name'=>160,'mother_occupation'=>120,'mother_phone'=>30,'guardian_name'=>160,'guardian_phone'=>30,'admission_pathway'=>60];
+        foreach($fields as $key=>$max){$data[$key]=trim((string)($_POST[$key]??''));if(strlen($data[$key])>$max)throw new RuntimeException('Panjang kolom '.$key.' melebihi batas.');}
+        $data['study_program_id']=(int)($_POST['study_program_id']??0);
+        $data['entry_year']=(int)($_POST['entry_year']??date('Y'));
+        $data['graduation_year']=(int)($_POST['graduation_year']??0);
+        $data['status']=(string)($_POST['status']??'registered');
+        $data['document_status']=(string)($_POST['document_status']??'pending');
+        $data['selection_score']=trim((string)($_POST['selection_score']??''));
+        $data['result_notes']=trim((string)($_POST['result_notes']??''));
+        if($data['full_name']===''||!filter_var($data['email'],FILTER_VALIDATE_EMAIL)||$data['study_program_id']<1||!in_array($data['gender'],['male','female'],true)||!in_array($data['status'],['registered','documents_review','selection','accepted','rejected','re_registered'],true)||!in_array($data['document_status'],['pending','complete','incomplete','invalid'],true)){
+            flash('Periksa nama, email, program studi, jenis kelamin, dan status PMB.','error');go('pmb');
+        }
+        if($data['national_id']!==''&&!preg_match('/^\\d{16}$/',$data['national_id'])){flash('NIK harus 16 digit.','error');go('pmb');}
+        try{
+            if($id>0){
+                $sql='UPDATE pmb_applicants SET full_name=:full_name,national_id=:national_id,email=:email,phone=:phone,whatsapp=:whatsapp,birth_place=:birth_place,birth_date=:birth_date,gender=:gender,religion=:religion,marital_status=:marital_status,address=:address,province=:province,city=:city,district=:district,village=:village,postal_code=:postal_code,study_program_id=:program,previous_school=:school,school_major=:major,graduation_year=:grad,diploma_number=:diploma,father_name=:father,father_occupation=:father_job,father_phone=:father_phone,mother_name=:mother,mother_occupation=:mother_job,mother_phone=:mother_phone,guardian_name=:guardian,guardian_phone=:guardian_phone,entry_year=:entry_year,admission_pathway=:pathway,status=:status,document_status=:document_status,selection_score=:score,result_notes=:notes,verified_by=:verified_by,verified_at=UTC_TIMESTAMP() WHERE id=:id';
+                $params=['full_name'=>$data['full_name'],'national_id'=>$data['national_id']?:null,'email'=>$data['email'],'phone'=>$data['phone']?:null,'whatsapp'=>$data['whatsapp']?:null,'birth_place'=>$data['birth_place']?:null,'birth_date'=>$data['birth_date']?:null,'gender'=>$data['gender'],'religion'=>$data['religion']?:null,'marital_status'=>$data['marital_status']?:null,'address'=>$data['address']?:null,'province'=>$data['province']?:null,'city'=>$data['city']?:null,'district'=>$data['district']?:null,'village'=>$data['village']?:null,'postal_code'=>$data['postal_code']?:null,'program'=>$data['study_program_id'],'school'=>$data['previous_school']?:null,'major'=>$data['school_major']?:null,'grad'=>$data['graduation_year']?:null,'diploma'=>$data['diploma_number']?:null,'father'=>$data['father_name']?:null,'father_job'=>$data['father_occupation']?:null,'father_phone'=>$data['father_phone']?:null,'mother'=>$data['mother_name']?:null,'mother_job'=>$data['mother_occupation']?:null,'mother_phone'=>$data['mother_phone']?:null,'guardian'=>$data['guardian_name']?:null,'guardian_phone'=>$data['guardian_phone']?:null,'entry_year'=>$data['entry_year']?:null,'pathway'=>$data['admission_pathway']?:'Reguler','status'=>$data['status'],'document_status'=>$data['document_status'],'score'=>$data['selection_score']!==''?$data['selection_score']:null,'notes'=>$data['result_notes']?:null,'verified_by'=>$u['id'],'id'=>$id];
+                $q=$pdo->prepare($sql);$q->execute($params);
+                auditLog($pdo,'admin.pmb_updated','pmb_applicant',$id,['status'=>$data['status']]);
+                flash('Data pendaftar berhasil diperbarui.');
+            }else{
+                $reg='PMB-'.date('Y').'-'.strtoupper(bin2hex(random_bytes(4)));
+                $q=$pdo->prepare("INSERT INTO pmb_applicants(registration_number,full_name,national_id,email,phone,whatsapp,birth_place,birth_date,gender,religion,marital_status,address,province,city,district,village,postal_code,study_program_id,previous_school,school_major,graduation_year,diploma_number,father_name,father_occupation,father_phone,mother_name,mother_occupation,mother_phone,guardian_name,guardian_phone,entry_year,admission_pathway,status,document_status) VALUES(:reg,:full_name,:national_id,:email,:phone,:whatsapp,:birth_place,:birth_date,:gender,:religion,:marital_status,:address,:province,:city,:district,:village,:postal_code,:program,:school,:major,:grad,:diploma,:father,:father_job,:father_phone,:mother,:mother_job,:mother_phone,:guardian,:guardian_phone,:entry_year,:pathway,:status,:document_status)");
+                $params=['reg'=>$reg,'full_name'=>$data['full_name'],'national_id'=>$data['national_id']?:null,'email'=>$data['email'],'phone'=>$data['phone']?:null,'whatsapp'=>$data['whatsapp']?:null,'birth_place'=>$data['birth_place']?:null,'birth_date'=>$data['birth_date']?:null,'gender'=>$data['gender'],'religion'=>$data['religion']?:null,'marital_status'=>$data['marital_status']?:null,'address'=>$data['address']?:null,'province'=>$data['province']?:null,'city'=>$data['city']?:null,'district'=>$data['district']?:null,'village'=>$data['village']?:null,'postal_code'=>$data['postal_code']?:null,'program'=>$data['study_program_id'],'school'=>$data['previous_school']?:null,'major'=>$data['school_major']?:null,'grad'=>$data['graduation_year']?:null,'diploma'=>$data['diploma_number']?:null,'father'=>$data['father_name']?:null,'father_job'=>$data['father_occupation']?:null,'father_phone'=>$data['father_phone']?:null,'mother'=>$data['mother_name']?:null,'mother_job'=>$data['mother_occupation']?:null,'mother_phone'=>$data['mother_phone']?:null,'guardian'=>$data['guardian_name']?:null,'guardian_phone'=>$data['guardian_phone']?:null,'entry_year'=>$data['entry_year']?:null,'pathway'=>$data['admission_pathway']?:'Reguler','status'=>$data['status'],'document_status'=>$data['document_status']];
+                $q->execute($params);$id=(int)$pdo->lastInsertId();auditLog($pdo,'admin.pmb_created','pmb_applicant',$id,['registration_number'=>$reg]);flash('Pendaftar baru berhasil ditambahkan. Nomor registrasi: '.$reg);
+            }
+        }catch(Throwable $e){error_log('[STIT PMB ADMIN SAVE] '.$e->getMessage());flash('Data pendaftar gagal disimpan. Periksa NIK/email dan program studi.','error');}
+        go('pmb');
+    }
+    if($action==='delete_pmb_applicant'){
+        allow(['super_admin','admin_akademik']);$id=(int)($_POST['id']??0);
+        try{$q=$pdo->prepare('SELECT storage_path FROM pmb_documents WHERE applicant_id=:id');$q->execute(['id'=>$id]);$files=$q->fetchAll();$pdo->beginTransaction();$pdo->prepare('DELETE FROM pmb_applicants WHERE id=:id')->execute(['id'=>$id]);$pdo->commit();$dir=dirname(__DIR__,2).'/backend/storage/pmb-private/';foreach($files as $file){$path=$dir.basename((string)$file['storage_path']);if(is_file($path))@unlink($path);}auditLog($pdo,'admin.pmb_deleted','pmb_applicant',$id);flash('Data pendaftar dan dokumen terkait berhasil dihapus.');}
+        catch(Throwable $e){if($pdo->inTransaction())$pdo->rollBack();error_log('[STIT PMB DELETE] '.$e->getMessage());flash('Data pendaftar tidak dapat dihapus.','error');}
+        go('pmb');
+    }
+    if($action==='verify_pmb_document'){
+        allow(['super_admin','admin_akademik']);$id=(int)($_POST['document_id']??0);$status=(string)($_POST['verification_status']??'pending');$note=trim((string)($_POST['verification_note']??''));
+        if(!in_array($status,['pending','valid','invalid'],true)){flash('Status dokumen tidak valid.','error');go('pmb');}
+        $q=$pdo->prepare('UPDATE pmb_documents SET verification_status=:status,verification_note=:note,verified_by=:uid,verified_at=UTC_TIMESTAMP() WHERE id=:id');$q->execute(['status'=>$status,'note'=>$note?:null,'uid'=>$u['id'],'id'=>$id]);flash('Verifikasi dokumen diperbarui.');go('pmb');
+    }
     if ($action==='run_database_migrations') {
         allow(['super_admin']);
         $selected=$_POST['migrations']??[];
