@@ -2491,6 +2491,45 @@ html[data-theme="green"] .student-edit-page .student-form-footer button#studentS
     display:block!important;flex:0 0 auto!important;visibility:visible!important;
   }
 }
+
+/* DRAWER CONTENT VISIBILITY: avoid flex sizing collapse in Android WebView */
+@media screen and (max-width:760px){
+  #adminMenuToggle:checked ~ #adminMobileDrawer .admin-mobile-drawer-panel{
+    display:block!important;position:fixed!important;top:0!important;bottom:0!important;left:0!important;
+    height:100vh!important;height:100dvh!important;min-height:100vh!important;
+    width:min(88vw,390px)!important;overflow:hidden!important;
+  }
+  #adminMenuToggle:checked ~ #adminMobileDrawer .admin-mobile-drawer-head{
+    position:absolute!important;top:calc(14px + env(safe-area-inset-top))!important;
+    left:16px!important;right:16px!important;height:58px!important;min-height:58px!important;
+    display:flex!important;align-items:center!important;z-index:3!important;
+  }
+  #adminMenuToggle:checked ~ #adminMobileDrawer .admin-mobile-drawer-content{
+    position:absolute!important;display:block!important;visibility:visible!important;opacity:1!important;
+    top:calc(86px + env(safe-area-inset-top))!important;right:16px!important;bottom:calc(14px + env(safe-area-inset-bottom))!important;left:16px!important;
+    width:auto!important;height:auto!important;min-height:0!important;max-height:none!important;
+    overflow-x:hidden!important;overflow-y:auto!important;padding:12px 0 20px!important;
+    background:#fff!important;color:#174b35!important;z-index:2!important;
+  }
+  #adminMenuToggle:checked ~ #adminMobileDrawer .admin-mobile-drawer-content .nav-dashboard,
+  #adminMenuToggle:checked ~ #adminMobileDrawer .admin-mobile-drawer-content .nav-group,
+  #adminMenuToggle:checked ~ #adminMobileDrawer .admin-mobile-drawer-content .nav-group-title,
+  #adminMenuToggle:checked ~ #adminMobileDrawer .admin-mobile-drawer-content .nav-group a{
+    display:flex!important;visibility:visible!important;opacity:1!important;
+  }
+  #adminMenuToggle:checked ~ #adminMobileDrawer .admin-mobile-drawer-content .nav-group{
+    display:block!important;margin:0 0 12px!important;padding:10px!important;
+    border:1px solid #dcece1!important;border-radius:12px!important;background:#fff!important;
+  }
+  #adminMenuToggle:checked ~ #adminMobileDrawer .admin-mobile-drawer-content .nav-group-title{
+    display:block!important;color:#087a4b!important;font-weight:800!important;margin:0 0 8px!important;
+  }
+  #adminMenuToggle:checked ~ #adminMobileDrawer .admin-mobile-drawer-content a{
+    min-height:44px!important;padding:10px 12px!important;margin:4px 0!important;
+    border-radius:10px!important;background:#f3faf5!important;color:#175b3d!important;
+    text-decoration:none!important;font-size:14px!important;line-height:1.35!important;
+  }
+}
 </style>
 <script>
 (function(){
