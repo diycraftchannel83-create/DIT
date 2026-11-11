@@ -21,7 +21,7 @@ $tagline=$campus['tagline']??'Membangun Generasi Unggul, Berilmu, Berakhlak, dan
 $about=$campus['about']??'STIT Darul Ilmi Tasikmalaya hadir sebagai lembaga pendidikan tinggi yang berkomitmen mencetak generasi pendidik dan pemimpin masa depan.';
 $hero=$campus['hero_image_url']??'';
 $heroSlides=json_decode(webContent($pdo,'hero_slides_json','[]'),true); if(!is_array($heroSlides))$heroSlides=[];
-$heroSlides=array_values(array_filter($heroSlides,static fn($s)=>is_array($s)&&!empty($s['url'])));
+$heroSlides=array_values(array_filter($heroSlides,static fn($s)=>is_array($s)&&!empty($s['url'])&&(($s['active']??true)!==false)));
 if(!$heroSlides && $hero!=='') $heroSlides=[['url'=>$hero,'alt'=>'Gedung kampus STIT Darul Ilmi Tasikmalaya','caption'=>'STIT Darul Ilmi · Tasikmalaya']];
 $aboutImage=webContent($pdo,'about_image_url',$hero);
 if ($aboutImage==='') $aboutImage=$hero;
