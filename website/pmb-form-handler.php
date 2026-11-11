@@ -19,9 +19,9 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
   if(!$pmbMessage&&(!preg_match('/^\d{16}$/',$f['national_id'])||!filter_var($f['email'],FILTER_VALIDATE_EMAIL)||!in_array($f['gender'],['male','female'],true)))$pmbMessage='Periksa kembali NIK, email, dan jenis kelamin.';
   if(!$pmbMessage&&($f['study_program_id']<1||$f['graduation_year']<1980||$f['graduation_year']>(int)date('Y')+1))$pmbMessage='Program studi atau tahun lulus tidak valid.';
   $files=[];
-  foreach(['ktp'=>'Fotokopi KTP','kk'=>'Kartu Keluarga','ijazah'=>'Ijazah SMA/SMK/MA sederajat'] as $key=>$label){
+  foreach(['ktp'=>'Fotokopi KTP','kk'=>'Kartu Keluarga','ijazah'=>'Ijazah SMA/SMK/MA sederajat','pas_foto'=>'Pas foto (opsional)'] as $key=>$label){
    if($pmbMessage)break;$up=$_FILES[$key]??null;
-   if(!$up||($up['error']??UPLOAD_ERR_NO_FILE)!==UPLOAD_ERR_OK){$pmbMessage='Dokumen wajib belum lengkap: '.$label.'.';break;}
+   if(!$up||($up['error']??UPLOAD_ERR_NO_FILE)===UPLOAD_ERR_NO_FILE){if($key==='pas_foto')continue;$pmbMessage='Dokumen wajib belum lengkap: '.$label.'.';break;}if(($up['error']??UPLOAD_ERR_OK)!==UPLOAD_ERR_OK){$pmbMessage='Unggahan '.$label.' gagal diproses.';break;}
    if((int)$up['size']<1||(int)$up['size']>5242880){$pmbMessage='Ukuran '.$label.' maksimal 5 MB.';break;}
    $mime=(new finfo(FILEINFO_MIME_TYPE))->file($up['tmp_name']);
    $ext=['application/pdf'=>'pdf','image/jpeg'=>'jpg','image/png'=>'png'][$mime]??'';
