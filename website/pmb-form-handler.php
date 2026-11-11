@@ -19,12 +19,19 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
   if(!$pmbMessage&&(!preg_match('/^\d{16}$/',$f['national_id'])||!filter_var($f['email'],FILTER_VALIDATE_EMAIL)||!in_array($f['gender'],['male','female'],true)))$pmbMessage='Periksa kembali NIK, email, dan jenis kelamin.';
   if(!$pmbMessage&&($f['study_program_id']<1||$f['graduation_year']<1980||$f['graduation_year']>(int)date('Y')+1))$pmbMessage='Program studi atau tahun lulus tidak valid.';
   $files=[];
-  foreach(['ktp'=>'Fotokopi KTP','kk'=>'Kartu Keluarga','ijazah'=>'Ijazah SMA/SMK/MA sederajat','pas_foto'=>'Pas foto (opsional)'] as $key=>$label){
+  foreach(['ktp'=>'Fotokopi KTP','kk'=>'Kartu Keluarga','ijazah'=>'Ijazah SMA/SMK/MA sederajat','pas_foto'=>'Pas foto terbaru ukuran 3x4'] as $key=>$label){
    if($pmbMessage)break;$up=$_FILES[$key]??null;
-   if(!$up||($up['error']??UPLOAD_ERR_NO_FILE)===UPLOAD_ERR_NO_FILE){if($key==='pas_foto')continue;$pmbMessage='Dokumen wajib belum lengkap: '.$label.'.';break;}if(($up['error']??UPLOAD_ERR_OK)!==UPLOAD_ERR_OK){$pmbMessage='Unggahan '.$label.' gagal diproses.';break;}
+   if(!$up||($up['error']??UPLOAD_ERR_NO_FILE)===UPLOAD_ERR_NO_FILE){$pmbMessage='Dokumen wajib belum lengkap: '.$label.'.';break;}if(($up['error']??UPLOAD_ERR_OK)!==UPLOAD_ERR_OK){$pmbMessage='Unggahan '.$label.' gagal diproses.';break;}
    if((int)$up['size']<1||(int)$up['size']>5242880){$pmbMessage='Ukuran '.$label.' maksimal 5 MB.';break;}
    $mime=(new finfo(FILEINFO_MIME_TYPE))->file($up['tmp_name']);
    $ext=['application/pdf'=>'pdf','image/jpeg'=>'jpg','image/png'=>'png'][$mime]??'';
+   if($key==='pas_foto'){
+    if(!in_array($mime,['image/jpeg','image/png'],true)){$pmbMessage='Pas foto harus berupa JPG atau PNG, bukan PDF.';break;}
+    $dimensions=@getimagesize($up['tmp_name']);
+    if(!$dimensions||empty($dimensions[0])||empty($dimensions[1])){$pmbMessage='File pas foto tidak dapat dibaca sebagai gambar.';break;}
+    $ratio=(float)$dimensions[0]/(float)$dimensions[1];
+    if($ratio<0.70||$ratio>0.80||$dimensions[1]<400){$pmbMessage='Pas foto harus posisi tegak dengan rasio 3:4 (contoh 300 × 400 piksel atau lebih besar).';break;}
+   }
    if($ext===''){$pmbMessage='Format '.$label.' harus PDF, JPG, atau PNG.';break;}
    $files[$key]=['tmp'=>$up['tmp_name'],'name'=>substr(basename((string)$up['name']),0,255),'mime'=>$mime,'size'=>(int)$up['size'],'ext'=>$ext];
   }
