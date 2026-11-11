@@ -8,6 +8,7 @@ on:
       - 'portal/**/*.php'
       - 'backend/**/*.php'
       - 'website/**/*.php'
+      - '*.php'
       - '.github/workflows/php-lint.yml'
   pull_request:
     paths:
