@@ -2736,4 +2736,61 @@ html[data-theme="black"] .side nav.nav .nav-group{background:rgba(0,0,0,.2)!impo
  html body .side.nav-expanded .android-nav-toggle{background:#fff!important;color:#075b3d!important;border-color:#d3e6d9!important}
 }
 </style>
+
+<style id="android-menu-panel-layout-fix">
+@media(max-width:760px){
+ html body .layout>.side{position:relative!important;z-index:3000!important;overflow:visible!important}
+ html body .side.nav-expanded{max-height:none!important;overflow:visible!important}
+ html body .side.nav-expanded::after{
+  content:"";position:fixed;top:calc(env(safe-area-inset-top) + 64px);right:0;bottom:0;left:0;
+  z-index:0;background:rgba(10,35,24,.34);backdrop-filter:none!important
+ }
+ html body .side.nav-expanded nav.nav{
+  display:block!important;position:absolute!important;top:calc(100% + 8px)!important;
+  left:12px!important;right:12px!important;bottom:auto!important;width:auto!important;
+  height:auto!important;min-height:0!important;max-height:calc(100dvh - env(safe-area-inset-top) - 150px)!important;
+  overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior:contain!important;
+  -webkit-overflow-scrolling:touch!important;float:none!important;clear:both!important;
+  padding:13px!important;margin:0!important;box-sizing:border-box!important;
+  border:1px solid #d9e8de!important;border-radius:16px!important;
+  background:#f8fcf9!important;color:#174b35!important;
+  box-shadow:0 12px 34px rgba(4,37,23,.22)!important;z-index:1!important
+ }
+ html body .side.nav-expanded nav.nav .nav-dashboard{
+  display:flex!important;position:relative!important;width:100%!important;height:auto!important;
+  min-height:44px!important;margin:0 0 10px!important;padding:11px 13px!important;
+  box-sizing:border-box!important;border:1px solid #cfe4d5!important;border-radius:10px!important;
+  background:#e8f5ec!important;color:#075b3d!important;font-size:14px!important;font-weight:800!important
+ }
+ html body .side.nav-expanded nav.nav .nav-group{
+  display:block!important;position:relative!important;float:none!important;clear:both!important;
+  width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;
+  overflow:visible!important;box-sizing:border-box!important;margin:0 0 9px!important;padding:10px!important;
+  border:1px solid #e0ece4!important;border-radius:12px!important;background:#fff!important
+ }
+ html body .side.nav-expanded nav.nav .nav-group-title{
+  display:block!important;height:auto!important;margin:0 0 6px!important;padding:0 3px 7px!important;
+  border-bottom:1px solid #edf3ee!important;color:#668071!important;
+  font-size:10px!important;font-weight:850!important;letter-spacing:.11em!important
+ }
+ html body .side.nav-expanded nav.nav .nav-group a{
+  display:flex!important;position:relative!important;float:none!important;clear:both!important;
+  width:100%!important;height:auto!important;min-height:40px!important;margin:2px 0!important;
+  padding:9px 10px!important;box-sizing:border-box!important;
+  border:1px solid transparent!important;border-radius:9px!important;
+  background:transparent!important;color:#294d39!important;
+  font-size:13px!important;font-weight:600!important;line-height:1.3!important;
+  white-space:normal!important;overflow-wrap:anywhere!important
+ }
+ html body .side.nav-expanded nav.nav .nav-group a.active{
+  border-color:#cce5d4!important;background:#eaf6ee!important;color:#075b3d!important;
+  box-shadow:inset 3px 0 #8dc99d!important;font-weight:800!important
+ }
+ html body .side.nav-expanded .android-nav-toggle{
+  position:relative!important;z-index:2!important;background:#fff!important;
+  color:#075b3d!important;border-color:#d3e6d9!important
+ }
+ html body .main,html body .top{position:relative!important;z-index:1!important}
+}
+</style>
 </body></html>
