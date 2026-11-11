@@ -2556,6 +2556,41 @@ html[data-theme="green"] .student-edit-page .student-form-footer button#studentS
   display:block!important;color:#087a4b!important;font-weight:800!important;margin:0 0 8px!important;
  }
 }
+
+/* LAST-RESORT ANDROID DRAWER: pin menu list to viewport, independent of panel sizing */
+@media screen and (max-width:760px){
+ body>#adminMobileDrawer[aria-hidden="false"] .admin-mobile-drawer-content,
+ #adminMobileDrawer[aria-hidden="false"] .admin-mobile-drawer-content{
+  position:fixed!important;display:block!important;
+  top:210px!important;left:0!important;right:auto!important;bottom:0!important;
+  width:min(88vw,390px)!important;height:auto!important;max-height:none!important;
+  min-height:0!important;overflow-x:hidden!important;overflow-y:auto!important;
+  padding:14px 16px calc(24px + env(safe-area-inset-bottom))!important;
+  margin:0!important;background:#fff!important;color:#174b35!important;
+  z-index:2147483647!important;visibility:visible!important;opacity:1!important;
+  box-sizing:border-box!important;
+ }
+ body>#adminMobileDrawer[aria-hidden="false"] .admin-mobile-drawer-content .nav-dashboard,
+ body>#adminMobileDrawer[aria-hidden="false"] .admin-mobile-drawer-content .nav-group,
+ body>#adminMobileDrawer[aria-hidden="false"] .admin-mobile-drawer-content .nav-group-title,
+ body>#adminMobileDrawer[aria-hidden="false"] .admin-mobile-drawer-content .nav-group a{
+  visibility:visible!important;opacity:1!important;color:#175b3d!important;
+ }
+ body>#adminMobileDrawer[aria-hidden="false"] .admin-mobile-drawer-content .nav-dashboard,
+ body>#adminMobileDrawer[aria-hidden="false"] .admin-mobile-drawer-content .nav-group a{
+  display:flex!important;min-height:48px!important;align-items:center!important;
+  padding:12px!important;margin:5px 0!important;background:#f1f8f3!important;
+  border:1px solid #dcece1!important;border-radius:10px!important;
+  color:#175b3d!important;text-decoration:none!important;font-size:15px!important;
+ }
+ body>#adminMobileDrawer[aria-hidden="false"] .admin-mobile-drawer-content .nav-group{
+  display:block!important;margin:0 0 12px!important;padding:10px!important;
+  background:#fff!important;border:1px solid #dcece1!important;border-radius:12px!important;
+ }
+ body>#adminMobileDrawer[aria-hidden="false"] .admin-mobile-drawer-content .nav-group-title{
+  display:block!important;padding:8px 4px!important;color:#087a4b!important;font-weight:800!important;
+ }
+}
 </style>
 <script>
 (function(){
