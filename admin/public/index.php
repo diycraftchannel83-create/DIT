@@ -1391,15 +1391,26 @@ $pendingCount=0;foreach($availableMigrations as $migrationName=>$migrationFile){
  $pmbPrograms=$pdo->query('SELECT id,name FROM study_programs WHERE is_active=1 ORDER BY name')->fetchAll();
  $pmbDocs=[];if($editPmbId){$dq=$pdo->prepare('SELECT * FROM pmb_documents WHERE applicant_id=:id ORDER BY document_type');$dq->execute(['id'=>$editPmbId]);$pmbDocs=$dq->fetchAll();}
  $pv=static fn(string $key,string $default='')=>e($editPmb[$key]??$default);
- $pmbAuditRows=[];$pmbRecentApplicants=[];
+ $pmbAuditRows=[];$pmbRecentApplicants=[];$pmbTotalApplicants=0;$pmbSearch=trim((string)($_GET['q']??''));
  try{$aq=$pdo->query("SELECT id,action,entity_id,ip_address,metadata FROM audit_logs WHERE entity_type='pmb_applicant' ORDER BY id DESC LIMIT 20");$pmbAuditRows=$aq->fetchAll();}catch(Throwable $auditViewError){error_log('[STIT PMB AUDIT VIEW] '.$auditViewError->getMessage());}
- // Sumber riwayat pendaftaran langsung dari tabel utama agar pendaftaran tetap terlihat
- // meskipun audit_logs belum tersedia atau pencatatan audit gagal.
- try{$rq=$pdo->query('SELECT id,registration_number,full_name,email,status,created_at FROM pmb_applicants ORDER BY id DESC LIMIT 20');$pmbRecentApplicants=$rq->fetchAll();}catch(Throwable $recentPmbError){error_log('[STIT PMB RECENT VIEW] '.$recentPmbError->getMessage());}
+ // Daftar CRUD selalu membaca tabel utama, bukan audit log. Pencarian mencakup nomor,
+ // nama, email, dan NIK; daftar dibatasi 100 baris agar dashboard tetap ringan.
+ try{
+  $pmbTotalApplicants=(int)$pdo->query('SELECT COUNT(*) FROM pmb_applicants')->fetchColumn();
+  if($pmbSearch!==''){
+   $rq=$pdo->prepare('SELECT id,registration_number,full_name,email,national_id,status,document_status,payment_status,created_at FROM pmb_applicants WHERE registration_number LIKE :q OR full_name LIKE :q OR email LIKE :q OR national_id LIKE :q ORDER BY id DESC LIMIT 100');
+   $rq->execute(['q'=>'%'.$pmbSearch.'%']);
+  }else{
+   $rq=$pdo->query('SELECT id,registration_number,full_name,email,national_id,status,document_status,payment_status,created_at FROM pmb_applicants ORDER BY id DESC LIMIT 100');
+  }
+  $pmbRecentApplicants=$rq->fetchAll();
+ }catch(Throwable $recentPmbError){error_log('[STIT PMB RECENT VIEW] '.$recentPmbError->getMessage());}
 ?>
 <div class="panel"><h2>Riwayat Aktivitas PMB</h2><p class="muted">Catatan pengiriman pendaftaran publik dan aktivitas pengelolaan admin (maksimal 20 terbaru).</p><?php if(!$pmbAuditRows):?><p class="muted">Belum ada aktivitas PMB yang tercatat. Pendaftaran baru akan dicatat setelah perubahan ini aktif.</p><?php else:?><div style="overflow:auto"><table><thead><tr><th>No. Log</th><th>Aktivitas</th><th>ID Pendaftar</th><th>IP</th></tr></thead><tbody><?php foreach($pmbAuditRows as $ar):?><tr><td><?=e($ar['id'])?></td><td><?=e($ar['action'])?></td><td><?=e($ar['entity_id'])?></td><td><?=e($ar['ip_address']??'—')?></td></tr><?php endforeach;?></tbody></table></div><?php endif;?>
-<h3 style="margin:22px 0 10px;color:#075b3d">Pendaftaran Terbaru (data utama)</h3>
-<?php if(!$pmbRecentApplicants):?><p class="muted">Belum ada data pendaftar pada tabel PMB.</p><?php else:?><div style="overflow:auto"><table><thead><tr><th>No. Registrasi</th><th>Nama</th><th>Email</th><th>Status</th><th>Tanggal</th><th>Aksi</th></tr></thead><tbody><?php foreach($pmbRecentApplicants as $pr):?><tr><td><?=e($pr['registration_number'])?></td><td><?=e($pr['full_name'])?></td><td><?=e($pr['email'])?></td><td><?=e(str_replace('_',' ',$pr['status']))?></td><td><?=e($pr['created_at'])?></td><td><a href="?page=pmb&edit=<?=(int)$pr['id']?>">Lihat / Edit</a></td></tr><?php endforeach;?></tbody></table></div><?php endif;?></div>
+<h3 style="margin:22px 0 10px;color:#075b3d">Daftar Pendaftar PMB</h3>
+<p class="muted">Total data tersimpan: <strong><?=number_format($pmbTotalApplicants,0,',','.')?></strong>. Menampilkan maksimal 100 hasil terbaru.</p>
+<form method="get" class="inline" style="margin:10px 0 14px"><input type="hidden" name="page" value="pmb"><input name="q" value="<?=e($pmbSearch)?>" placeholder="Cari nomor registrasi, nama, email, atau NIK"><button type="submit">Cari</button><a href="?page=pmb" class="btn">Reset</a></form>
+<?php if(!$pmbRecentApplicants):?><p class="muted"><?=$pmbSearch!==''?'Tidak ada pendaftar yang cocok dengan pencarian.':'Belum ada data pendaftar pada tabel PMB.'?></p><?php else:?><div style="overflow:auto"><table><thead><tr><th>No. Registrasi</th><th>Nama</th><th>Email</th><th>Status PMB</th><th>Dokumen</th><th>Pembayaran</th><th>Tanggal</th><th>Aksi</th></tr></thead><tbody><?php foreach($pmbRecentApplicants as $pr):?><tr><td><?=e($pr['registration_number'])?></td><td><?=e($pr['full_name'])?></td><td><?=e($pr['email'])?></td><td><?=e(str_replace('_',' ',$pr['status']))?></td><td><?=e(str_replace('_',' ',$pr['document_status']))?></td><td><?=e(str_replace('_',' ',$pr['payment_status']??'unpaid'))?></td><td><?=e($pr['created_at'])?></td><td><a href="?page=pmb&amp;edit=<?=(int)$pr['id']?>">Lihat / Edit</a></td></tr><?php endforeach;?></tbody></table></div><?php endif;?></div>
 <div class="panel"><h2><?=$editPmb?'Edit Pendaftar PMB':'Tambah Pendaftar PMB'?></h2>
 <form method="post" class="inline" style="align-items:flex-start">
 <input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="save_pmb_applicant"><input type="hidden" name="id" value="<?=e($editPmb['id']??0)?>">
