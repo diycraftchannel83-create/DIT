@@ -345,7 +345,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
     }
     if($action==='delete_pmb_applicant'){
         allow(['super_admin','admin_akademik']);$id=(int)($_POST['id']??0);
-        try{$q=$pdo->prepare('SELECT storage_path FROM pmb_documents WHERE applicant_id=:id');$q->execute(['id'=>$id]);$files=$q->fetchAll();$pdo->beginTransaction();$pdo->prepare('DELETE FROM pmb_applicants WHERE id=:id')->execute(['id'=>$id]);$pdo->commit();$dir=dirname(__DIR__,2).'/backend/storage/pmb-private/';foreach($files as $file){$path=$dir.basename((string)$file['storage_path']);if(is_file($path))@unlink($path);}auditLog($pdo,'admin.pmb_deleted','pmb_applicant',$id);flash('Data pendaftar dan dokumen terkait berhasil dihapus.');}
+        try{$q=$pdo->prepare('SELECT storage_path FROM pmb_documents WHERE applicant_id=:id');$q->execute(['id'=>$id]);$files=$q->fetchAll();$pdo->beginTransaction();$pdo->prepare('DELETE FROM pmb_applicants WHERE id=:id')->execute(['id'=>$id]);$pdo->commit();$docRoot=(string)($_SERVER['DOCUMENT_ROOT']??dirname(__DIR__,2));$dir=dirname($docRoot).'/stit-pmb-private/';foreach($files as $file){$path=$dir.basename((string)$file['storage_path']);if(is_file($path))@unlink($path);}auditLog($pdo,'admin.pmb_deleted','pmb_applicant',$id);flash('Data pendaftar dan dokumen terkait berhasil dihapus.');}
         catch(Throwable $e){if($pdo->inTransaction())$pdo->rollBack();error_log('[STIT PMB DELETE] '.$e->getMessage());flash('Data pendaftar tidak dapat dihapus.','error');}
         go('pmb');
     }
@@ -868,7 +868,7 @@ if($page==='pmb'&&isset($_GET['document'])){
     $docId=(int)$_GET['document'];
     $q=$pdo->prepare('SELECT storage_path,mime_type,original_name FROM pmb_documents WHERE id=:id LIMIT 1');$q->execute(['id'=>$docId]);$doc=$q->fetch();
     if(!$doc){http_response_code(404);exit('Dokumen tidak ditemukan.');}
-    $storage=realpath(dirname(__DIR__,2).'/backend/storage/pmb-private');
+    $storage=realpath(dirname((string)($_SERVER['DOCUMENT_ROOT']??dirname(__DIR__,2))).'/stit-pmb-private');
     $path=$storage?realpath($storage.'/'.basename((string)$doc['storage_path'])):false;
     if(!$storage||!$path||!str_starts_with($path,$storage.DIRECTORY_SEPARATOR)||!is_file($path)){http_response_code(404);exit('Berkas tidak tersedia.');}
     $mime=in_array($doc['mime_type'],['application/pdf','image/jpeg','image/png'],true)?$doc['mime_type']:'application/octet-stream';
