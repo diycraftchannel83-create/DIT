@@ -1,6 +1,12 @@
 package id.ac.darulilmi.portal
 
 import android.annotation.SuppressLint
+import android.app.DownloadManager
+import android.content.Context
+import android.os.Environment
+import android.webkit.CookieManager
+import android.webkit.URLUtil
+import android.widget.Toast
 import android.content.Intent
 import android.content.ActivityNotFoundException
 import android.net.Uri
@@ -77,9 +83,15 @@ class MainActivity : ComponentActivity() {
             var loading by remember { mutableStateOf(true) }
             var pageError by remember { mutableStateOf<String?>(null) }
             var webViewRef by remember { mutableStateOf<WebView?>(null) }
+            var canNavigateBack by remember { mutableStateOf(false) }
 
-            BackHandler(enabled = webViewRef?.canGoBack() == true) {
-                webViewRef?.goBack()
+            BackHandler(enabled = webViewRef != null) {
+                val view = webViewRef
+                if (view?.canGoBack() == true) {
+                    view.goBack()
+                } else {
+                    finish()
+                }
             }
 
             MaterialTheme(colorScheme = lightColorScheme(primary = CampusGreen)) {
@@ -96,7 +108,7 @@ class MainActivity : ComponentActivity() {
                                     javaScriptEnabled = true
                                     domStorageEnabled = true
                                     databaseEnabled = true
-                                    cacheMode = WebSettings.LOAD_NO_CACHE
+                                    cacheMode = WebSettings.LOAD_DEFAULT
                                     loadWithOverviewMode = true
                                     useWideViewPort = true
                                     javaScriptCanOpenWindowsAutomatically = false
@@ -104,6 +116,12 @@ class MainActivity : ComponentActivity() {
                                     mixedContentMode = WebSettings.MIXED_CONTENT_NEVER_ALLOW
                                     allowFileAccess = false
                                     allowContentAccess = true
+                                    safeBrowsingEnabled = true
+                                }
+
+                                CookieManager.getInstance().apply {
+                                    setAcceptCookie(true)
+                                    setAcceptThirdPartyCookies(this@apply, false)
                                 }
 
                                 webChromeClient = object : WebChromeClient() {
@@ -171,14 +189,49 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
 
+                                setDownloadListener { url, userAgent, contentDisposition, mimeType, _ ->
+                                    val downloadUri = runCatching { Uri.parse(url) }.getOrNull()
+                                    if (downloadUri == null || downloadUri.scheme != "https") {
+                                        Toast.makeText(context, "Unduhan hanya diizinkan melalui koneksi HTTPS.", Toast.LENGTH_LONG).show()
+                                    } else if (downloadUri.host.equals(CAMPUS_HOST, ignoreCase = true)) {
+                                        runCatching {
+                                            val request = DownloadManager.Request(downloadUri).apply {
+                                                setMimeType(mimeType)
+                                                addRequestHeader("User-Agent", userAgent.orEmpty())
+                                                CookieManager.getInstance().getCookie(url)?.let { addRequestHeader("Cookie", it) }
+                                                setTitle(URLUtil.guessFileName(url, contentDisposition, mimeType))
+                                                setDescription("Mengunduh dokumen akademik")
+                                                setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                                                setDestinationInExternalPublicDir(
+                                                    Environment.DIRECTORY_DOWNLOADS,
+                                                    URLUtil.guessFileName(url, contentDisposition, mimeType)
+                                                )
+                                                allowScanningByMediaScanner()
+                                            }
+                                            val manager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+                                            manager.enqueue(request)
+                                            Toast.makeText(context, "Unduhan dimulai. Periksa folder Download.", Toast.LENGTH_LONG).show()
+                                        }.onFailure {
+                                            Toast.makeText(context, "Tidak dapat memulai unduhan: ${it.localizedMessage ?: "kesalahan sistem"}", Toast.LENGTH_LONG).show()
+                                        }
+                                    } else {
+                                        runCatching { startActivity(Intent(Intent.ACTION_VIEW, downloadUri)) }
+                                            .onFailure { Toast.makeText(context, "Tidak ada aplikasi untuk mengunduh tautan ini.", Toast.LENGTH_LONG).show() }
+                                    }
+                                }
+
                                 webViewClient = object : WebViewClient() {
                                     override fun shouldOverrideUrlLoading(
                                         view: WebView,
                                         request: WebResourceRequest
                                     ): Boolean {
                                         val uri = request.url
-                                        if (uri.scheme == "https" && uri.host == CAMPUS_HOST) {
+                                        if (uri.scheme == "https" && uri.host.equals(CAMPUS_HOST, ignoreCase = true)) {
                                             return false
+                                        }
+                                        if (uri.scheme == "http" && uri.host.equals(CAMPUS_HOST, ignoreCase = true)) {
+                                            view.loadUrl(uri.buildUpon().scheme("https").build().toString())
+                                            return true
                                         }
                                         if (uri.scheme == "http" || uri.scheme == "https" ||
                                             uri.scheme == "mailto" || uri.scheme == "tel"
@@ -199,6 +252,8 @@ class MainActivity : ComponentActivity() {
                                         favicon: android.graphics.Bitmap?
                                     ) {
                                         loading = true
+                                        pageError = null
+                                        canNavigateBack = view?.canGoBack() == true
                                     }
 
                                     override fun onReceivedHttpError(
@@ -225,6 +280,7 @@ class MainActivity : ComponentActivity() {
 
                                     override fun onPageFinished(view: WebView?, url: String?) {
                                         loading = false
+                                        canNavigateBack = view?.canGoBack() == true
                                     }
                                 }
 
