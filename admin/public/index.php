@@ -587,6 +587,28 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
         $q=$pdo->prepare($sql);$q->execute(['nim'=>$nim,'program'=>$program,'entry'=>$entry]+$values+['id'=>$id,'uid'=>$uid]);if($q->rowCount()===0){$check=$pdo->prepare('SELECT id FROM students WHERE id=:id AND user_id=:uid');$check->execute(['id'=>$id,'uid'=>$uid]);if(!$check->fetchColumn())throw new RuntimeException('Mahasiswa tidak ditemukan.');}
         $pdo->commit();flash('Data mahasiswa berhasil diperbarui.');}catch(Throwable $e){if($pdo->inTransaction())$pdo->rollBack();error_log('[STIT UPDATE STUDENT] '.$e->getMessage());flash('Gagal memperbarui. Periksa NIM/email duplikat dan data yang dimasukkan.','error');}go('students');
     }
+    if ($action==='update_lecturer') {
+        allow(['super_admin','admin_akademik']);
+        $id=(int)($_POST['lecturer_id']??0);$uid=(int)($_POST['user_id']??0);
+        $name=trim((string)($_POST['full_name']??''));$username=trim((string)($_POST['username']??''));$email=trim((string)($_POST['email']??''));$password=(string)($_POST['password']??'');
+        $number=trim((string)($_POST['lecturer_number']??''));$phone=trim((string)($_POST['phone']??''));
+        if($id<1||$uid<1||$name===''||$username===''||strlen($name)>160||strlen($username)>100||($email!==''&&!filter_var($email,FILTER_VALIDATE_EMAIL))||($password!==''&&strlen($password)<10)||strlen($password)>200||strlen($number)>40||strlen($phone)>30){flash('Data utama dosen tidak valid.','error');go('lecturers');}
+        $fields=['national_id'=>trim((string)($_POST['national_id']??'')),'birth_place'=>trim((string)($_POST['birth_place']??'')),'birth_date'=>trim((string)($_POST['birth_date']??'')),'gender'=>(string)($_POST['gender']??''),'religion'=>trim((string)($_POST['religion']??'')),'marital_status'=>trim((string)($_POST['marital_status']??'')),'province'=>trim((string)($_POST['province']??'')),'city'=>trim((string)($_POST['city']??'')),'district'=>trim((string)($_POST['district']??'')),'village'=>trim((string)($_POST['village']??'')),'postal_code'=>trim((string)($_POST['postal_code']??'')),'address'=>trim((string)($_POST['address']??'')),'emergency_contact_name'=>trim((string)($_POST['emergency_contact_name']??'')),'emergency_contact_phone'=>trim((string)($_POST['emergency_contact_phone']??'')),'study_program_id'=>(int)($_POST['study_program_id']??0),'academic_rank'=>trim((string)($_POST['academic_rank']??'')),'functional_position'=>trim((string)($_POST['functional_position']??'')),'employment_status'=>trim((string)($_POST['employment_status']??'')),'employment_type'=>trim((string)($_POST['employment_type']??'')),'employment_start_date'=>trim((string)($_POST['employment_start_date']??'')),'highest_education'=>trim((string)($_POST['highest_education']??'')),'expertise'=>trim((string)($_POST['expertise']??'')),'certification_number'=>trim((string)($_POST['certification_number']??''))];
+        if($fields['national_id']!==''&&!preg_match('/^\\d{16}$/',$fields['national_id'])){flash('NIK harus 16 digit atau dikosongkan.','error');go('lecturers');}
+        if(!in_array($fields['gender'],['','male','female'],true)){flash('Jenis kelamin tidak valid.','error');go('lecturers');}
+        foreach(['birth_date','employment_start_date'] as $dateField)if($fields[$dateField]!==''&&!preg_match('/^\\d{4}-\\d{2}-\\d{2}$/',$fields[$dateField])){flash('Format tanggal tidak valid.','error');go('lecturers');}
+        try{
+            $uploadedPhoto=saveStudentPhotoUpload('photo_file','lecturers');
+            $pdo->beginTransaction();
+            $uq=$pdo->prepare($password!==''?'UPDATE users SET full_name=:name,email=:email,username=:username,password_hash=:hash WHERE id=:uid':'UPDATE users SET full_name=:name,email=:email,username=:username WHERE id=:uid');
+            $userArgs=['name'=>$name,'email'=>$email?:null,'username'=>$username,'uid'=>$uid];if($password!=='')$userArgs['hash']=password_hash($password,PASSWORD_DEFAULT);$uq->execute($userArgs);
+            $sql='UPDATE lecturers SET lecturer_number=:number,phone=:phone,national_id=:national_id,birth_place=:birth_place,birth_date=:birth_date,gender=:gender,religion=:religion,marital_status=:marital_status,province=:province,city=:city,district=:district,village=:village,postal_code=:postal_code,address=:address,emergency_contact_name=:emergency_contact_name,emergency_contact_phone=:emergency_contact_phone,study_program_id=:study_program_id,academic_rank=:academic_rank,functional_position=:functional_position,employment_status=:employment_status,employment_type=:employment_type,employment_start_date=:employment_start_date,highest_education=:highest_education,expertise=:expertise,certification_number=:certification_number'.($uploadedPhoto!==null?',photo_url=:photo_url':'').' WHERE id=:id AND user_id=:uid';
+            $args=['number'=>$number?:null,'phone'=>$phone?:null,'id'=>$id,'uid'=>$uid]+$fields;foreach($args as $k=>$v)if(is_string($v)&&$v==='')$args[$k]=null;if($fields['study_program_id']<1)$args['study_program_id']=null;if($uploadedPhoto!==null)$args['photo_url']=$uploadedPhoto;
+            $lq=$pdo->prepare($sql);$lq->execute($args);if($lq->rowCount()===0){$check=$pdo->prepare('SELECT id FROM lecturers WHERE id=:id AND user_id=:uid');$check->execute(['id'=>$id,'uid'=>$uid]);if(!$check->fetchColumn())throw new RuntimeException('Data dosen tidak ditemukan.');}
+            $pdo->commit();flash('Data dosen berhasil diperbarui.');
+        }catch(Throwable $e){if($pdo->inTransaction())$pdo->rollBack();error_log('[STIT UPDATE LECTURER] '.$e->getMessage());flash('Gagal memperbarui data dosen. Periksa username/email/NIDN agar tidak duplikat.','error');}
+        go('lecturers');
+    }
     if ($action==='save_student' || $action==='save_lecturer' || $action==='save_account') {
         allow(['super_admin','admin_akademik']);
         $fullName=trim((string)($_POST['full_name']??'')); $username=trim((string)($_POST['username']??'')); $email=trim((string)($_POST['email']??'')); $password=(string)($_POST['password']??'');
@@ -1889,7 +1911,7 @@ $pendingCount=0;foreach($availableMigrations as $migrationName=>$migrationFile){
   <div style="overflow-x:auto"><table><thead><tr><th>No.</th><th>Nama Dosen</th><th>NIDN</th><th>Email</th><th>Telepon</th><th>Program Studi</th><th>Status Kepegawaian</th><th>Ikatan Kerja</th><th>Pendidikan</th><th>Jabatan Fungsional</th><th>Keahlian</th><th>NIK</th><th>Tempat/Tanggal Lahir</th><th>Jenis Kelamin</th><th>Agama</th><th>Status Perkawinan</th><th>Alamat</th><th>Kontak Darurat</th><th>Tanggal Mulai</th><th>Sertifikasi</th></tr></thead><tbody>
   <?php foreach($rows as $index=>$lecturerRow):?><tr>
   <td><?=($index+1)?></td>
-  <td><button type="button" class="lecturer-name-select" data-lecturer-name="<?=e($lecturerRow['full_name']??'')?>" onclick="window.selectLecturerForEditor(this)"><?=e($lecturerRow['full_name']??'—')?></button></td>
+  <td><a class="student-name-link" href="?page=lecturers&amp;edit=<?=(int)$lecturerRow['id']?>#lecturerEditForm"><?=e($lecturerRow['full_name']??'—')?></a></td>
   <td><?=e($lecturerRow['lecturer_number']??'—')?></td><td><?=e($lecturerRow['email']??'—')?></td><td><?=e($lecturerRow['phone']??'—')?></td><td><?=e($lecturerRow['study_program']??'—')?></td>
   <td><?=e($lecturerRow['employment_status']??'—')?></td><td><?=e($lecturerRow['employment_type']??'—')?></td><td><?=e($lecturerRow['highest_education']??'—')?></td><td><?=e($lecturerRow['functional_position']??'—')?></td><td><?=e($lecturerRow['expertise']??'—')?></td><td><?=e($lecturerRow['national_id']??'—')?></td>
   <td><?=e(trim(($lecturerRow['birth_place']??'').' '.($lecturerRow['birth_date']??''))?:'—')?></td><td><?=e(($lecturerRow['gender']??'')==='male'?'Laki-laki':(($lecturerRow['gender']??'')==='female'?'Perempuan':'—'))?></td><td><?=e($lecturerRow['religion']??'—')?></td><td><?=e($lecturerRow['marital_status']??'—')?></td>
@@ -1897,6 +1919,49 @@ $pendingCount=0;foreach($availableMigrations as $migrationName=>$migrationFile){
   <td><?=e(trim(($lecturerRow['emergency_contact_name']??'').' '.($lecturerRow['emergency_contact_phone']??''))?:'—')?></td><td><?=e($lecturerRow['employment_start_date']??'—')?></td><td><?=e($lecturerRow['certification_number']??'—')?></td>
   </tr><?php endforeach;?>
   </tbody></table></div><?php endif;?>
+</div>
+<?php endif;?>
+<?php if($page==='lecturers'&&isset($_GET['edit'])&&in_array($u['role'],$academicRoles,true)):
+ $editLq=$pdo->prepare('SELECT l.*,u.id AS account_user_id,u.full_name,u.email,u.username FROM lecturers l JOIN users u ON u.id=l.user_id WHERE l.id=:id LIMIT 1');$editLq->execute(['id'=>(int)$_GET['edit']]);$editLecturer=$editLq->fetch();$editLecturerPrograms=$pdo->query('SELECT id,name FROM study_programs WHERE is_active=1 ORDER BY name')->fetchAll();
+ if($editLecturer):?>
+<div class="panel student-create-panel student-edit-page" id="lecturerEditForm">
+ <div class="student-form-heading"><div><span class="eyebrow">DATA TENAGA PENDIDIK</span><h2>Edit Data Dosen</h2><p class="muted">Perbarui seluruh biodata, kepegawaian, akademik, dan akun dosen <?=e($editLecturer['full_name'])?>.</p></div><span class="tag">Mode Edit</span></div>
+ <form method="post" enctype="multipart/form-data">
+  <input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="update_lecturer"><input type="hidden" name="lecturer_id" value="<?=(int)$editLecturer['id']?>"><input type="hidden" name="user_id" value="<?=(int)$editLecturer['account_user_id']?>">
+  <div class="student-fields">
+   <div><label>Nama Lengkap + Gelar</label><input name="full_name" maxlength="160" required value="<?=e($editLecturer['full_name']??'')?>"></div>
+   <div><label>NIDN / Nomor Dosen</label><input name="lecturer_number" maxlength="40" value="<?=e($editLecturer['lecturer_number']??'')?>"></div>
+   <div><label>Foto Profil Dosen</label><?php if(!empty($editLecturer['photo_url'])):?><img src="<?=e($editLecturer['photo_url'])?>" alt="Foto dosen" style="width:76px;height:76px;object-fit:cover;border-radius:50%;display:block;margin-bottom:8px"><?php endif;?><input type="file" name="photo_file" accept="image/jpeg,image/png,image/webp"><small class="muted">Kosongkan jika tidak ingin mengganti foto.</small></div>
+   <div><label>Telepon / WhatsApp</label><input name="phone" maxlength="30" value="<?=e($editLecturer['phone']??'')?>"></div>
+   <div><label>Email</label><input type="email" name="email" maxlength="190" value="<?=e($editLecturer['email']??'')?>"></div>
+   <div><label>Username</label><input name="username" maxlength="100" required value="<?=e($editLecturer['username']??'')?>"></div>
+   <div><label>Password Baru (opsional, minimal 10 karakter)</label><input type="password" name="password" minlength="10" maxlength="200" autocomplete="new-password"></div>
+   <div><label>Status Kepegawaian</label><input name="employment_status" maxlength="40" value="<?=e($editLecturer['employment_status']??'')?>"></div>
+   <div><label>Jenis Ikatan Kerja</label><input name="employment_type" maxlength="40" value="<?=e($editLecturer['employment_type']??'')?>"></div>
+   <div><label>Tanggal Mulai Bekerja</label><input type="date" name="employment_start_date" value="<?=e($editLecturer['employment_start_date']??'')?>"></div>
+   <div><label>NIK</label><input name="national_id" maxlength="16" value="<?=e($editLecturer['national_id']??'')?>"></div>
+   <div><label>Tempat Lahir</label><input name="birth_place" maxlength="100" value="<?=e($editLecturer['birth_place']??'')?>"></div>
+   <div><label>Tanggal Lahir</label><input type="date" name="birth_date" value="<?=e($editLecturer['birth_date']??'')?>"></div>
+   <div><label>Jenis Kelamin</label><select name="gender"><option value="">Pilih</option><option value="male" <?=$editLecturer['gender']==='male'?'selected':''?>>Laki-laki</option><option value="female" <?=$editLecturer['gender']==='female'?'selected':''?>>Perempuan</option></select></div>
+   <div><label>Agama</label><input name="religion" maxlength="40" value="<?=e($editLecturer['religion']??'')?>"></div>
+   <div><label>Status Perkawinan</label><input name="marital_status" maxlength="30" value="<?=e($editLecturer['marital_status']??'')?>"></div>
+   <div><label>Provinsi</label><input name="province" maxlength="100" value="<?=e($editLecturer['province']??'')?>"></div>
+   <div><label>Kabupaten / Kota</label><input name="city" maxlength="100" value="<?=e($editLecturer['city']??'')?>"></div>
+   <div><label>Kecamatan</label><input name="district" maxlength="100" value="<?=e($editLecturer['district']??'')?>"></div>
+   <div><label>Desa / Kelurahan</label><input name="village" maxlength="100" value="<?=e($editLecturer['village']??'')?>"></div>
+   <div><label>Kode Pos</label><input name="postal_code" maxlength="10" value="<?=e($editLecturer['postal_code']??'')?>"></div>
+   <div class="full"><label>Alamat Lengkap</label><textarea name="address" rows="3" maxlength="2000"><?=e($editLecturer['address']??'')?></textarea></div>
+   <div><label>Kontak Darurat</label><input name="emergency_contact_name" maxlength="160" value="<?=e($editLecturer['emergency_contact_name']??'')?>"></div>
+   <div><label>Telepon Kontak Darurat</label><input name="emergency_contact_phone" maxlength="30" value="<?=e($editLecturer['emergency_contact_phone']??'')?>"></div>
+   <div><label>Program Studi</label><select name="study_program_id"><option value="">Pilih program studi</option><?php foreach($editLecturerPrograms as $lp):?><option value="<?=$lp['id']?>" <?=((int)$editLecturer['study_program_id']===(int)$lp['id'])?'selected':''?>><?=e($lp['name'])?></option><?php endforeach;?></select></div>
+   <div><label>Jabatan Fungsional</label><input name="functional_position" maxlength="120" value="<?=e($editLecturer['functional_position']??'')?>"></div>
+   <div><label>Pangkat / Golongan</label><input name="academic_rank" maxlength="100" value="<?=e($editLecturer['academic_rank']??'')?>"></div>
+   <div><label>Pendidikan Tertinggi</label><input name="highest_education" maxlength="40" value="<?=e($editLecturer['highest_education']??'')?>"></div>
+   <div><label>Bidang Keahlian</label><input name="expertise" maxlength="255" value="<?=e($editLecturer['expertise']??'')?>"></div>
+   <div><label>Nomor Sertifikasi Pendidik</label><input name="certification_number" maxlength="100" value="<?=e($editLecturer['certification_number']??'')?>"></div>
+  </div>
+  <div class="student-form-footer"><span class="muted">Periksa kembali data dosen sebelum menyimpan perubahan.</span><div><a class="student-detail-cancel" href="?page=lecturers#lecturerRegisteredList">Batal</a><button type="submit">Simpan Perubahan</button></div></div>
+ </form>
 </div>
 <?php endif;?><?php if($page==='courses'&&in_array($u['role'],$academicRoles,true)): $programs=$pdo->query('SELECT id,name FROM study_programs WHERE is_active=1 ORDER BY name')->fetchAll();?><div class="panel"><h2>Tambah Mata Kuliah</h2><form class="inline" method="post"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="save_course"><div><label>Program Studi</label><select name="study_program_id" required><?php foreach($programs as $p):?><option value="<?=$p['id']?>"><?=e($p['name'])?></option><?php endforeach;?></select></div><div><label>Kode</label><input name="code" maxlength="30" required></div><div><label>Nama Mata Kuliah</label><input name="name" maxlength="180" required></div><div><label>SKS</label><input type="number" name="credits" min="1" max="12" required></div><div><label>Semester Rekomendasi</label><select name="recommended_semester"><option value="">Tidak ditentukan</option><?php for($sem=1;$sem<=8;$sem++):?><option value="<?=$sem?>">Semester <?=$sem?></option><?php endfor;?></select></div><button>Simpan Mata Kuliah</button></form></div><?php endif;?>
 <?php if($page==='classes'&&in_array($u['role'],$academicRoles,true)): $courses=$pdo->query('SELECT id,code,name FROM courses WHERE is_active=1 ORDER BY name')->fetchAll();$semesters=$pdo->query('SELECT s.id,CONCAT(y.name," - ",s.name) AS label FROM semesters s JOIN academic_years y ON y.id=s.academic_year_id ORDER BY s.start_date DESC')->fetchAll();$lecturers=$pdo->query('SELECT l.id,u.full_name FROM lecturers l JOIN users u ON u.id=l.user_id ORDER BY u.full_name')->fetchAll();?><div class="panel"><h2>Buat Kelas Kuliah</h2><form class="inline" method="post"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="save_class"><div><label>Mata Kuliah</label><select name="course_id" required><?php foreach($courses as $c):?><option value="<?=$c['id']?>"><?=e($c['code'].' - '.$c['name'])?></option><?php endforeach;?></select></div><div><label>Semester</label><select name="semester_id" required><?php foreach($semesters as $sm):?><option value="<?=$sm['id']?>"><?=e($sm['label'])?></option><?php endforeach;?></select></div><div><label>Dosen Pengampu</label><select name="lecturer_id"><option value="">Belum ditentukan</option><?php foreach($lecturers as $l):?><option value="<?=$l['id']?>"><?=e($l['full_name'])?></option><?php endforeach;?></select></div><div><label>Nama Kelas</label><input name="class_name" maxlength="40" placeholder="A" required></div><div><label>Kapasitas</label><input type="number" name="capacity" min="1" max="500"></div><button>Buat Kelas</button></form></div><?php endif;?>
