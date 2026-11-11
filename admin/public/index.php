@@ -1122,7 +1122,7 @@ $mobileIcon = static function(string $key) use ($mobileIconPaths): string {
 };
 ?>
 
-<main class="main"><header class="top"><strong><?=e($labels[$u['role']]??$u['role'])?></strong><div class="top-actions"><label class="admin-menu-trigger" for="adminMenuToggle" aria-label="Buka menu navigasi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span>Menu</span></label><form method="post"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="logout"><button class="logout">Keluar</button></form></div></header><section class="content"><?php if($flash):?><div class="alert <?=$flash['type']==='error'?'error':''?>"><?=e($flash['message'])?></div><?php endif;?>
+<main class="main"><header class="top"><strong><?=e($labels[$u['role']]??$u['role'])?></strong><div class="top-actions"><label class="admin-menu-trigger" for="adminMenuToggle" aria-label="Buka menu navigasi" onclick="var drawer=document.getElementById('adminMobileDrawer');if(drawer){drawer.style.removeProperty('display');}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span>Menu</span></label><form method="post"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="logout"><button class="logout">Keluar</button></form></div></header><section class="content"><?php if($flash):?><div class="alert <?=$flash['type']==='error'?'error':''?>"><?=e($flash['message'])?></div><?php endif;?>
 <?php if($page==='system'):?>
 <h1>Pengaturan Sistem</h1><p class="muted">Atur tampilan Dashboard SIAKAD sesuai kenyamanan Anda. Pilihan tema disimpan pada browser/perangkat ini.</p>
 <div class="theme-settings">
@@ -1582,7 +1582,7 @@ $pendingCount=0;foreach($availableMigrations as $migrationName=>$migrationFile){
 <div class="admin-mobile-drawer" id="adminMobileDrawer">
   <label class="admin-mobile-backdrop" for="adminMenuToggle" aria-label="Tutup menu"></label>
   <section class="admin-mobile-drawer-panel" aria-label="Menu navigasi admin">
-    <div class="admin-mobile-drawer-head"><strong>Menu Dashboard</strong><label class="admin-mobile-close" for="adminMenuToggle" aria-label="Tutup menu" title="Tutup menu">×</label></div>
+    <div class="admin-mobile-drawer-head"><strong>Menu Dashboard</strong><button type="button" class="admin-mobile-close" aria-label="Tutup menu" title="Tutup menu" onclick="var toggle=document.getElementById('adminMenuToggle');var drawer=document.getElementById('adminMobileDrawer');if(toggle){toggle.checked=false;}if(drawer){drawer.style.setProperty('display','none','important');}return false;">×</button></div>
     <nav class="admin-mobile-drawer-content" aria-label="Navigasi dashboard">
       <a class="nav-dashboard <?=$page==='dashboard'?'active':''?>" href="?page=dashboard">Dashboard</a>
       <?php foreach($visibleMenuGroups as $groupLabel=>$groupKeys): ?>
