@@ -659,6 +659,23 @@ foreach ($menuGroups as $groupLabel => $groupKeys) {
     $visibleKeys = array_values(array_filter($groupKeys, static fn(string $key): bool => $mobileAllowed($key)));
     if ($visibleKeys) $visibleMenuGroups[$groupLabel] = $visibleKeys;
 }
+// Quick navigation only shows unique destinations allowed for the signed-in role.
+// The complete role-filtered menu remains available in the drawer.
+$quickCandidates = [
+    ['page'=>'dashboard','label'=>'Beranda','icon'=>'⌂'],
+    ['page'=>'students','label'=>'Mahasiswa','icon'=>'♙'],
+    ['page'=>'krs','label'=>'KRS','icon'=>'▤'],
+    ['page'=>'grades','label'=>'Nilai','icon'=>'▧'],
+    ['page'=>'attendance','label'=>'Presensi','icon'=>'◷'],
+    ['page'=>'khs','label'=>'KHS','icon'=>'▥'],
+    ['page'=>'ipk','label'=>'IPK','icon'=>'▥'],
+    ['page'=>'system','label'=>'Sistem','icon'=>'⚙'],
+];
+$mobileQuick = array_slice(
+    array_values(array_filter($quickCandidates, static fn(array $item): bool => $mobileAllowed($item['page']))),
+    0,
+    5
+);
 if ($page==='login') {
 ?><!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Login Admin - STIT Darul Ilmi</title><style>
 *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at 12% 12%,#16885b 0,transparent 34%),linear-gradient(135deg,#03452f,#087a4b 58%,#b9e66b);font:15px system-ui;color:#173b2b}.login{width:min(460px,94vw);background:#fff;padding:36px;border:1px solid #e1eee5;border-radius:28px;box-shadow:0 24px 80px #002b1c66}.mark-wrap{display:flex;justify-content:center;align-items:center;margin:0 auto 22px}.campus-logo{display:block;width:142px;height:142px;max-width:48%;object-fit:contain}.login h1{font-size:27px;line-height:1.15;color:#075b3d;margin:22px 0 8px}.muted{color:#64756b;line-height:1.55}label{display:block;font-weight:700;margin:17px 0 7px;color:#234b37}input{width:100%;padding:14px 15px;border:1px solid #d4e5d9;border-radius:13px;font:inherit;background:#fbfefc;outline:none}input:focus{border-color:#078653;box-shadow:0 0 0 3px #07865320}button{width:100%;margin-top:24px;padding:14px;border:0;border-radius:30px;background:linear-gradient(90deg,#087a4b,#03452f);color:white;font-weight:800;font-size:15px;cursor:pointer;box-shadow:0 8px 20px #075b3d30}.alert{padding:12px 14px;border-radius:12px;background:#fff0ee;color:#a32118;margin:14px 0}.login-foot{border-top:1px solid #e8f1eb;margin-top:24px;padding-top:16px;font-size:12px}@media(max-width:760px){
@@ -1086,7 +1103,7 @@ html[data-theme="green"] .student-edit-action{background:#e5f4eb!important;color
 html[data-theme="green"] .student-form-footer button#studentNext,
 html[data-theme="green"] .student-form-footer button#studentSubmit{background:#087a4b!important;color:#fff!important}
 </style></head><body><div class="layout"><aside class="side"><div class="brand"><img src="<?=e($campusLogoUrl)?>" alt="Logo STIT Darul Ilmi"><span class="brand-copy">STIT DARUL ILMI<small>Academic Portal</small></span></div><nav class="nav" aria-label="Navigasi desktop"><a class="nav-dashboard <?=$page==='dashboard'?'active':''?>" href="?page=dashboard">Dashboard</a><?php foreach($visibleMenuGroups as $groupLabel=>$groupKeys): ?><div class="nav-group"><div class="nav-group-title"><?=e($groupLabel)?></div><?php foreach($groupKeys as $key): ?><a class="<?=$page===$key?'active':''?>" href="?page=<?=e($key)?>"><?=e($menus[$key])?></a><?php endforeach; ?></div><?php endforeach; ?></nav></aside>
-<nav class="mobile-bottom-nav" aria-label="Navigasi utama Android">
+<nav class="mobile-bottom-nav" aria-label="Navigasi utama Android" style="--quick-count:<?=max(1,count($mobileQuick))?>">
 <?php foreach($mobileQuick as $item): ?><a class="mobile-nav-item <?=$page===$item['page']?'active':''?>" href="?page=<?=e($item['page'])?>"><span class="mobile-nav-icon" aria-hidden="true"><?=e($item['icon'])?></span><span><?=e($item['label'])?></span></a><?php endforeach; ?>
 
 </nav>
@@ -2497,7 +2514,7 @@ html[data-theme="green"] .student-edit-page .student-form-footer button#studentS
  .modal,.account-modal,.student-detail-backdrop{padding:12px!important}
  .modal-card,.account-modal-card,.student-detail-modal{width:min(100%,560px)!important;max-width:100%!important;max-height:calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;overflow-y:auto!important;overscroll-behavior:contain!important}
  .student-form-footer{padding-bottom:calc(12px + env(safe-area-inset-bottom))!important}
- .mobile-bottom-nav{padding-bottom:calc(7px + env(safe-area-inset-bottom))!important}
+ .mobile-bottom-nav{grid-template-columns:repeat(var(--quick-count,4),minmax(0,1fr))!important;padding-bottom:calc(7px + env(safe-area-inset-bottom))!important}
  .admin-mobile-drawer{touch-action:pan-y}
  .admin-mobile-drawer-panel{width:min(82vw,330px)!important;max-width:calc(100vw - 20px)!important;height:min(88dvh,760px)!important;max-height:calc(100dvh - env(safe-area-inset-top) - 12px)!important;top:0!important;transform:none!important}
  .admin-mobile-drawer-content{min-height:0!important;overflow-y:auto!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important}
