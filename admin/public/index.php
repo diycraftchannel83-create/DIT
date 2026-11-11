@@ -1122,7 +1122,7 @@ $mobileIcon = static function(string $key) use ($mobileIconPaths): string {
 };
 ?>
 
-<main class="main"><header class="top"><strong><?=e($labels[$u['role']]??$u['role'])?></strong><div class="top-actions"><button type="button" class="admin-menu-trigger" id="adminMenuTrigger" popovertarget="adminMobileDrawer" aria-controls="adminMobileDrawer" aria-haspopup="true" aria-label="Buka menu navigasi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span>Menu</span></button><form method="post"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="logout"><button class="logout">Keluar</button></form></div></header><section class="content"><?php if($flash):?><div class="alert <?=$flash['type']==='error'?'error':''?>"><?=e($flash['message'])?></div><?php endif;?>
+<main class="main"><header class="top"><strong><?=e($labels[$u['role']]??$u['role'])?></strong><div class="top-actions"><label class="admin-menu-trigger" for="adminMenuToggle" role="button" tabindex="0" aria-label="Buka menu navigasi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span>Menu</span></label><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span>Menu</span></button><form method="post"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="logout"><button class="logout">Keluar</button></form></div></header><section class="content"><?php if($flash):?><div class="alert <?=$flash['type']==='error'?'error':''?>"><?=e($flash['message'])?></div><?php endif;?>
 <?php if($page==='system'):?>
 <h1>Pengaturan Sistem</h1><p class="muted">Atur tampilan Dashboard SIAKAD sesuai kenyamanan Anda. Pilihan tema disimpan pada browser/perangkat ini.</p>
 <div class="theme-settings">
@@ -1577,7 +1577,45 @@ $pendingCount=0;foreach($availableMigrations as $migrationName=>$migrationFile){
 })();
 </script>
 <?php endif;?>
-<div class="panel"><h2>Daftar <?=e($ds['title'])?> <span class="tag"><?=count($rows)?> data</span></h2><?php if(!$rows):?><p class="muted">Belum ada data untuk ditampilkan.</p><?php else:?><table><thead><tr><?php foreach(array_keys($rows[0]) as $col):if(($page==='accounts'||$page==='students')&&$col==='id')continue;?><th><?=e(str_replace('_',' ',$col))?></th><?php endforeach;?><?php if($page==='students'&&in_array($u['role'],$academicRoles,true)):?><th>Aksi</th><?php endif;?></tr></thead><tbody><?php foreach($rows as $row):?><tr><?php foreach($row as $column=>$value):if(($page==='accounts'||$page==='students')&&$column==='id')continue;?><td><?php if($page==='students'&&$column==='full_name'):?><a class="student-name-link" href="?page=students&amp;edit=<?=(int)$row['id']?>#studentEditModal" aria-label="Lihat dan edit data <?=e($value)?>"><?=e($value)?></a><?php elseif($page==='accounts'&&$column==='username'):$accountJson=['id'=>(int)$row['id'],'username'=>$row['username'],'full_name'=>$row['full_name'],'email'=>$row['email'],'role'=>$row['role'],'role_label'=>['super_admin'=>'Super Admin','admin_akademik'=>'Admin Akademik','admin_keuangan'=>'Admin Keuangan','ketua_prodi'=>'Ketua Program Studi','ketua_stit'=>'Ketua STIT','dosen'=>'Dosen','mahasiswa'=>'Mahasiswa'][$row['role']]??$row['role'],'status'=>$row['status'],'program_studi'=>$row['program_studi'],'created_at'=>$row['created_at']??null,'last_login_at'=>$row['last_login_at']];?><button type="button" class="account-link" onclick="return window.openAccountDetail(this)" data-account-json="<?=e(json_encode($accountJson,JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP))?>"><?=e($value)?></button><?php else:?><?=e($value===null?'—':$value)?><?php endif;?></td><?php endforeach;?><?php if($page==='students'&&in_array($u['role'],$academicRoles,true)):?><td class="student-action-cell"><a class="student-edit-action" href="?page=students&amp;edit=<?=(int)$row['id']?>#studentEditModal"><span aria-hidden="true">✎</span> Edit Data</a></td><?php endif;?></tr><?php endforeach;?></tbody></table><?php endif;?></div><?php endif;?></section></main></div><script>
+<div class="panel"><h2>Daftar <?=e($ds['title'])?> <span class="tag"><?=count($rows)?> data</span></h2><?php if(!$rows):?><p class="muted">Belum ada data untuk ditampilkan.</p><?php else:?><table><thead><tr><?php foreach(array_keys($rows[0]) as $col):if(($page==='accounts'||$page==='students')&&$col==='id')continue;?><th><?=e(str_replace('_',' ',$col))?></th><?php endforeach;?><?php if($page==='students'&&in_array($u['role'],$academicRoles,true)):?><th>Aksi</th><?php endif;?></tr></thead><tbody><?php foreach($rows as $row):?><tr><?php foreach($row as $column=>$value):if(($page==='accounts'||$page==='students')&&$column==='id')continue;?><td><?php if($page==='students'&&$column==='full_name'):?><a class="student-name-link" href="?page=students&amp;edit=<?=(int)$row['id']?>#studentEditModal" aria-label="Lihat dan edit data <?=e($value)?>"><?=e($value)?></a><?php elseif($page==='accounts'&&$column==='username'):$accountJson=['id'=>(int)$row['id'],'username'=>$row['username'],'full_name'=>$row['full_name'],'email'=>$row['email'],'role'=>$row['role'],'role_label'=>['super_admin'=>'Super Admin','admin_akademik'=>'Admin Akademik','admin_keuangan'=>'Admin Keuangan','ketua_prodi'=>'Ketua Program Studi','ketua_stit'=>'Ketua STIT','dosen'=>'Dosen','mahasiswa'=>'Mahasiswa'][$row['role']]??$row['role'],'status'=>$row['status'],'program_studi'=>$row['program_studi'],'created_at'=>$row['created_at']??null,'last_login_at'=>$row['last_login_at']];?><button type="button" class="account-link" onclick="return window.openAccountDetail(this)" data-account-json="<?=e(json_encode($accountJson,JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP))?>"><?=e($value)?></button><?php else:?><?=e($value===null?'—':$value)?><?php endif;?></td><?php endforeach;?><?php if($page==='students'&&in_array($u['role'],$academicRoles,true)):?><td class="student-action-cell"><a class="student-edit-action" href="?page=students&amp;edit=<?=(int)$row['id']?>#studentEditModal"><span aria-hidden="true">✎</span> Edit Data</a></td><?php endif;?></tr><?php endforeach;?></tbody></table><?php endif;?></div><?php endif;?></section></main></div>
+<input type="checkbox" id="adminMenuToggle" class="admin-menu-toggle" aria-label="Tampilkan menu navigasi">
+<div class="admin-mobile-drawer" id="adminMobileDrawer">
+  <label class="admin-mobile-backdrop" for="adminMenuToggle" aria-label="Tutup menu"></label>
+  <section class="admin-mobile-drawer-panel" aria-label="Menu navigasi admin">
+    <div class="admin-mobile-drawer-head"><strong>Menu Dashboard</strong><label class="admin-mobile-close" for="adminMenuToggle" role="button" tabindex="0" aria-label="Tutup menu">×</label></div>
+    <nav class="admin-mobile-drawer-content" aria-label="Navigasi dashboard">
+      <a class="nav-dashboard <?=$page==='dashboard'?'active':''?>" href="?page=dashboard">Dashboard</a>
+      <?php foreach($visibleMenuGroups as $groupLabel=>$groupKeys): ?>
+        <section class="nav-group"><div class="nav-group-title"><?=e($groupLabel)?></div>
+        <?php foreach($groupKeys as $key): ?><a class="<?=$page===$key?'active':''?>" href="?page=<?=e($key)?>"><?=e($menus[$key])?></a><?php endforeach; ?>
+        </section>
+      <?php endforeach; ?>
+    </nav>
+  </section>
+</div>
+<style>
+.admin-menu-toggle{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}
+.admin-mobile-drawer{display:none!important;position:fixed!important;inset:0!important;z-index:2147483647!important;width:100vw!important;height:100vh!important;height:100dvh!important;margin:0!important;padding:0!important;border:0!important;overflow:hidden!important}
+.admin-menu-toggle:checked ~ .admin-mobile-drawer{display:block!important}
+.admin-mobile-backdrop{position:absolute!important;inset:0!important;display:block!important;background:rgba(7,45,30,.55)!important;backdrop-filter:blur(2px)!important}
+.admin-mobile-drawer-panel{position:absolute!important;inset:0 auto 0 0!important;width:min(88vw,370px)!important;height:100%!important;max-height:100%!important;box-sizing:border-box!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;padding:calc(14px + env(safe-area-inset-top)) 16px calc(14px + env(safe-area-inset-bottom))!important;background:#fff!important;color:#174b35!important;border-radius:0 20px 20px 0!important;box-shadow:18px 0 48px rgba(7,55,35,.24)!important}
+.admin-mobile-drawer-head{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;flex:0 0 auto!important;padding:10px 2px 14px!important;border-bottom:1px solid #dcece1!important;color:#075b3d!important}
+.admin-mobile-drawer-head strong{font-size:17px!important}
+.admin-mobile-close{display:flex!important;align-items:center!important;justify-content:center!important;width:40px!important;height:40px!important;min-height:40px!important;border:1px solid #cfe5d6!important;border-radius:10px!important;background:#eaf6ee!important;color:#075b3d!important;font-size:27px!important;line-height:1!important;cursor:pointer!important}
+.admin-mobile-drawer-content{display:flex!important;flex:1 1 auto!important;flex-direction:column!important;align-items:stretch!important;gap:8px!important;min-height:0!important;overflow-y:auto!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;padding:14px 0!important}
+.admin-mobile-drawer-content .nav-dashboard,.admin-mobile-drawer-content .nav-group a{display:flex!important;align-items:center!important;min-height:46px!important;height:auto!important;box-sizing:border-box!important;padding:11px 13px!important;border:1px solid #dcece1!important;border-radius:11px!important;background:#f5faf6!important;color:#175b3d!important;text-decoration:none!important;white-space:normal!important;font-size:14px!important;line-height:1.35!important}
+.admin-mobile-drawer-content .nav-group{display:block!important;flex:0 0 auto!important;margin:0!important;padding:10px!important;border:1px solid #e0eee5!important;border-radius:13px!important;background:#fff!important}
+.admin-mobile-drawer-content .nav-group-title{display:block!important;margin:0 0 8px!important;color:#087a4b!important;font-size:11px!important;font-weight:800!important;letter-spacing:.06em!important;text-transform:uppercase!important}
+.admin-mobile-drawer-content .nav-group a{margin:5px 0!important}
+.admin-mobile-drawer-content a.active{background:#e1f3e7!important;border-color:#9bcfae!important;color:#05613e!important;font-weight:800!important}
+@media(min-width:761px){.admin-menu-toggle:checked ~ .admin-mobile-drawer{display:none!important}}
+</style>
+<script>
+document.addEventListener('keydown',function(event){
+ if(event.key==='Escape'){var toggle=document.getElementById('adminMenuToggle');if(toggle)toggle.checked=false;}
+});
+</script>
+<script>
 ;
 </script><script>
 (function(){
@@ -2389,19 +2427,7 @@ html[data-theme="green"] .student-edit-page .student-form-footer button#studentS
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',mountStudentEditor,{once:true}); else mountStudentEditor();
 })();
 </script>
-<div class="admin-mobile-popover" id="adminMobileDrawer" popover="auto" aria-label="Menu navigasi admin">
-  <section class="admin-mobile-drawer-panel">
-    <div class="admin-mobile-drawer-head"><strong>Menu Dashboard</strong><button type="button" aria-label="Tutup menu" popovertarget="adminMobileDrawer" popovertargetaction="hide">×</button></div>
-    <nav class="admin-mobile-drawer-content" aria-label="Navigasi dashboard">
-      <a class="nav-dashboard <?=$page==='dashboard'?'active':''?>" href="?page=dashboard">Dashboard</a>
-      <?php foreach($visibleMenuGroups as $groupLabel=>$groupKeys): ?>
-        <section class="nav-group"><div class="nav-group-title"><?=e($groupLabel)?></div>
-        <?php foreach($groupKeys as $key): ?><a class="<?=$page===$key?'active':''?>" href="?page=<?=e($key)?>"><?=e($menus[$key])?></a><?php endforeach; ?>
-        </section>
-      <?php endforeach; ?>
-    </nav>
-  </section>
-</div>
+
 <style>
 .admin-mobile-popover{position:fixed;inset:0 auto 0 0;width:min(88vw,370px);height:100dvh;max-height:100dvh;margin:0;padding:0;border:0;overflow:hidden;background:transparent;color:#174b35}
 .admin-mobile-popover:popover-open{display:block}
