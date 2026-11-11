@@ -31,7 +31,7 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
   $f['study_program_id']=(int)($_POST['study_program_id']??0);$f['entry_year']=(int)($_POST['entry_year']??date('Y'));$f['graduation_year']=(int)($_POST['graduation_year']??0);
   $required=['full_name'];
   foreach($required as $k)if($f[$k]===''){$pmbMessage='Lengkapi seluruh data wajib yang bertanda wajib.';break;}
-  if(!$pmbMessage&&(!preg_match('/^\d{16}$/',$f['national_id'])||!filter_var($f['email'],FILTER_VALIDATE_EMAIL)||!in_array($f['gender'],['male','female'],true)))$pmbMessage='Periksa kembali NIK, email, dan jenis kelamin.';
+  if(!$pmbMessage&&mb_strlen($f['full_name'])<2)$pmbMessage='Nama lengkap minimal 2 karakter.';
   if(!$pmbMessage&&$f['study_program_id']<1&&count($pmbPrograms)>0)$f['study_program_id']=(int)$pmbPrograms[0]['id'];
   $files=[];
   foreach([] as $key=>$label){ // Mode pengujian: dokumen PMB dilewati.
