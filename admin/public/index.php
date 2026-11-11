@@ -474,6 +474,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
             $storedSlides->execute();
             $slides=json_decode((string)($storedSlides->fetchColumn()?:'[]'),true);
             if(!is_array($slides)) $slides=[];
+            if(!$slides){$legacyHero=(string)($pdo->query('SELECT hero_image_url FROM campus_profile WHERE id=1')->fetchColumn()?:'');if($legacyHero!=='')$slides[]=['url'=>$legacyHero,'alt'=>'Gedung kampus STIT Darul Ilmi Tasikmalaya','caption'=>'STIT Darul Ilmi · Tasikmalaya'];}
             $removeSlides=array_values(array_unique(array_filter(array_map('intval',(array)($_POST['remove_hero_slides']??[])),static fn($i)=>$i>=0)));
             foreach($slides as $index=>$slide){if(in_array((int)$index,$removeSlides,true))unset($slides[$index]);}
             $slides=array_values(array_filter($slides,static fn($slide)=>is_array($slide)&&!empty($slide['url'])));
