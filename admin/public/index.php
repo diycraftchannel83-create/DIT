@@ -895,7 +895,43 @@ html[data-theme="green"] .content,html[data-theme="green"] .main{background:#f3f
 #lecturerCreateForm .student-tabs .student-tab{position:relative!important;z-index:20!important;pointer-events:auto!important;touch-action:manipulation!important}
 #lecturerCreateForm .student-form-footer button{cursor:pointer!important}
 </style>
-<style id="lecturer-name-select-style">.lecturer-name-select{border:0;background:transparent;padding:4px 0;color:#075b3d;font:inherit;font-weight:800;text-align:left;text-decoration:underline;text-decoration-color:#9bcbb0;text-underline-offset:3px;cursor:pointer}.lecturer-name-select:hover{color:#087a4b}</style></head><body><main class="login"><div class="mark-wrap"><img class="campus-logo" src="<?=e($campusLogoUrl)?>" alt="Logo STIT Darul Ilmi Tasikmalaya"></div><p style="color:#078653;font-weight:800;letter-spacing:.12em;font-size:11px;margin:20px 0 0">PORTAL AKADEMIK TERPADU</p><h1>Selamat Datang<br>Admin STIT Darul Ilmi</h1><p class="muted">Masuk untuk mengelola layanan akademik dan informasi kampus STIT Darul Ilmi Tasikmalaya.</p><?php if($flash):?><div class="alert"><?=e($flash['message'])?></div><?php endif;?><form method="post"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="login"><label>Username</label><input name="username" autocomplete="username" placeholder="Masukkan username" required><label>Password</label><input type="password" name="password" autocomplete="current-password" placeholder="Masukkan password" required><button type="submit">Masuk ke Dashboard　›</button></form><div class="login-foot muted">Gunakan akun admin yang dibuat melalui prosedur setup backend. Tidak ada akun bawaan.<br><a href="../../portal/public/?page=login" style="display:inline-block;margin-top:12px;color:#087a4b;font-weight:800">Login Mahasiswa / Dosen →</a></div></main></script>
+<style id="lecturer-name-select-style">.lecturer-name-select{border:0;background:transparent;padding:4px 0;color:#075b3d;font:inherit;font-weight:800;text-align:left;text-decoration:underline;text-decoration-color:#9bcbb0;text-underline-offset:3px;cursor:pointer}.lecturer-name-select:hover{color:#087a4b}</style><style id="plain-data-clickable-text">
+/* Nama, username, dan data yang dapat dibuka tetap clickable, tetapi bukan tombol/menu hijau. */
+html[data-theme="green"] .content button.account-link,
+html[data-theme="green"] .content button.lecturer-name-select,
+html[data-theme="green"] .content a.student-name-link,
+html[data-theme="green"] .content a[href*="page=students"][href*="edit="],
+html[data-theme="green"] .content a[href*="page=lecturers"][href*="edit="]{
+  display:inline!important;
+  width:auto!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  background-image:none!important;
+  color:#175b43!important;
+  box-shadow:none!important;
+  font:inherit!important;
+  font-weight:650!important;
+  text-decoration:none!important;
+  cursor:pointer!important;
+}
+html[data-theme="green"] .content button.account-link:hover,
+html[data-theme="green"] .content button.lecturer-name-select:hover,
+html[data-theme="green"] .content a.student-name-link:hover{
+  background:transparent!important;
+  color:#087a4b!important;
+  text-decoration:underline!important;
+}
+html[data-theme="green"] .content .student-edit-action{
+  background:#f3f5f4!important;
+  color:#34443d!important;
+  border:1px solid #d9e1dc!important;
+  box-shadow:none!important;
+}
+</style></head><body><main class="login"><div class="mark-wrap"><img class="campus-logo" src="<?=e($campusLogoUrl)?>" alt="Logo STIT Darul Ilmi Tasikmalaya"></div><p style="color:#078653;font-weight:800;letter-spacing:.12em;font-size:11px;margin:20px 0 0">PORTAL AKADEMIK TERPADU</p><h1>Selamat Datang<br>Admin STIT Darul Ilmi</h1><p class="muted">Masuk untuk mengelola layanan akademik dan informasi kampus STIT Darul Ilmi Tasikmalaya.</p><?php if($flash):?><div class="alert"><?=e($flash['message'])?></div><?php endif;?><form method="post"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="login"><label>Username</label><input name="username" autocomplete="username" placeholder="Masukkan username" required><label>Password</label><input type="password" name="password" autocomplete="current-password" placeholder="Masukkan password" required><button type="submit">Masuk ke Dashboard　›</button></form><div class="login-foot muted">Gunakan akun admin yang dibuat melalui prosedur setup backend. Tidak ada akun bawaan.<br><a href="../../portal/public/?page=login" style="display:inline-block;margin-top:12px;color:#087a4b;font-weight:800">Login Mahasiswa / Dosen →</a></div></main></script>
 <script id="lecturer-navigation-fix">
 (function(){
   function openLecturerPage(event){
