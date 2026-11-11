@@ -2534,19 +2534,5 @@ html[data-theme="green"] .student-edit-page .student-form-footer button#studentS
  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
 </style>
-<script>
-(function(){
- document.addEventListener('keydown',function(event){
-  if(event.key==='Escape'){
-   var toggle=document.getElementById('adminMenuToggle');
-   var drawer=document.getElementById('adminMobileDrawer');
-   var trigger=document.getElementById('adminMenuTrigger');
-   if(toggle)toggle.checked=false;
-   if(drawer){drawer.setAttribute('aria-hidden','true');drawer.style.setProperty('display','none','important');}
-   if(trigger)trigger.setAttribute('aria-expanded','false');
-   document.body.style.overflow='';
-  }
- });
-})();
-</script>
+
 </body></html>
