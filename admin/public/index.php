@@ -915,6 +915,51 @@ html[data-theme="green"] .content,html[data-theme="green"] .main{background:#f3f
   },{capture:true,passive:false});
 })();
 </script>
+<script id="lecturer-tabs-independent-init">
+(function(){
+ function initLecturerTabs(){
+  var form=document.getElementById('lecturerCreateForm');
+  if(!form||form.dataset.tabsReady==='1')return;
+  var tabs=Array.prototype.slice.call(form.querySelectorAll('.student-tabs .student-tab'));
+  var panels=Array.prototype.slice.call(form.querySelectorAll('.student-tab-panel'));
+  var prev=document.getElementById('lecturerPrev');
+  var next=document.getElementById('lecturerNext');
+  var submit=document.getElementById('lecturerSubmit');
+  if(!tabs.length||tabs.length!==panels.length||!prev||!next||!submit)return;
+  var active=0;
+  function show(index){
+   active=Math.max(0,Math.min(Number(index)||0,tabs.length-1));
+   tabs.forEach(function(tab,i){
+    var selected=i===active;
+    tab.classList.toggle('active',selected);
+    tab.setAttribute('aria-selected',selected?'true':'false');
+    tab.setAttribute('aria-current',selected?'step':'false');
+   });
+   panels.forEach(function(panel,i){
+    var selected=i===active;
+    panel.hidden=!selected;
+    panel.classList.toggle('active',selected);
+    panel.setAttribute('aria-hidden',selected?'false':'true');
+   });
+   prev.hidden=active===0;
+   next.hidden=active===tabs.length-1;
+   submit.hidden=active!==tabs.length-1;
+  }
+  tabs.forEach(function(tab,index){
+   tab.type='button';
+   tab.addEventListener('click',function(event){event.preventDefault();show(index);});
+  });
+  prev.addEventListener('click',function(event){event.preventDefault();show(active-1);});
+  next.addEventListener('click',function(event){event.preventDefault();show(active+1);});
+  form.dataset.tabsReady='1';
+  window.stitLecturerStep=function(delta){show(active+(Number(delta)||0));};
+  window.stitLecturerStepTo=function(index){show(index);};
+  show(0);
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initLecturerTabs);
+ else initLecturerTabs();
+})();
+</script>
 </body></html><?php exit;
 }
 $datasets=[
