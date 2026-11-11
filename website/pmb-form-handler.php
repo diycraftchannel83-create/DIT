@@ -4,7 +4,7 @@ if(session_status()!==PHP_SESSION_ACTIVE)session_start();
 $cfgPath=dirname(__DIR__).'/backend/config/database.local.php';
 if(!is_file($cfgPath)){http_response_code(503);exit('Pendaftaran belum dikonfigurasi.');}
 $cfg=require $cfgPath;
-$pdo=new PDO(sprintf('mysql:host=%s;dbname=%s;charset=%s',$cfg['host'],$cfg['database'],$cfg['charset']??'utf8mb4'),$cfg['username'],$cfg['password'],[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC]);
+try{$pdo=new PDO(sprintf('mysql:host=%s;dbname=%s;charset=%s',$cfg['host'],$cfg['database'],$cfg['charset']??'utf8mb4'),$cfg['username'],$cfg['password'],[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC]);}catch(Throwable $e){error_log('[STIT PMB DB] '.$e->getMessage());http_response_code(503);exit('Layanan pendaftaran sementara tidak tersedia.');}
 $pmbPrograms=$pdo->query('SELECT id,name FROM study_programs WHERE is_active=1 ORDER BY name')->fetchAll();
 if(empty($_SESSION['pmb_csrf']))$_SESSION['pmb_csrf']=bin2hex(random_bytes(32));
 $pmbCsrf=$_SESSION['pmb_csrf'];$pmbMessage='';$pmbRegistration='';
