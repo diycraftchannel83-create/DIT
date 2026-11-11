@@ -26,7 +26,7 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
    $mime=(new finfo(FILEINFO_MIME_TYPE))->file($up['tmp_name']);
    $ext=['application/pdf'=>'pdf','image/jpeg'=>'jpg','image/png'=>'png'][$mime]??'';
    if($ext===''){$pmbMessage='Format '.$label.' harus PDF, JPG, atau PNG.';break;}
-   $files[$key]=['tmp'=>$up['tmp_name'],'name'=>basename((string)$up['name']),'mime'=>$mime,'size'=>(int)$up['size'],'ext'=>$ext];
+   $files[$key]=['tmp'=>$up['tmp_name'],'name'=>substr(basename((string)$up['name']),0,255),'mime'=>$mime,'size'=>(int)$up['size'],'ext'=>$ext];
   }
   if(!$pmbMessage){
    $docRoot=(string)($_SERVER['DOCUMENT_ROOT']??dirname(__DIR__));$storage=dirname($docRoot).'/stit-pmb-private';
