@@ -2389,56 +2389,51 @@ html[data-theme="green"] .student-edit-page .student-form-footer button#studentS
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',mountStudentEditor,{once:true}); else mountStudentEditor();
 })();
 </script>
-<div class="admin-menu-backdrop" id="adminMenuBackdrop" hidden></div>
-<aside class="admin-mobile-drawer" id="adminMobileDrawer" aria-label="Menu navigasi admin" aria-hidden="true" hidden>
-  <div class="admin-mobile-drawer-head"><strong>Menu Dashboard</strong><button type="button" id="adminMenuClose" aria-label="Tutup menu">×</button></div>
-  <div class="admin-mobile-drawer-content" id="adminMobileDrawerContent"></div>
+<div class="admin-menu-backdrop" id="adminMenuBackdrop" hidden onclick="this.hidden=true;document.getElementById('adminMobileDrawer').hidden=true;document.body.style.overflow='';"></div>
+<aside class="admin-mobile-drawer" id="adminMobileDrawer" aria-label="Menu navigasi admin" hidden>
+  <div class="admin-mobile-drawer-head"><strong>Menu Dashboard</strong><button type="button" aria-label="Tutup menu" onclick="document.getElementById('adminMenuBackdrop').hidden=true;document.getElementById('adminMobileDrawer').hidden=true;document.body.style.overflow='';">×</button></div>
+  <nav class="admin-mobile-drawer-content" aria-label="Navigasi dashboard">
+    <a class="nav-dashboard <?=$page==='dashboard'?'active':''?>" href="?page=dashboard">Dashboard</a>
+    <?php foreach($visibleMenuGroups as $groupLabel=>$groupKeys): ?>
+      <section class="nav-group"><div class="nav-group-title"><?=e($groupLabel)?></div>
+      <?php foreach($groupKeys as $key): ?><a class="<?=$page===$key?'active':''?>" href="?page=<?=e($key)?>"><?=e($menus[$key])?></a><?php endforeach; ?>
+      </section>
+    <?php endforeach; ?>
+  </nav>
 </aside>
 <style>
-.top{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important}
-.top-actions{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:9px!important;flex:0 0 auto!important}
-.top-actions form{display:flex!important;align-items:center!important;margin:0!important}
-.admin-menu-trigger{display:none;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:9px 13px;margin:0;border:1px solid #bcd9c7;border-radius:12px;background:#e7f4eb;color:#145b40;font:700 13px system-ui,sans-serif;box-shadow:none;cursor:pointer}
-.admin-menu-trigger svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
 .admin-menu-backdrop[hidden],.admin-mobile-drawer[hidden]{display:none!important}
+.admin-menu-trigger{display:none;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:9px 13px;margin:0;border:1px solid #bcd9c7;border-radius:12px;background:#e7f4eb;color:#145b40;font:700 13px system-ui,sans-serif;cursor:pointer}
+.admin-menu-trigger svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
 @media(max-width:760px){
- .top{min-height:76px!important;height:auto!important;padding:calc(20px + env(safe-area-inset-top,0px)) 16px 12px!important}
- .top-actions{gap:8px!important}
- .top-actions .logout{min-height:44px!important;padding:9px 14px!important}
  .admin-menu-trigger{display:inline-flex!important}
- .admin-menu-backdrop{position:fixed;inset:0;z-index:2147483000;background:rgba(7,45,30,.42);backdrop-filter:blur(2px)}
- .admin-mobile-drawer{position:fixed!important;z-index:2147483001!important;inset:0 auto 0 0!important;width:min(88vw,370px)!important;max-width:88vw!important;height:100dvh!important;max-height:100dvh!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;padding:calc(14px + env(safe-area-inset-top)) 16px calc(14px + env(safe-area-inset-bottom))!important;background:#fff!important;color:#174b35!important;border:0!important;border-radius:0 20px 20px 0!important;box-shadow:18px 0 48px rgba(7,55,35,.24)!important;transform:none!important}
+ .admin-menu-backdrop{position:fixed!important;inset:0!important;z-index:2147483000!important;background:rgba(7,45,30,.48)!important}
+ .admin-mobile-drawer{position:fixed!important;z-index:2147483001!important;top:0!important;bottom:0!important;left:0!important;width:min(88vw,370px)!important;max-width:88vw!important;height:100vh!important;height:100dvh!important;box-sizing:border-box!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;padding:calc(14px + env(safe-area-inset-top)) 16px calc(14px + env(safe-area-inset-bottom))!important;background:#fff!important;color:#174b35!important;border:0!important;border-radius:0 20px 20px 0!important;box-shadow:18px 0 48px rgba(7,55,35,.24)!important}
  .admin-mobile-drawer[hidden]{display:none!important}
- .admin-mobile-drawer-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex:0 0 auto;padding:10px 2px 14px;border-bottom:1px solid #dcece1;color:#075b3d}
- .admin-mobile-drawer-head strong{font-size:17px}
- .admin-mobile-drawer-head button{width:38px;height:38px;min-height:38px;margin:0;padding:0;border:1px solid #cfe5d6;border-radius:10px;background:#eaf6ee;color:#075b3d;font-size:27px;line-height:1;box-shadow:none}
- .admin-mobile-drawer-content{min-height:0;flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:14px 0}
- .admin-mobile-drawer-content .brand{display:none!important}
- .admin-mobile-drawer-content .nav{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:8px!important;overflow:visible!important}
- .admin-mobile-drawer-content .nav-dashboard,.admin-mobile-drawer-content .nav-group a{display:flex!important;align-items:center!important;min-height:46px!important;height:auto!important;padding:11px 13px!important;border:1px solid #dcece1!important;border-radius:11px!important;background:#f5faf6!important;color:#175b3d!important;text-decoration:none!important;white-space:normal!important;font-size:14px!important;line-height:1.35!important}
- .admin-mobile-drawer-content .nav-group{display:block!important;margin:0!important;padding:10px!important;border:1px solid #e0eee5!important;border-radius:13px!important;background:#fff!important}
+ .admin-mobile-drawer-head{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;flex:0 0 auto!important;padding:10px 2px 14px!important;border-bottom:1px solid #dcece1!important;color:#075b3d!important}
+ .admin-mobile-drawer-head strong{font-size:17px!important}
+ .admin-mobile-drawer-head button{width:40px!important;height:40px!important;min-height:40px!important;margin:0!important;padding:0!important;border:1px solid #cfe5d6!important;border-radius:10px!important;background:#eaf6ee!important;color:#075b3d!important;font-size:27px!important;line-height:1!important}
+ .admin-mobile-drawer-content{display:flex!important;flex:1 1 auto!important;flex-direction:column!important;align-items:stretch!important;gap:8px!important;min-height:0!important;overflow-y:auto!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;padding:14px 0!important}
+ .admin-mobile-drawer-content .nav-dashboard,.admin-mobile-drawer-content .nav-group a{display:flex!important;align-items:center!important;min-height:46px!important;height:auto!important;box-sizing:border-box!important;padding:11px 13px!important;border:1px solid #dcece1!important;border-radius:11px!important;background:#f5faf6!important;color:#175b3d!important;text-decoration:none!important;white-space:normal!important;font-size:14px!important;line-height:1.35!important}
+ .admin-mobile-drawer-content .nav-group{display:block!important;flex:0 0 auto!important;margin:0!important;padding:10px!important;border:1px solid #e0eee5!important;border-radius:13px!important;background:#fff!important}
  .admin-mobile-drawer-content .nav-group-title{display:block!important;margin:0 0 8px!important;color:#087a4b!important;font-size:11px!important;font-weight:800!important;letter-spacing:.06em!important;text-transform:uppercase}
  .admin-mobile-drawer-content .nav-group a{margin:5px 0!important}
- .admin-mobile-drawer-content .nav a.active{background:#e1f3e7!important;border-color:#9bcfae!important;color:#05613e!important;font-weight:800!important}
+ .admin-mobile-drawer-content a.active{background:#e1f3e7!important;border-color:#9bcfae!important;color:#05613e!important;font-weight:800!important}
 }
+@media(min-width:761px){.admin-menu-backdrop,.admin-mobile-drawer{display:none!important}}
 </style>
 <script>
 (function(){
- const trigger=document.getElementById('adminMenuTrigger');
- const backdrop=document.getElementById('adminMenuBackdrop');
- const drawer=document.getElementById('adminMobileDrawer');
- const content=document.getElementById('adminMobileDrawerContent');
- const close=document.getElementById('adminMenuClose');
- const source=document.querySelector('.side .nav');
- if(!trigger||!backdrop||!drawer||!content||!source)return;
- content.appendChild(source.cloneNode(true));
- function openMenu(){backdrop.hidden=false;drawer.hidden=false;drawer.setAttribute('aria-hidden','false');trigger.setAttribute('aria-expanded','true');document.body.style.overflow='hidden';}
- function closeMenu(){backdrop.hidden=true;drawer.hidden=true;drawer.setAttribute('aria-hidden','true');trigger.setAttribute('aria-expanded','false');document.body.style.overflow='';}
- trigger.addEventListener('click',openMenu);
- close.addEventListener('click',closeMenu);
- backdrop.addEventListener('click',closeMenu);
- drawer.addEventListener('click',function(event){if(event.target.closest('a'))closeMenu();});
- document.addEventListener('keydown',function(event){if(event.key==='Escape'&&!drawer.hidden)closeMenu();});
+ var button=document.getElementById('adminMenuTrigger');
+ if(!button)return;
+ button.onclick=function(){
+   var backdrop=document.getElementById('adminMenuBackdrop');
+   var drawer=document.getElementById('adminMobileDrawer');
+   if(!backdrop||!drawer)return;
+   backdrop.hidden=false;
+   drawer.hidden=false;
+   document.body.style.overflow='hidden';
+ };
 })();
 </script>
 </body></html>
