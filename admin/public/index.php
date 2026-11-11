@@ -306,7 +306,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
         $id=(int)($_POST['id']??0);
         $data=[];
         $fields=['full_name'=>160,'national_id'=>32,'email'=>190,'phone'=>30,'whatsapp'=>30,'birth_place'=>100,'birth_date'=>10,'gender'=>10,'religion'=>40,'marital_status'=>30,'address'=>5000,'province'=>100,'city'=>100,'district'=>100,'village'=>100,'postal_code'=>10,'previous_school'=>180,'school_major'=>120,'diploma_number'=>100,'father_name'=>160,'father_occupation'=>120,'father_phone'=>30,'mother_name'=>160,'mother_occupation'=>120,'mother_phone'=>30,'guardian_name'=>160,'guardian_phone'=>30,'admission_pathway'=>60];
-        foreach($fields as $key=>$max){$data[$key]=trim((string)($_POST[$key]??''));if(strlen($data[$key])>$max)throw new RuntimeException('Panjang kolom '.$key.' melebihi batas.');}
+        $tooLong=false;foreach($fields as $key=>$max){$data[$key]=trim((string)($_POST[$key]??''));if(strlen($data[$key])>$max)$tooLong=true;}if($tooLong){flash('Ada kolom yang melebihi batas karakter.','error');go('pmb');}
         $data['study_program_id']=(int)($_POST['study_program_id']??0);
         $data['entry_year']=(int)($_POST['entry_year']??date('Y'));
         $data['graduation_year']=(int)($_POST['graduation_year']??0);
