@@ -2476,3 +2476,32 @@ html[data-theme="green"] .student-edit-page .student-form-footer button#studentS
 })();
 </script>
 </body></html>
+
+
+/* ANDROID ADMIN DRAWER HOTFIX: keep the menu body visible below its heading */
+@media screen and (max-width:760px){
+  #adminMobileDrawer.is-open{
+    position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;height:100dvh!important;
+    min-height:100vh!important;min-height:100dvh!important;max-height:none!important;
+    display:block!important;overflow:hidden!important;z-index:2147483647!important;
+  }
+  #adminMobileDrawer.is-open .admin-mobile-drawer-panel{
+    position:absolute!important;inset:0 auto 0 0!important;
+    width:min(88vw,390px)!important;max-width:88vw!important;
+    height:100%!important;min-height:100%!important;max-height:none!important;
+    display:flex!important;flex-direction:column!important;overflow:hidden!important;
+    box-sizing:border-box!important;padding:calc(14px + env(safe-area-inset-top)) 16px calc(14px + env(safe-area-inset-bottom))!important;
+  }
+  #adminMobileDrawer.is-open .admin-mobile-drawer-head{
+    display:flex!important;flex:0 0 auto!important;min-height:58px!important;
+  }
+  #adminMobileDrawer.is-open .admin-mobile-drawer-content{
+    display:flex!important;flex:1 1 0!important;min-height:0!important;height:auto!important;
+    flex-direction:column!important;overflow-x:hidden!important;overflow-y:auto!important;
+    overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;
+    visibility:visible!important;opacity:1!important;
+  }
+  #adminMobileDrawer.is-open .admin-mobile-drawer-content .nav-group{
+    display:block!important;flex:0 0 auto!important;visibility:visible!important;
+  }
+}
