@@ -1397,11 +1397,23 @@ $pendingCount=0;foreach($availableMigrations as $migrationName=>$migrationFile){
  // nama, email, dan NIK; daftar dibatasi 100 baris agar dashboard tetap ringan.
  try{
   $pmbTotalApplicants=(int)$pdo->query('SELECT COUNT(*) FROM pmb_applicants')->fetchColumn();
-  if($pmbSearch!==''){
-   $rq=$pdo->prepare('SELECT id,registration_number,full_name,email,national_id,status,document_status,payment_status,created_at FROM pmb_applicants WHERE registration_number LIKE :q OR full_name LIKE :q OR email LIKE :q OR national_id LIKE :q ORDER BY id DESC LIMIT 100');
-   $rq->execute(['q'=>'%'.$pmbSearch.'%']);
-  }else{
-   $rq=$pdo->query('SELECT id,registration_number,full_name,email,national_id,status,document_status,payment_status,created_at FROM pmb_applicants ORDER BY id DESC LIMIT 100');
+  try{
+   if($pmbSearch!==''){
+    $rq=$pdo->prepare('SELECT id,registration_number,full_name,email,national_id,status,document_status,payment_status,created_at FROM pmb_applicants WHERE registration_number LIKE :q OR full_name LIKE :q OR email LIKE :q OR national_id LIKE :q ORDER BY id DESC LIMIT 100');
+    $rq->execute(['q'=>'%'.$pmbSearch.'%']);
+   }else{
+    $rq=$pdo->query('SELECT id,registration_number,full_name,email,national_id,status,document_status,payment_status,created_at FROM pmb_applicants ORDER BY id DESC LIMIT 100');
+   }
+  }catch(Throwable $extendedPmbError){
+   // Fallback agar data utama tetap terlihat pada database yang belum memiliki
+   // seluruh kolom migrasi PMB lanjutan.
+   error_log('[STIT PMB EXTENDED LIST] '.$extendedPmbError->getMessage());
+   if($pmbSearch!==''){
+    $rq=$pdo->prepare('SELECT id,registration_number,full_name,email,status,created_at FROM pmb_applicants WHERE registration_number LIKE :q OR full_name LIKE :q OR email LIKE :q ORDER BY id DESC LIMIT 100');
+    $rq->execute(['q'=>'%'.$pmbSearch.'%']);
+   }else{
+    $rq=$pdo->query('SELECT id,registration_number,full_name,email,status,created_at FROM pmb_applicants ORDER BY id DESC LIMIT 100');
+   }
   }
   $pmbRecentApplicants=$rq->fetchAll();
  }catch(Throwable $recentPmbError){error_log('[STIT PMB RECENT VIEW] '.$recentPmbError->getMessage());}
