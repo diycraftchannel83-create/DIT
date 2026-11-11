@@ -10,9 +10,12 @@ import android.widget.Toast
 import android.content.Intent
 import android.content.ActivityNotFoundException
 import android.net.Uri
+import android.print.PrintAttributes
+import android.print.PrintManager
 import android.os.Bundle
 import android.os.Build
 import android.webkit.WebChromeClient
+import android.webkit.JavascriptInterface
 import android.webkit.ValueCallback
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceError
@@ -54,6 +57,26 @@ class MainActivity : ComponentActivity() {
     private var campusWebView: WebView? = null
     private var pendingFileCallback: ValueCallback<Array<Uri>>? = null
     private lateinit var fileChooserLauncher: ActivityResultLauncher<Intent>
+
+    private inner class AndroidPrintBridge {
+        @JavascriptInterface
+        fun printPage() {
+            runOnUiThread {
+                val view = campusWebView ?: return@runOnUiThread
+                runCatching {
+                    val printManager = getSystemService(Context.PRINT_SERVICE) as PrintManager
+                    val adapter = view.createPrintDocumentAdapter("STIT Darul Ilmi")
+                    printManager.print(
+                        "STIT Darul Ilmi",
+                        adapter,
+                        PrintAttributes.Builder().build()
+                    )
+                }.onFailure {
+                    Toast.makeText(this@MainActivity, "Fitur cetak tidak dapat dibuka.", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
 
     private fun deliverSelectedFiles(data: Intent?) {
         val callback = pendingFileCallback ?: return
@@ -191,6 +214,9 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
 
+                                // Expose only a narrow print bridge to pages loaded from the trusted campus host.
+                                addJavascriptInterface(AndroidPrintBridge(), "AndroidPrint")
+
                                 setDownloadListener { url, userAgent, contentDisposition, mimeType, _ ->
                                     val downloadUri = runCatching { Uri.parse(url) }.getOrNull()
                                     if (downloadUri == null || downloadUri.scheme != "https") {
@@ -283,6 +309,12 @@ class MainActivity : ComponentActivity() {
                                     override fun onPageFinished(view: WebView?, url: String?) {
                                         loading = false
                                         canNavigateBack = view?.canGoBack() == true
+                                        if (url != null && Uri.parse(url).host.equals(CAMPUS_HOST, ignoreCase = true)) {
+                                            view?.evaluateJavascript(
+                                                "(function(){window.print=function(){if(window.AndroidPrint){AndroidPrint.printPage();}};})();",
+                                                null
+                                            )
+                                        }
                                     }
                                 }
 
