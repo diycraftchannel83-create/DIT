@@ -11,6 +11,7 @@ import android.content.Intent
 import android.content.ActivityNotFoundException
 import android.net.Uri
 import android.os.Bundle
+import android.os.Build
 import android.webkit.WebChromeClient
 import android.webkit.ValueCallback
 import android.webkit.WebResourceRequest
@@ -85,7 +86,7 @@ class MainActivity : ComponentActivity() {
             var webViewRef by remember { mutableStateOf<WebView?>(null) }
             var canNavigateBack by remember { mutableStateOf(false) }
 
-            BackHandler(enabled = webViewRef != null) {
+            BackHandler(enabled = canNavigateBack) {
                 val view = webViewRef
                 if (view?.canGoBack() == true) {
                     view.goBack()
@@ -116,13 +117,14 @@ class MainActivity : ComponentActivity() {
                                     mixedContentMode = WebSettings.MIXED_CONTENT_NEVER_ALLOW
                                     allowFileAccess = false
                                     allowContentAccess = true
-                                    safeBrowsingEnabled = true
                                 }
-
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                    settings.safeBrowsingEnabled = true
+                                }
                                 CookieManager.getInstance().apply {
                                     setAcceptCookie(true)
-                                    setAcceptThirdPartyCookies(this@apply, false)
                                 }
+                                CookieManager.getInstance().setAcceptThirdPartyCookies(this, false)
 
                                 webChromeClient = object : WebChromeClient() {
                                     override fun onProgressChanged(view: WebView?, newProgress: Int) {
@@ -208,7 +210,7 @@ class MainActivity : ComponentActivity() {
                                                 )
                                                 allowScanningByMediaScanner()
                                             }
-                                            val manager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+                                            val manager = this@MainActivity.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
                                             manager.enqueue(request)
                                             Toast.makeText(context, "Unduhan dimulai. Periksa folder Download.", Toast.LENGTH_LONG).show()
                                         }.onFailure {
