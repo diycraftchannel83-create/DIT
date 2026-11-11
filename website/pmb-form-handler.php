@@ -23,8 +23,17 @@ try{$pdo=new PDO(sprintf('mysql:host=%s;dbname=%s;charset=%s',$cfg['host'],$cfg[
 $pmbPrograms=$pdo->query('SELECT id,name FROM study_programs WHERE is_active=1 ORDER BY name')->fetchAll();
 if(empty($_SESSION['pmb_csrf']))$_SESSION['pmb_csrf']=bin2hex(random_bytes(32));
 $pmbCsrf=$_SESSION['pmb_csrf'];$pmbMessage='';$pmbRegistration='';
+$iniBytes=static function(string $value):int{
+ $value=trim($value);if($value==='')return 0;
+ $unit=strtolower(substr($value,-1));$number=(float)$value;
+ return (int)($number*match($unit){'g'=>1073741824,'m'=>1048576,'k'=>1024,default=>1});
+};
 if($_SERVER['REQUEST_METHOD']==='POST'){
- if(!hash_equals($pmbCsrf,(string)($_POST['csrf']??'')))$pmbMessage='Sesi formulir kedaluwarsa. Muat ulang halaman lalu coba kembali.';
+ $contentLength=(int)($_SERVER['CONTENT_LENGTH']??0);
+ $postLimit=$iniBytes((string)ini_get('post_max_size'));
+ if($postLimit>0&&$contentLength>$postLimit){
+  $pmbMessage='Total ukuran seluruh data dan dokumen melebihi batas server ('.ini_get('post_max_size').'). Kecilkan ukuran berkas atau minta admin hosting menaikkan post_max_size.';
+ }elseif(!hash_equals($pmbCsrf,(string)($_POST['csrf']??'')))$pmbMessage='Sesi formulir kedaluwarsa atau data unggahan melebihi batas server. Muat ulang halaman dan periksa ukuran semua dokumen.';
  else{
   $f=[];$keys=['full_name','national_id','email','phone','whatsapp','birth_place','religion','marital_status','postal_code','birth_date','gender','address','province','city','district','village','previous_school','school_major','diploma_number','father_name','father_occupation','father_phone','mother_name','mother_occupation','mother_phone','guardian_name','guardian_phone','emergency_contact_name','emergency_contact_phone','admission_pathway'];
   foreach($keys as $k)$f[$k]=trim((string)($_POST[$k]??''));
@@ -40,7 +49,18 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
   foreach(['ktp'=>'Fotokopi KTP','kk'=>'Kartu Keluarga','ijazah'=>'Ijazah SMA/SMK/MA sederajat','pas_foto'=>'Pas foto terbaru ukuran 3x4'] as $key=>$label){
 
    if($pmbMessage)break;$up=$_FILES[$key]??null;
-   if(!$up||($up['error']??UPLOAD_ERR_NO_FILE)===UPLOAD_ERR_NO_FILE){$pmbMessage='Dokumen wajib belum lengkap: '.$label.'.';break;}if(($up['error']??UPLOAD_ERR_OK)!==UPLOAD_ERR_OK){$pmbMessage='Unggahan '.$label.' gagal diproses.';break;}
+   if(!$up||($up['error']??UPLOAD_ERR_NO_FILE)===UPLOAD_ERR_NO_FILE){$pmbMessage='Dokumen wajib belum lengkap: '.$label.'.';break;}if(($up['error']??UPLOAD_ERR_OK)!==UPLOAD_ERR_OK){
+    $uploadError=(int)$up['error'];
+    $pmbMessage=match($uploadError){
+     UPLOAD_ERR_INI_SIZE=>'Ukuran '.$label.' melewati batas upload_max_filesize server ('.ini_get('upload_max_filesize').').',
+     UPLOAD_ERR_FORM_SIZE=>'Ukuran '.$label.' melewati batas formulir.',
+     UPLOAD_ERR_PARTIAL=>'Unggahan '.$label.' terputus. Coba unggah ulang.',
+     UPLOAD_ERR_NO_TMP_DIR=>'Server tidak memiliki folder sementara untuk unggahan.',
+     UPLOAD_ERR_CANT_WRITE=>'Server gagal menulis berkas '.$label.'. Periksa ruang disk dan izin folder.',
+     UPLOAD_ERR_EXTENSION=>'Unggahan '.$label.' dihentikan oleh konfigurasi ekstensi PHP.',
+     default=>'Unggahan '.$label.' gagal diproses (kode '.$uploadError.').'
+    };break;
+   }
    if((int)$up['size']<1||(int)$up['size']>5242880){$pmbMessage='Ukuran '.$label.' maksimal 5 MB.';break;}
    $mime=(new finfo(FILEINFO_MIME_TYPE))->file($up['tmp_name']);
    $ext=['application/pdf'=>'pdf','image/jpeg'=>'jpg','image/png'=>'png'][$mime]??'';
