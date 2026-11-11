@@ -765,58 +765,7 @@ html[data-theme="green"] .content,html[data-theme="green"] .main{background:#f3f
 .student-detail-actions{grid-column:1/-1;display:flex;align-items:center;gap:12px;position:sticky;bottom:-1px;padding:14px 0 2px;background:var(--surface,#fff)}
 .student-detail-cancel{padding:10px 16px;border-radius:10px;background:#edf2ef;color:#34564a;text-decoration:none;font-weight:700}
 @media(max-width:600px){.student-detail-backdrop{align-items:flex-end;padding:0}.student-detail-modal{width:100%;max-height:94dvh;border-radius:22px 22px 0 0;padding:18px 16px calc(20px + env(safe-area-inset-bottom));}.student-detail-modal form{grid-template-columns:1fr;gap:12px}.student-detail-actions{bottom:0}.student-detail-actions button{flex:1;min-height:46px}}
-</style></head><body><main class="login"><div class="mark-wrap"><img class="campus-logo" src="<?=e($campusLogoUrl)?>" alt="Logo STIT Darul Ilmi Tasikmalaya"></div><p style="color:#078653;font-weight:800;letter-spacing:.12em;font-size:11px;margin:20px 0 0">PORTAL AKADEMIK TERPADU</p><h1>Selamat Datang<br>Admin STIT Darul Ilmi</h1><p class="muted">Masuk untuk mengelola layanan akademik dan informasi kampus STIT Darul Ilmi Tasikmalaya.</p><?php if($flash):?><div class="alert"><?=e($flash['message'])?></div><?php endif;?><form method="post"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="login"><label>Username</label><input name="username" autocomplete="username" placeholder="Masukkan username" required><label>Password</label><input type="password" name="password" autocomplete="current-password" placeholder="Masukkan password" required><button type="submit">Masuk ke Dashboard　›</button></form><div class="login-foot muted">Gunakan akun admin yang dibuat melalui prosedur setup backend. Tidak ada akun bawaan.<br><a href="../../portal/public/?page=login" style="display:inline-block;margin-top:12px;color:#087a4b;font-weight:800">Login Mahasiswa / Dosen →</a></div></main><div class="admin-menu-backdrop" id="adminMenuBackdrop" hidden></div>
-<aside class="admin-mobile-drawer" id="adminMobileDrawer" aria-label="Menu navigasi admin" aria-hidden="true" hidden>
-  <div class="admin-mobile-drawer-head"><strong>Menu Dashboard</strong><button type="button" id="adminMenuClose" aria-label="Tutup menu">×</button></div>
-  <div class="admin-mobile-drawer-content" id="adminMobileDrawerContent"></div>
-</aside>
-<style>
-.top{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important}
-.top-actions{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:9px!important;flex:0 0 auto!important}
-.top-actions form{display:flex!important;align-items:center!important;margin:0!important}
-.admin-menu-trigger{display:none;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:9px 13px;margin:0;border:1px solid #bcd9c7;border-radius:12px;background:#e7f4eb;color:#145b40;font:700 13px system-ui,sans-serif;box-shadow:none;cursor:pointer}
-.admin-menu-trigger svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
-.admin-menu-backdrop[hidden],.admin-mobile-drawer[hidden]{display:none!important}
-@media(max-width:760px){
- .top{min-height:76px!important;height:auto!important;padding:calc(20px + env(safe-area-inset-top,0px)) 16px 12px!important}
- .top-actions{gap:8px!important}
- .top-actions .logout{min-height:44px!important;padding:9px 14px!important}
- .admin-menu-trigger{display:inline-flex!important}
- .admin-menu-backdrop{position:fixed;inset:0;z-index:2147483000;background:rgba(7,45,30,.42);backdrop-filter:blur(2px)}
- .admin-mobile-drawer{position:fixed!important;z-index:2147483001!important;inset:0 auto 0 0!important;width:min(88vw,370px)!important;max-width:88vw!important;height:100dvh!important;max-height:100dvh!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;padding:calc(14px + env(safe-area-inset-top)) 16px calc(14px + env(safe-area-inset-bottom))!important;background:#fff!important;color:#174b35!important;border:0!important;border-radius:0 20px 20px 0!important;box-shadow:18px 0 48px rgba(7,55,35,.24)!important;transform:none!important}
- .admin-mobile-drawer[hidden]{display:none!important}
- .admin-mobile-drawer-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex:0 0 auto;padding:10px 2px 14px;border-bottom:1px solid #dcece1;color:#075b3d}
- .admin-mobile-drawer-head strong{font-size:17px}
- .admin-mobile-drawer-head button{width:38px;height:38px;min-height:38px;margin:0;padding:0;border:1px solid #cfe5d6;border-radius:10px;background:#eaf6ee;color:#075b3d;font-size:27px;line-height:1;box-shadow:none}
- .admin-mobile-drawer-content{min-height:0;flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:14px 0}
- .admin-mobile-drawer-content .brand{display:none!important}
- .admin-mobile-drawer-content .nav{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:8px!important;overflow:visible!important}
- .admin-mobile-drawer-content .nav-dashboard,.admin-mobile-drawer-content .nav-group a{display:flex!important;align-items:center!important;min-height:46px!important;height:auto!important;padding:11px 13px!important;border:1px solid #dcece1!important;border-radius:11px!important;background:#f5faf6!important;color:#175b3d!important;text-decoration:none!important;white-space:normal!important;font-size:14px!important;line-height:1.35!important}
- .admin-mobile-drawer-content .nav-group{display:block!important;margin:0!important;padding:10px!important;border:1px solid #e0eee5!important;border-radius:13px!important;background:#fff!important}
- .admin-mobile-drawer-content .nav-group-title{display:block!important;margin:0 0 8px!important;color:#087a4b!important;font-size:11px!important;font-weight:800!important;letter-spacing:.06em!important;text-transform:uppercase}
- .admin-mobile-drawer-content .nav-group a{margin:5px 0!important}
- .admin-mobile-drawer-content .nav a.active{background:#e1f3e7!important;border-color:#9bcfae!important;color:#05613e!important;font-weight:800!important}
-}
-</style>
-<script>
-(function(){
- const trigger=document.getElementById('adminMenuTrigger');
- const backdrop=document.getElementById('adminMenuBackdrop');
- const drawer=document.getElementById('adminMobileDrawer');
- const content=document.getElementById('adminMobileDrawerContent');
- const close=document.getElementById('adminMenuClose');
- const source=document.querySelector('.side .nav');
- if(!trigger||!backdrop||!drawer||!content||!source)return;
- content.appendChild(source.cloneNode(true));
- function openMenu(){backdrop.hidden=false;drawer.hidden=false;drawer.setAttribute('aria-hidden','false');trigger.setAttribute('aria-expanded','true');document.body.style.overflow='hidden';}
- function closeMenu(){backdrop.hidden=true;drawer.hidden=true;drawer.setAttribute('aria-hidden','true');trigger.setAttribute('aria-expanded','false');document.body.style.overflow='';}
- trigger.addEventListener('click',openMenu);
- close.addEventListener('click',closeMenu);
- backdrop.addEventListener('click',closeMenu);
- drawer.addEventListener('click',function(event){if(event.target.closest('a'))closeMenu();});
- document.addEventListener('keydown',function(event){if(event.key==='Escape'&&!drawer.hidden)closeMenu();});
-})();
-</script>
+</style></head><body><main class="login"><div class="mark-wrap"><img class="campus-logo" src="<?=e($campusLogoUrl)?>" alt="Logo STIT Darul Ilmi Tasikmalaya"></div><p style="color:#078653;font-weight:800;letter-spacing:.12em;font-size:11px;margin:20px 0 0">PORTAL AKADEMIK TERPADU</p><h1>Selamat Datang<br>Admin STIT Darul Ilmi</h1><p class="muted">Masuk untuk mengelola layanan akademik dan informasi kampus STIT Darul Ilmi Tasikmalaya.</p><?php if($flash):?><div class="alert"><?=e($flash['message'])?></div><?php endif;?><form method="post"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="login"><label>Username</label><input name="username" autocomplete="username" placeholder="Masukkan username" required><label>Password</label><input type="password" name="password" autocomplete="current-password" placeholder="Masukkan password" required><button type="submit">Masuk ke Dashboard　›</button></form><div class="login-foot muted">Gunakan akun admin yang dibuat melalui prosedur setup backend. Tidak ada akun bawaan.<br><a href="../../portal/public/?page=login" style="display:inline-block;margin-top:12px;color:#087a4b;font-weight:800">Login Mahasiswa / Dosen →</a></div></main></script>
 </body></html><?php exit;
 }
 $datasets=[
@@ -1173,7 +1122,7 @@ $mobileIcon = static function(string $key) use ($mobileIconPaths): string {
 };
 ?>
 
-<main class="main"><header class="top"><strong><?=e($labels[$u['role']]??$u['role'])?></strong><div class="top-actions"><form method="post"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="logout"><button class="logout">Keluar</button></form><button type="button" class="admin-menu-trigger" id="adminMenuTrigger" aria-controls="adminMobileDrawer" aria-expanded="false" aria-label="Buka menu navigasi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span>Menu</span></button></div></header><section class="content"><?php if($flash):?><div class="alert <?=$flash['type']==='error'?'error':''?>"><?=e($flash['message'])?></div><?php endif;?>
+<main class="main"><header class="top"><strong><?=e($labels[$u['role']]??$u['role'])?></strong><div class="top-actions"><button type="button" class="admin-menu-trigger" id="adminMenuTrigger" aria-controls="adminMobileDrawer" aria-expanded="false" aria-label="Buka menu navigasi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span>Menu</span></button><form method="post"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="logout"><button class="logout">Keluar</button></form></div></header><section class="content"><?php if($flash):?><div class="alert <?=$flash['type']==='error'?'error':''?>"><?=e($flash['message'])?></div><?php endif;?>
 <?php if($page==='system'):?>
 <h1>Pengaturan Sistem</h1><p class="muted">Atur tampilan Dashboard SIAKAD sesuai kenyamanan Anda. Pilihan tema disimpan pada browser/perangkat ini.</p>
 <div class="theme-settings">
@@ -2440,4 +2389,55 @@ html[data-theme="green"] .student-edit-page .student-form-footer button#studentS
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',mountStudentEditor,{once:true}); else mountStudentEditor();
 })();
 </script>
+<div class="admin-menu-backdrop" id="adminMenuBackdrop" hidden></div>
+<aside class="admin-mobile-drawer" id="adminMobileDrawer" aria-label="Menu navigasi admin" aria-hidden="true" hidden>
+  <div class="admin-mobile-drawer-head"><strong>Menu Dashboard</strong><button type="button" id="adminMenuClose" aria-label="Tutup menu">×</button></div>
+  <div class="admin-mobile-drawer-content" id="adminMobileDrawerContent"></div>
+</aside>
+<style>
+.top{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important}
+.top-actions{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:9px!important;flex:0 0 auto!important}
+.top-actions form{display:flex!important;align-items:center!important;margin:0!important}
+.admin-menu-trigger{display:none;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:9px 13px;margin:0;border:1px solid #bcd9c7;border-radius:12px;background:#e7f4eb;color:#145b40;font:700 13px system-ui,sans-serif;box-shadow:none;cursor:pointer}
+.admin-menu-trigger svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.admin-menu-backdrop[hidden],.admin-mobile-drawer[hidden]{display:none!important}
+@media(max-width:760px){
+ .top{min-height:76px!important;height:auto!important;padding:calc(20px + env(safe-area-inset-top,0px)) 16px 12px!important}
+ .top-actions{gap:8px!important}
+ .top-actions .logout{min-height:44px!important;padding:9px 14px!important}
+ .admin-menu-trigger{display:inline-flex!important}
+ .admin-menu-backdrop{position:fixed;inset:0;z-index:2147483000;background:rgba(7,45,30,.42);backdrop-filter:blur(2px)}
+ .admin-mobile-drawer{position:fixed!important;z-index:2147483001!important;inset:0 auto 0 0!important;width:min(88vw,370px)!important;max-width:88vw!important;height:100dvh!important;max-height:100dvh!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;padding:calc(14px + env(safe-area-inset-top)) 16px calc(14px + env(safe-area-inset-bottom))!important;background:#fff!important;color:#174b35!important;border:0!important;border-radius:0 20px 20px 0!important;box-shadow:18px 0 48px rgba(7,55,35,.24)!important;transform:none!important}
+ .admin-mobile-drawer[hidden]{display:none!important}
+ .admin-mobile-drawer-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex:0 0 auto;padding:10px 2px 14px;border-bottom:1px solid #dcece1;color:#075b3d}
+ .admin-mobile-drawer-head strong{font-size:17px}
+ .admin-mobile-drawer-head button{width:38px;height:38px;min-height:38px;margin:0;padding:0;border:1px solid #cfe5d6;border-radius:10px;background:#eaf6ee;color:#075b3d;font-size:27px;line-height:1;box-shadow:none}
+ .admin-mobile-drawer-content{min-height:0;flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:14px 0}
+ .admin-mobile-drawer-content .brand{display:none!important}
+ .admin-mobile-drawer-content .nav{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:8px!important;overflow:visible!important}
+ .admin-mobile-drawer-content .nav-dashboard,.admin-mobile-drawer-content .nav-group a{display:flex!important;align-items:center!important;min-height:46px!important;height:auto!important;padding:11px 13px!important;border:1px solid #dcece1!important;border-radius:11px!important;background:#f5faf6!important;color:#175b3d!important;text-decoration:none!important;white-space:normal!important;font-size:14px!important;line-height:1.35!important}
+ .admin-mobile-drawer-content .nav-group{display:block!important;margin:0!important;padding:10px!important;border:1px solid #e0eee5!important;border-radius:13px!important;background:#fff!important}
+ .admin-mobile-drawer-content .nav-group-title{display:block!important;margin:0 0 8px!important;color:#087a4b!important;font-size:11px!important;font-weight:800!important;letter-spacing:.06em!important;text-transform:uppercase}
+ .admin-mobile-drawer-content .nav-group a{margin:5px 0!important}
+ .admin-mobile-drawer-content .nav a.active{background:#e1f3e7!important;border-color:#9bcfae!important;color:#05613e!important;font-weight:800!important}
+}
+</style>
+<script>
+(function(){
+ const trigger=document.getElementById('adminMenuTrigger');
+ const backdrop=document.getElementById('adminMenuBackdrop');
+ const drawer=document.getElementById('adminMobileDrawer');
+ const content=document.getElementById('adminMobileDrawerContent');
+ const close=document.getElementById('adminMenuClose');
+ const source=document.querySelector('.side .nav');
+ if(!trigger||!backdrop||!drawer||!content||!source)return;
+ content.appendChild(source.cloneNode(true));
+ function openMenu(){backdrop.hidden=false;drawer.hidden=false;drawer.setAttribute('aria-hidden','false');trigger.setAttribute('aria-expanded','true');document.body.style.overflow='hidden';}
+ function closeMenu(){backdrop.hidden=true;drawer.hidden=true;drawer.setAttribute('aria-hidden','true');trigger.setAttribute('aria-expanded','false');document.body.style.overflow='';}
+ trigger.addEventListener('click',openMenu);
+ close.addEventListener('click',closeMenu);
+ backdrop.addEventListener('click',closeMenu);
+ drawer.addEventListener('click',function(event){if(event.target.closest('a'))closeMenu();});
+ document.addEventListener('keydown',function(event){if(event.key==='Escape'&&!drawer.hidden)closeMenu();});
+})();
 </body></html>
