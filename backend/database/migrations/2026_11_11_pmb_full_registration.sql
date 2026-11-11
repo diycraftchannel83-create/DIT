@@ -27,6 +27,8 @@ ALTER TABLE pmb_applicants
  ADD COLUMN mother_phone VARCHAR(30) NULL AFTER mother_occupation,
  ADD COLUMN guardian_name VARCHAR(160) NULL AFTER mother_phone,
  ADD COLUMN guardian_phone VARCHAR(30) NULL AFTER guardian_name,
+ ADD COLUMN emergency_contact_name VARCHAR(160) NULL AFTER guardian_phone,
+ ADD COLUMN emergency_contact_phone VARCHAR(30) NULL AFTER emergency_contact_name,
  ADD COLUMN entry_year SMALLINT UNSIGNED NULL AFTER guardian_phone,
  ADD COLUMN admission_pathway VARCHAR(60) NULL AFTER entry_year,
  ADD COLUMN document_status ENUM('pending','complete','incomplete','invalid') NOT NULL DEFAULT 'pending' AFTER status,
