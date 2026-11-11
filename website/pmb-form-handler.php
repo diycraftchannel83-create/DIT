@@ -67,6 +67,11 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
       $d=$pdo->prepare('INSERT INTO pmb_documents(applicant_id,document_type,original_name,storage_path,mime_type,file_size) VALUES(:app,:type,:name,:path,:mime,:size)');
       $d->execute(['app'=>$appId,'type'=>$type,'name'=>$file['name'],'path'=>$filename,'mime'=>$file['mime'],'size'=>$file['size']]);
      }
+     // Catat pengiriman PMB ke audit log pusat (best-effort, tidak menggagalkan pendaftaran).
+     try{
+      $audit=$pdo->prepare("INSERT INTO audit_logs(user_id,action,entity_type,entity_id,ip_address,user_agent,metadata) VALUES(NULL,'pmb.registration_submitted','pmb_applicant',:entity,:ip,:agent,:metadata)");
+      $audit->execute(['entity'=>$appId,'ip'=>substr((string)($_SERVER['REMOTE_ADDR']??''),0,45)?:null,'agent'=>substr((string)($_SERVER['HTTP_USER_AGENT']??''),0,255)?:null,'metadata'=>json_encode(['registration_number'=>$pmbRegistration,'email'=>$f['email']],JSON_UNESCAPED_UNICODE|JSON_INVALID_UTF8_SUBSTITUTE)]);
+     }catch(Throwable $auditError){error_log('[STIT PMB AUDIT] '.$auditError->getMessage());}
      $pdo->commit();$_SESSION['pmb_confirmation']=['registration'=>$pmbRegistration,'email'=>$f['email'],'created_at'=>date('Y-m-d H:i:s')];$_SESSION['pmb_csrf']=bin2hex(random_bytes(32));header('Location: pmb-confirmation.php',true,303);exit;
     }catch(Throwable $e){if($pdo->inTransaction())$pdo->rollBack();foreach($saved as $path)if(is_file($path))@unlink($path);error_log('[STIT PMB SUBMIT] '.$e->getMessage());$pmbMessage='Pendaftaran gagal disimpan. Silakan coba kembali.';$pmbRegistration='';}
    }
