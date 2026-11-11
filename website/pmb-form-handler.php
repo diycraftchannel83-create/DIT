@@ -51,3 +51,11 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
   }
  }
 }
+
+$pmbStatusResult=null;$pmbStatusChecked=false;
+if(isset($_GET['registration'])&&isset($_GET['email'])){
+ $pmbStatusChecked=true;
+ $check=$pdo->prepare('SELECT a.registration_number,a.full_name,a.status,a.document_status,a.created_at,p.name AS program FROM pmb_applicants a LEFT JOIN study_programs p ON p.id=a.study_program_id WHERE a.registration_number=:reg AND a.email=:email LIMIT 1');
+ $check->execute(['reg'=>trim((string)$_GET['registration']),'email'=>trim((string)$_GET['email'])]);
+ $pmbStatusResult=$check->fetch()?:false;
+}
