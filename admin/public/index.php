@@ -2474,14 +2474,58 @@ html[data-theme="green"] .student-edit-page .student-form-footer button#studentS
 .admin-mobile-drawer-content a.active{background:#e1f3e7!important;border-color:#9bcfae!important;color:#05613e!important;font-weight:800!important}
 @media(max-width:760px){.admin-menu-trigger{display:inline-flex!important}}
 @media(min-width:761px){.admin-menu-trigger,.admin-mobile-drawer{display:none!important}}
+
+/* ANDROID RESPONSIVE AUDIT: consistent touch targets, safe areas and overflow control */
+@media(max-width:760px){
+ html,body{max-width:100%;overflow-x:hidden!important;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+ body{padding-bottom:calc(82px + env(safe-area-inset-bottom))!important}
+ .layout,.main,.content,.top,.panel,.card,.student-create-panel,.student-edit-page{min-width:0!important;max-width:100%!important}
+ .main{width:100%!important}
+ .top{min-height:58px!important;gap:10px!important;padding-left:12px!important;padding-right:12px!important}
+ .top-actions{display:flex!important;align-items:center!important;gap:8px!important;min-width:0!important}
+ .content{padding-left:12px!important;padding-right:12px!important;padding-bottom:calc(100px + env(safe-area-inset-bottom))!important}
+ img,svg,canvas,video{max-width:100%}
+ .cards,.grid,.stats,.dashboard-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .panel,.card{overflow:hidden!important}
+ .panel table,.table-wrap table,table.responsive-table{display:block!important;width:100%!important;max-width:100%!important;overflow-x:auto!important;overscroll-behavior-x:contain!important;-webkit-overflow-scrolling:touch!important}
+ .panel table{min-width:600px!important}
+ .panel .table-wrap,.table-wrap{display:block!important;width:100%!important;max-width:100%!important;overflow-x:auto!important;overscroll-behavior-x:contain!important;-webkit-overflow-scrolling:touch!important}
+ form:not(.inline){max-width:100%;min-width:0}
+ input:not([type=checkbox]):not([type=radio]):not([type=hidden]),select,textarea{max-width:100%;min-width:0;font-size:16px!important}
+ button,.button,.btn,input[type=submit],input[type=button],select{min-height:42px}
+ button{touch-action:manipulation}
+ .modal,.account-modal,.student-detail-backdrop{padding:12px!important}
+ .modal-card,.account-modal-card,.student-detail-modal{width:min(100%,560px)!important;max-width:100%!important;max-height:calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;overflow-y:auto!important;overscroll-behavior:contain!important}
+ .student-form-footer{padding-bottom:calc(12px + env(safe-area-inset-bottom))!important}
+ .mobile-bottom-nav{padding-bottom:calc(7px + env(safe-area-inset-bottom))!important}
+ .admin-mobile-drawer{touch-action:pan-y}
+ .admin-mobile-drawer-panel{width:min(82vw,330px)!important;max-width:calc(100vw - 20px)!important;height:min(88dvh,760px)!important;max-height:calc(100dvh - env(safe-area-inset-top) - 12px)!important;top:0!important;transform:none!important}
+ .admin-mobile-drawer-content{min-height:0!important;overflow-y:auto!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important}
+}
+@media(max-width:380px){
+ .content{padding-left:9px!important;padding-right:9px!important}
+ .cards,.grid,.stats,.dashboard-grid{grid-template-columns:minmax(0,1fr)!important}
+ .admin-mobile-drawer-panel{width:min(88vw,320px)!important}
+ .top-actions .logout{padding:8px 9px!important;font-size:11px!important}
+}
+@media(orientation:landscape) and (max-height:520px) and (max-width:900px){
+ .admin-mobile-drawer-panel{height:calc(100dvh - env(safe-area-inset-top) - 8px)!important;max-height:calc(100dvh - env(safe-area-inset-top) - 8px)!important}
+ .admin-mobile-drawer-content{overflow-y:auto!important}
+}
+@media(prefers-reduced-motion:reduce){
+ *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
 </style>
 <script>
 (function(){
  document.addEventListener('keydown',function(event){
   if(event.key==='Escape'){
-   var d=document.getElementById('adminMobileDrawer'),b=document.getElementById('adminMenuBackdrop'),t=document.getElementById('adminMenuTrigger');
-   if(d)d.classList.remove('is-open');if(b)b.classList.remove('is-open');
-   if(d)d.setAttribute('aria-hidden','true');if(t)t.setAttribute('aria-expanded','false');
+   var toggle=document.getElementById('adminMenuToggle');
+   var drawer=document.getElementById('adminMobileDrawer');
+   var trigger=document.getElementById('adminMenuTrigger');
+   if(toggle)toggle.checked=false;
+   if(drawer){drawer.setAttribute('aria-hidden','true');drawer.style.setProperty('display','none','important');}
+   if(trigger)trigger.setAttribute('aria-expanded','false');
    document.body.style.overflow='';
   }
  });
