@@ -1582,7 +1582,7 @@ $pendingCount=0;foreach($availableMigrations as $migrationName=>$migrationFile){
 <div class="admin-mobile-drawer" id="adminMobileDrawer">
   <label class="admin-mobile-backdrop" for="adminMenuToggle" aria-label="Tutup menu"></label>
   <section class="admin-mobile-drawer-panel" aria-label="Menu navigasi admin">
-    <div class="admin-mobile-drawer-head"><strong>Menu Dashboard</strong><label class="admin-mobile-close" for="adminMenuToggle" role="button" tabindex="0" aria-label="Tutup menu">×</label></div>
+    <div class="admin-mobile-drawer-head"><strong>Menu Dashboard</strong><button type="button" class="admin-mobile-close" aria-label="Tutup menu" onclick="var menuToggle=document.getElementById('adminMenuToggle');if(menuToggle){menuToggle.checked=false;}return false;">×</button></div>
     <nav class="admin-mobile-drawer-content" aria-label="Navigasi dashboard">
       <a class="nav-dashboard <?=$page==='dashboard'?'active':''?>" href="?page=dashboard">Dashboard</a>
       <?php foreach($visibleMenuGroups as $groupLabel=>$groupKeys): ?>
