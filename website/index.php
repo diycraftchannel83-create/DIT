@@ -46,7 +46,7 @@ $canonical=(!empty($_SERVER['HTTPS'])&&$_SERVER['HTTPS']!=='off'?'https':'http')
 <!doctype html>
 <html lang="id">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#70B77E"><meta name="description" content="<?=h($description)?>">
 <meta name="keywords" content="STIT Darul Ilmi Tasikmalaya, Kampus STIT Darul Ilmi, Kuliah Manajemen Pendidikan Islam, S1 Manajemen Pendidikan Islam Tasikmalaya, Pendaftaran Mahasiswa Baru STIT Darul Ilmi">
 <meta property="og:type" content="website"><meta property="og:title" content="<?=h($name)?> | Website Resmi"><meta property="og:description" content="<?=h($description)?>"><meta property="og:image" content="<?=h($hero?:$logo)?>"><link rel="canonical" href="<?=h($canonical)?>">
@@ -221,6 +221,23 @@ footer h3{color:#fff!important}footer a{color:#d8f5a8!important}
 </style>
 
 <meta name="theme-color" content="#075b3d">
+
+<style id="android-frontpage-safe-area">
+/* Keep the public campus header below Android's overlaid status/notification bar. */
+@media (max-width:780px){
+  header{
+    padding-top:max(env(safe-area-inset-top),30px)!important;
+    scroll-margin-top:calc(max(env(safe-area-inset-top),30px) + 12px);
+  }
+  header .container.nav{
+    padding-top:10px!important;
+    padding-bottom:10px!important;
+  }
+  header .links.open{
+    max-height:calc(100dvh - max(env(safe-area-inset-top),30px) - 100px)!important;
+  }
+}
+</style>
 </head>
 <body>
 <div class="topline"><div class="container"><span>Website Resmi Perguruan Tinggi</span><span>Nilai Keislaman · Ilmu Pengetahuan · Pengabdian</span><a href="#kontak">Hubungi Kami ↗</a></div></div>
