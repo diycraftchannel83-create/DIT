@@ -1,10 +1,25 @@
 <?php
 declare(strict_types=1);
 if(session_status()!==PHP_SESSION_ACTIVE)session_start();
-$cfgPath=dirname(__DIR__).'/backend/config/database.local.php';
-if(!is_file($cfgPath)){http_response_code(503);exit('Pendaftaran belum dikonfigurasi.');}
+// Support both deployment layouts:
+// 1) repository root with website/ as document root
+// 2) website files copied directly into public_html alongside backend/
+$cfgCandidates=[
+ dirname(__DIR__).'/backend/config/database.local.php',
+ __DIR__.'/backend/config/database.local.php',
+ dirname(__DIR__,2).'/backend/config/database.local.php'
+];
+$cfgPath='';
+foreach($cfgCandidates as $candidate){if(is_file($candidate)){$cfgPath=$candidate;break;}}
+$pmbUnavailable=static function(string $message):never{
+ http_response_code(503);
+ $safe=htmlspecialchars($message,ENT_QUOTES,'UTF-8');
+ echo '<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PMB belum tersedia</title><style>body{margin:0;background:#f3f8f4;font:15px system-ui;color:#173b2b;display:grid;min-height:100vh;place-items:center;padding:20px;box-sizing:border-box}.panel{max-width:620px;background:#fff;border:1px solid #dcebe0;border-radius:20px;padding:28px;box-shadow:0 12px 36px #123a2412}h1{font-size:22px;color:#075b3d;margin:0 0 10px}.note{background:#fff8e8;border:1px solid #f1dfb7;border-radius:12px;padding:14px;line-height:1.6}</style></head><body><main class="panel"><h1>Pendaftaran Mahasiswa Baru</h1><p>STIT Darul Ilmi Tasikmalaya</p><div class="note">'.$safe.'</div><p>Silakan hubungi administrator SIAKAD untuk mengaktifkan layanan pendaftaran.</p></main></body></html>';
+ exit;
+};
+if($cfgPath==='')$pmbUnavailable('Konfigurasi database belum ditemukan. Pastikan file backend/config/database.local.php sudah dibuat di folder backend yang sejajar dengan folder website atau public_html.');
 $cfg=require $cfgPath;
-try{$pdo=new PDO(sprintf('mysql:host=%s;dbname=%s;charset=%s',$cfg['host'],$cfg['database'],$cfg['charset']??'utf8mb4'),$cfg['username'],$cfg['password'],[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC]);}catch(Throwable $e){error_log('[STIT PMB DB] '.$e->getMessage());http_response_code(503);exit('Layanan pendaftaran sementara tidak tersedia.');}
+try{$pdo=new PDO(sprintf('mysql:host=%s;dbname=%s;charset=%s',$cfg['host'],$cfg['database'],$cfg['charset']??'utf8mb4'),$cfg['username'],$cfg['password'],[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC]);}catch(Throwable $e){error_log('[STIT PMB DB] '.$e->getMessage());$pmbUnavailable('Koneksi database pendaftaran belum berhasil. Periksa host, nama database, username, dan password pada backend/config/database.local.php.');}
 $pmbPrograms=$pdo->query('SELECT id,name FROM study_programs WHERE is_active=1 ORDER BY name')->fetchAll();
 if(empty($_SESSION['pmb_csrf']))$_SESSION['pmb_csrf']=bin2hex(random_bytes(32));
 $pmbCsrf=$_SESSION['pmb_csrf'];$pmbMessage='';$pmbRegistration='';
