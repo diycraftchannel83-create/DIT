@@ -67,7 +67,7 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
       $d=$pdo->prepare('INSERT INTO pmb_documents(applicant_id,document_type,original_name,storage_path,mime_type,file_size) VALUES(:app,:type,:name,:path,:mime,:size)');
       $d->execute(['app'=>$appId,'type'=>$type,'name'=>$file['name'],'path'=>$filename,'mime'=>$file['mime'],'size'=>$file['size']]);
      }
-     $pdo->commit();$pmbMessage='Pendaftaran berhasil dikirim. Simpan nomor registrasi Anda.';$_SESSION['pmb_csrf']=bin2hex(random_bytes(32));$pmbCsrf=$_SESSION['pmb_csrf'];
+     $pdo->commit();$_SESSION['pmb_confirmation']=['registration'=>$pmbRegistration,'email'=>$f['email'],'created_at'=>date('Y-m-d H:i:s')];$_SESSION['pmb_csrf']=bin2hex(random_bytes(32));header('Location: pmb-confirmation.php',true,303);exit;
     }catch(Throwable $e){if($pdo->inTransaction())$pdo->rollBack();foreach($saved as $path)if(is_file($path))@unlink($path);error_log('[STIT PMB SUBMIT] '.$e->getMessage());$pmbMessage='Pendaftaran gagal disimpan. Silakan coba kembali.';$pmbRegistration='';}
    }
   }
