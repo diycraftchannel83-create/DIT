@@ -1608,9 +1608,33 @@ $pendingCount=0;foreach($availableMigrations as $migrationName=>$migrationFile){
 @media(min-width:761px){.admin-menu-toggle:checked ~ .admin-mobile-drawer{display:none!important}}
 </style>
 <script>
-document.addEventListener('keydown',function(event){
- if(event.key==='Escape'){var toggle=document.getElementById('adminMenuToggle');if(toggle)toggle.checked=false;}
-});
+(function(){
+ function initAdminDrawer(){
+  var toggle=document.getElementById('adminMenuToggle');
+  var drawer=document.getElementById('adminMobileDrawer');
+  if(!toggle||!drawer)return;
+  /* Move overlay out of transformed dashboard containers for Android WebView. */
+  if(drawer.parentNode!==document.body)document.body.appendChild(drawer);
+  function render(){
+   var open=!!toggle.checked;
+   drawer.style.setProperty('display',open?'block':'none','important');
+   drawer.setAttribute('aria-hidden',open?'false':'true');
+   document.body.style.overflow=open?'hidden':'';
+  }
+  toggle.addEventListener('change',render);
+  drawer.querySelectorAll('.admin-mobile-backdrop').forEach(function(backdrop){
+   backdrop.addEventListener('click',function(){toggle.checked=false;render();});
+  });
+  var close=drawer.querySelector('.admin-mobile-close');
+  if(close)close.addEventListener('click',function(){toggle.checked=false;render();});
+  document.addEventListener('keydown',function(event){
+   if(event.key==='Escape'&&toggle.checked){toggle.checked=false;render();}
+  });
+  render();
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initAdminDrawer,{once:true});
+ else initAdminDrawer();
+})();
 </script>
 <script>
 ;
@@ -2492,43 +2516,45 @@ html[data-theme="green"] .student-edit-page .student-form-footer button#studentS
   }
 }
 
-/* DRAWER CONTENT VISIBILITY: avoid flex sizing collapse in Android WebView */
+/* Android WebView: body-mounted drawer uses viewport-fixed layout */
 @media screen and (max-width:760px){
-  #adminMenuToggle:checked ~ #adminMobileDrawer .admin-mobile-drawer-panel{
-    display:block!important;position:fixed!important;top:0!important;bottom:0!important;left:0!important;
-    height:100vh!important;height:100dvh!important;min-height:100vh!important;
-    width:min(88vw,390px)!important;overflow:hidden!important;
-  }
-  #adminMenuToggle:checked ~ #adminMobileDrawer .admin-mobile-drawer-head{
-    position:absolute!important;top:calc(14px + env(safe-area-inset-top))!important;
-    left:16px!important;right:16px!important;height:58px!important;min-height:58px!important;
-    display:flex!important;align-items:center!important;z-index:3!important;
-  }
-  #adminMenuToggle:checked ~ #adminMobileDrawer .admin-mobile-drawer-content{
-    position:absolute!important;display:block!important;visibility:visible!important;opacity:1!important;
-    top:calc(86px + env(safe-area-inset-top))!important;right:16px!important;bottom:calc(14px + env(safe-area-inset-bottom))!important;left:16px!important;
-    width:auto!important;height:auto!important;min-height:0!important;max-height:none!important;
-    overflow-x:hidden!important;overflow-y:auto!important;padding:12px 0 20px!important;
-    background:#fff!important;color:#174b35!important;z-index:2!important;
-  }
-  #adminMenuToggle:checked ~ #adminMobileDrawer .admin-mobile-drawer-content .nav-dashboard,
-  #adminMenuToggle:checked ~ #adminMobileDrawer .admin-mobile-drawer-content .nav-group,
-  #adminMenuToggle:checked ~ #adminMobileDrawer .admin-mobile-drawer-content .nav-group-title,
-  #adminMenuToggle:checked ~ #adminMobileDrawer .admin-mobile-drawer-content .nav-group a{
-    display:flex!important;visibility:visible!important;opacity:1!important;
-  }
-  #adminMenuToggle:checked ~ #adminMobileDrawer .admin-mobile-drawer-content .nav-group{
-    display:block!important;margin:0 0 12px!important;padding:10px!important;
-    border:1px solid #dcece1!important;border-radius:12px!important;background:#fff!important;
-  }
-  #adminMenuToggle:checked ~ #adminMobileDrawer .admin-mobile-drawer-content .nav-group-title{
-    display:block!important;color:#087a4b!important;font-weight:800!important;margin:0 0 8px!important;
-  }
-  #adminMenuToggle:checked ~ #adminMobileDrawer .admin-mobile-drawer-content a{
-    min-height:44px!important;padding:10px 12px!important;margin:4px 0!important;
-    border-radius:10px!important;background:#f3faf5!important;color:#175b3d!important;
-    text-decoration:none!important;font-size:14px!important;line-height:1.35!important;
-  }
+ body>#adminMobileDrawer[aria-hidden="false"]{
+  display:block!important;position:fixed!important;inset:0!important;
+  width:100vw!important;height:100vh!important;height:100dvh!important;
+  max-height:none!important;z-index:2147483647!important;overflow:hidden!important;
+ }
+ body>#adminMobileDrawer[aria-hidden="false"] .admin-mobile-drawer-panel{
+  position:absolute!important;inset:0 auto 0 0!important;
+  display:flex!important;flex-direction:column!important;
+  width:min(88vw,390px)!important;height:100%!important;max-height:none!important;
+  box-sizing:border-box!important;overflow:hidden!important;
+  padding:calc(14px + env(safe-area-inset-top)) 16px calc(14px + env(safe-area-inset-bottom))!important;
+  background:#fff!important;
+ }
+ body>#adminMobileDrawer[aria-hidden="false"] .admin-mobile-drawer-head{
+  display:flex!important;flex:0 0 auto!important;min-height:58px!important;
+ }
+ body>#adminMobileDrawer[aria-hidden="false"] .admin-mobile-drawer-content{
+  display:block!important;position:relative!important;flex:1 1 auto!important;
+  width:100%!important;min-height:0!important;height:auto!important;
+  overflow-x:hidden!important;overflow-y:auto!important;
+  visibility:visible!important;opacity:1!important;padding:12px 0 20px!important;
+  background:#fff!important;color:#174b35!important;
+ }
+ body>#adminMobileDrawer[aria-hidden="false"] .admin-mobile-drawer-content .nav-group{
+  display:block!important;visibility:visible!important;opacity:1!important;
+  margin:0 0 12px!important;padding:10px!important;border:1px solid #dcece1!important;
+  border-radius:12px!important;background:#fff!important;
+ }
+ body>#adminMobileDrawer[aria-hidden="false"] .admin-mobile-drawer-content a{
+  display:flex!important;visibility:visible!important;opacity:1!important;
+  min-height:44px!important;padding:10px 12px!important;margin:4px 0!important;
+  border-radius:10px!important;background:#f3faf5!important;color:#175b3d!important;
+  text-decoration:none!important;font-size:14px!important;line-height:1.35!important;
+ }
+ body>#adminMobileDrawer[aria-hidden="false"] .admin-mobile-drawer-content .nav-group-title{
+  display:block!important;color:#087a4b!important;font-weight:800!important;margin:0 0 8px!important;
+ }
 }
 </style>
 <script>
