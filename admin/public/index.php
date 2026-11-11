@@ -1119,7 +1119,7 @@ $mobileIcon = static function(string $key) use ($mobileIconPaths): string {
 };
 ?>
 
-<main class="main"><header class="top"><strong><?=e($labels[$u['role']]??$u['role'])?></strong><div class="top-actions"><label class="admin-menu-trigger" for="adminMenuToggle" aria-label="Buka menu navigasi" onclick="var drawer=document.getElementById('adminMobileDrawer');if(drawer){drawer.style.removeProperty('display');}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span>Menu</span></label><form method="post"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="logout"><button class="logout">Keluar</button></form></div></header><section class="content"><?php if($flash):?><div class="alert <?=$flash['type']==='error'?'error':''?>"><?=e($flash['message'])?></div><?php endif;?>
+<main class="main"><header class="top"><strong><?=e($labels[$u['role']]??$u['role'])?></strong><div class="top-actions"><button type="button" class="admin-menu-trigger" id="adminMenuTrigger" aria-label="Buka menu navigasi" aria-controls="adminMobileDrawer" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span>Menu</span></label><form method="post"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="logout"><button class="logout">Keluar</button></form></div></header><section class="content"><?php if($flash):?><div class="alert <?=$flash['type']==='error'?'error':''?>"><?=e($flash['message'])?></div><?php endif;?>
 <?php if($page==='system'):?>
 <h1>Pengaturan Sistem</h1><p class="muted">Atur tampilan Dashboard SIAKAD sesuai kenyamanan Anda. Pilihan tema disimpan pada browser/perangkat ini.</p>
 <div class="theme-settings">
@@ -1613,14 +1613,21 @@ $pendingCount=0;foreach($availableMigrations as $migrationName=>$migrationFile){
   var toggle=document.getElementById('adminMenuToggle');
   var drawer=document.getElementById('adminMobileDrawer');
   if(!toggle||!drawer)return;
-  /* Move overlay out of transformed dashboard containers for Android WebView. */
+  /* Keep the overlay attached to body so Android WebView cannot clip it. */
   if(drawer.parentNode!==document.body)document.body.appendChild(drawer);
+  var trigger=document.getElementById('adminMenuTrigger');
   function render(){
    var open=!!toggle.checked;
-   drawer.style.setProperty('display',open?'block':'none','important');
    drawer.setAttribute('aria-hidden',open?'false':'true');
+   drawer.style.setProperty('display',open?'block':'none','important');
+   if(trigger)trigger.setAttribute('aria-expanded',open?'true':'false');
    document.body.style.overflow=open?'hidden':'';
   }
+  if(trigger)trigger.addEventListener('click',function(event){
+   event.preventDefault();
+   toggle.checked=!toggle.checked;
+   render();
+  });
   toggle.addEventListener('change',render);
   drawer.querySelectorAll('.admin-mobile-backdrop').forEach(function(backdrop){
    backdrop.addEventListener('click',function(){toggle.checked=false;render();});
