@@ -268,7 +268,7 @@ input,select,textarea,.profile-edit input,.profile-edit textarea,.profile-edit s
     <div class="ektm-card-top"><img src="<?=h($campusLogoUrl)?>" alt="Logo STIT Darul Ilmi"><div><strong>SEKOLAH TINGGI ILMU TARBIYAH<br>STIT DARUL ILMI TASIKMALAYA</strong><span>Jl. Cirahayu, Sindangraja, Jamanis, Kabupaten Tasikmalaya 46175</span></div></div><h3 class="ektm-card-title">KARTU TANDA MAHASISWA</h3>
     <div class="ektm-card-body"><div class="ektm-photo"><img src="<?=h(!empty($profile['photo_url'])?$profile['photo_url']:'assets/profile-placeholder.svg')?>" alt="Foto <?=h($profile['full_name'])?>" onerror="this.src='assets/profile-placeholder.svg'"></div>
       <div class="ektm-info"><strong class="ektm-student-name"><?=h($profile['full_name'])?></strong><span class="ektm-nim"><?=h($profile['nim'])?></span><dl><div><dt>Program Studi</dt><dd><?=h($profile['program']??'—')?></dd></div><div><dt>Tahun Masuk</dt><dd><?=h($profile['entry_year']??'—')?></dd></div><div><dt>Status</dt><dd><?=h(ucfirst((string)($profile['student_status']??'Aktif')))?></dd></div></dl></div>
-      <div class="ektm-qr"><div id="ektmQr" data-qr="<?=h((string)$profile['nim'])?>"></div><small>QR NIM</small></div>
+      <div class="ektm-qr"><div id="ektmQr" data-qr="<?=h((string)$profile['nim'])?>"></div></div>
     </div><div class="ektm-card-bottom"><span>BERLAKU SELAMA STATUS MAHASISWA AKTIF</span><span>STIT DARUL ILMI</span></div>
   </article>
   <p class="ektm-note"><?=empty($profile['photo_url'])?'Foto mahasiswa belum diisi. Silakan hubungi Admin Akademik untuk melengkapi foto pada kartu.':'Gunakan kartu ini sebagai identitas digital mahasiswa.'?></p>
