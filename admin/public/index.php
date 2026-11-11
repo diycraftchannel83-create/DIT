@@ -889,6 +889,25 @@ html[data-theme="green"] .content,html[data-theme="green"] .main{background:#f3f
 .student-detail-cancel{padding:10px 16px;border-radius:10px;background:#edf2ef;color:#34564a;text-decoration:none;font-weight:700}
 @media(max-width:600px){.student-detail-backdrop{align-items:flex-end;padding:0}.student-detail-modal{width:100%;max-height:94dvh;border-radius:22px 22px 0 0;padding:18px 16px calc(20px + env(safe-area-inset-bottom));}.student-detail-modal form{grid-template-columns:1fr;gap:12px}.student-detail-actions{bottom:0}.student-detail-actions button{flex:1;min-height:46px}}
 </style></head><body><main class="login"><div class="mark-wrap"><img class="campus-logo" src="<?=e($campusLogoUrl)?>" alt="Logo STIT Darul Ilmi Tasikmalaya"></div><p style="color:#078653;font-weight:800;letter-spacing:.12em;font-size:11px;margin:20px 0 0">PORTAL AKADEMIK TERPADU</p><h1>Selamat Datang<br>Admin STIT Darul Ilmi</h1><p class="muted">Masuk untuk mengelola layanan akademik dan informasi kampus STIT Darul Ilmi Tasikmalaya.</p><?php if($flash):?><div class="alert"><?=e($flash['message'])?></div><?php endif;?><form method="post"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="login"><label>Username</label><input name="username" autocomplete="username" placeholder="Masukkan username" required><label>Password</label><input type="password" name="password" autocomplete="current-password" placeholder="Masukkan password" required><button type="submit">Masuk ke Dashboard　›</button></form><div class="login-foot muted">Gunakan akun admin yang dibuat melalui prosedur setup backend. Tidak ada akun bawaan.<br><a href="../../portal/public/?page=login" style="display:inline-block;margin-top:12px;color:#087a4b;font-weight:800">Login Mahasiswa / Dosen →</a></div></main></script>
+<script id="lecturer-navigation-fix">
+(function(){
+  function openLecturerPage(event){
+    var link=event.target && event.target.closest ? event.target.closest('a[href*="page=lecturers"]') : null;
+    if(!link) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    window.location.href=window.location.pathname+'?page=lecturers';
+  }
+  document.addEventListener('click',openLecturerPage,true);
+  document.addEventListener('touchend',function(event){
+    var link=event.target && event.target.closest ? event.target.closest('a[href*="page=lecturers"]') : null;
+    if(!link) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    window.location.href=window.location.pathname+'?page=lecturers';
+  },{capture:true,passive:false});
+})();
+</script>
 </body></html><?php exit;
 }
 $datasets=[
