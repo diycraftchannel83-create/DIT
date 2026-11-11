@@ -1950,12 +1950,11 @@ $pendingCount=0;foreach($availableMigrations as $migrationName=>$migrationFile){
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initAdminDrawer,{once:true});
  else initAdminDrawer();
 })();
-</script>>
+</script>
 <script>
-;
-</script><script>
 (function(){
- const form=document.getElementById('studentCreateForm');if(!form)return;
+ const form=document.getElementById('studentCreateForm');
+ if(form){
  const tabs=[...form.querySelectorAll('.student-tab')],panels=[...form.querySelectorAll('.student-tab-panel')];
  const prev=document.getElementById('studentPrev'),next=document.getElementById('studentNext'),submit=document.getElementById('studentSubmit');
  let active=0;
@@ -1967,6 +1966,7 @@ $pendingCount=0;foreach($availableMigrations as $migrationName=>$migrationFile){
  const photo=document.getElementById('studentPhotoFile'),preview=document.getElementById('studentPhotoPreview');
  photo.addEventListener('change',function(){const file=this.files&&this.files[0];if(!file){preview.innerHTML='<span>FOTO</span>';return;}if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>2*1024*1024){this.value='';preview.innerHTML='<span>FOTO</span>';alert('Pilih foto JPG, PNG, atau WebP dengan ukuran maksimal 2 MB.');return;}const reader=new FileReader();reader.onload=()=>{preview.innerHTML='';const img=document.createElement('img');img.src=reader.result;img.alt='Pratinjau foto profil';preview.appendChild(img);};reader.readAsDataURL(file);});
  show(0);
+ }
  const lecturerForm=document.getElementById('lecturerCreateForm');
  if(lecturerForm){
   const lecturerTabs=[...lecturerForm.querySelectorAll('.student-tab')],lecturerPanels=[...lecturerForm.querySelectorAll('.student-tab-panel')];
