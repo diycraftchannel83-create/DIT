@@ -70,6 +70,28 @@ function saveCampusHeroUpload(string $field='hero_image_file'): ?string {
     $base=rtrim(dirname((string)($_SERVER['SCRIPT_NAME']??'/')),'/');
     return $scheme.'://'.($_SERVER['HTTP_HOST']??'localhost').$base.'/uploads/campus/'.$name;
 }
+function saveCampusHeroSlideUploads(string $field='hero_slide_files'): array {
+    if (empty($_FILES[$field]) || !isset($_FILES[$field]['name']) || !is_array($_FILES[$field]['name'])) return [];
+    $files=$_FILES[$field];$urls=[];$count=count($files['name']);
+    if($count>12) throw new RuntimeException('Maksimal 12 foto slideshow dapat diunggah sekaligus.');
+    $dir=__DIR__.'/uploads/campus';
+    if(!is_dir($dir)&&!mkdir($dir,0755,true)&&!is_dir($dir)) throw new RuntimeException('Folder upload foto slideshow tidak tersedia.');
+    for($i=0;$i<$count;$i++){
+        if(($files['error'][$i]??UPLOAD_ERR_NO_FILE)===UPLOAD_ERR_NO_FILE) continue;
+        if(($files['error'][$i]??UPLOAD_ERR_OK)!==UPLOAD_ERR_OK||($files['size'][$i]??0)>5*1024*1024) throw new RuntimeException('Setiap foto slideshow harus berhasil diunggah dan maksimal 5 MB.');
+        $tmp=(string)($files['tmp_name'][$i]??'');
+        if(!is_uploaded_file($tmp)) throw new RuntimeException('Salah satu file foto slideshow tidak valid.');
+        $mime=(new finfo(FILEINFO_MIME_TYPE))->file($tmp);
+        $ext=['image/jpeg'=>'jpg','image/png'=>'png','image/webp'=>'webp'][$mime]??null;
+        if(!$ext) throw new RuntimeException('Foto slideshow harus JPG, PNG, atau WebP.');
+        $name='slide-'.bin2hex(random_bytes(16)).'.'.$ext;
+        if(!move_uploaded_file($tmp,$dir.'/'.$name)) throw new RuntimeException('Salah satu foto slideshow tidak dapat disimpan.');
+        $https=(!empty($_SERVER['HTTPS'])&&$_SERVER['HTTPS']!=='off');
+        $base=rtrim(dirname((string)($_SERVER['SCRIPT_NAME']??'/')),'/');
+        $urls[]=($https?'https':'http').'://'.($_SERVER['HTTP_HOST']??'localhost').$base.'/uploads/campus/'.$name;
+    }
+    return $urls;
+}
 function saveCampusEktmUpload(string $field='ektm_image_file'): ?string {
     if (empty($_FILES[$field]) || ($_FILES[$field]['error'] ?? UPLOAD_ERR_NO_FILE)===UPLOAD_ERR_NO_FILE) return null;
     $file=$_FILES[$field];
@@ -446,6 +468,20 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
             elseif (!empty($_POST['remove_about_image'])) $values['about_image_url']='';
         } catch(Throwable $uploadError) {
             flash($uploadError->getMessage(),'error'); go('dashboard');
+        }
+        try {
+            $storedSlides=$pdo->prepare("SELECT content_value FROM website_content WHERE content_key='hero_slides_json' LIMIT 1");
+            $storedSlides->execute();
+            $slides=json_decode((string)($storedSlides->fetchColumn()?:'[]'),true);
+            if(!is_array($slides)) $slides=[];
+            $removeSlides=array_values(array_unique(array_filter(array_map('intval',(array)($_POST['remove_hero_slides']??[])),static fn($i)=>$i>=0)));
+            foreach($slides as $index=>$slide){if(in_array((int)$index,$removeSlides,true))unset($slides[$index]);}
+            $slides=array_values(array_filter($slides,static fn($slide)=>is_array($slide)&&!empty($slide['url'])));
+            foreach(saveCampusHeroSlideUploads() as $url){$slides[]=['url'=>$url,'alt'=>'Gedung kampus STIT Darul Ilmi Tasikmalaya','caption'=>'STIT Darul Ilmi · Tasikmalaya'];}
+            if(count($slides)>30) throw new RuntimeException('Slideshow maksimal 30 foto. Hapus beberapa foto sebelum menambah yang baru.');
+            $values['hero_slides_json']=json_encode($slides,JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE);
+        } catch(Throwable $slideError) {
+            flash($slideError->getMessage(),'error'); go('dashboard');
         }
         foreach(['stats_json','why_cards','gallery_json','testimonials_json'] as $jsonKey){
             if($values[$jsonKey]!==''){json_decode($values[$jsonKey],true);if(json_last_error()!==JSON_ERROR_NONE||!is_array(json_decode($values[$jsonKey],true))){flash('Format JSON pada '.$jsonKey.' tidak valid.','error');go('dashboard');}}
@@ -1218,13 +1254,21 @@ $mobileIcon = static function(string $key) use ($mobileIconPaths): string {
 <?php elseif($page==='dashboard'):?><h1>Dashboard Akademik</h1><p class="muted">Ringkasan data STIT Darul Ilmi Tasikmalaya.</p><div class="cards"><?php if($u['role']==='ketua_prodi' && $programScopeId!==null): $scopeCounts=[['Mahasiswa',"SELECT COUNT(*) FROM students WHERE study_program_id=".$programScopeId],['Mata Kuliah',"SELECT COUNT(*) FROM courses WHERE study_program_id=".$programScopeId]]; foreach($scopeCounts as [$label,$sql]):?><div class="card"><span class="muted"><?=e($label)?></span><strong><?=number_format((int)$pdo->query($sql)->fetchColumn())?></strong></div><?php endforeach; else: foreach(['students'=>'Mahasiswa','lecturers'=>'Dosen','study_programs'=>'Program Studi','courses'=>'Mata Kuliah','course_classes'=>'Kelas Kuliah','pmb_applicants'=>'Pendaftar PMB'] as $t=>$label):?><div class="card"><span class="muted"><?=e($label)?></span><strong><?=number_format(tableCount($pdo,$t))?></strong></div><?php endforeach; endif;?></div><?php if(in_array($u['role'],$academicRoles,true)): $campus=$pdo->query('SELECT * FROM campus_profile WHERE id=1')->fetch()?:[];$recentNews=$pdo->query('SELECT id,title,category,published_at,created_at FROM news_posts ORDER BY created_at DESC LIMIT 5')->fetchAll();?>
 <div class="panel"><h2>Informasi Kampus</h2><form method="post" enctype="multipart/form-data" class="inline"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="save_campus_profile"><div style="flex-basis:100%;padding:14px;background:#f0f8f2;border:1px solid #cfe8d6;border-radius:12px"><label>Logo Resmi Kampus (JPG, PNG, WebP — maksimal 5 MB)</label><?php if(!empty($campus['logo_image_url'])):?><div style="margin:10px 0"><img src="<?=e($campus['logo_image_url'])?>" alt="Logo kampus saat ini" style="width:92px;height:92px;object-fit:contain;background:white;border-radius:12px;padding:6px"></div><?php endif;?><input type="file" name="logo_image_file" accept="image/jpeg,image/png,image/webp"><small class="muted">Unggah logo resmi untuk header dan footer website.</small><?php if(!empty($campus['logo_image_url'])):?><label style="display:block;margin-top:8px"><input type="checkbox" name="remove_logo_image" value="1"> Gunakan logo bawaan repository</label><?php endif;?></div><div style="flex-basis:100%;padding:14px;background:#f0f8f2;border:1px solid #cfe8d6;border-radius:12px"><label>Foto Gedung Kampus (JPG, PNG, WebP — maksimal 5 MB)</label><?php if(!empty($campus['hero_image_url'])):?><div style="margin:10px 0"><img src="<?=e($campus['hero_image_url'])?>" alt="Foto gedung kampus saat ini" style="width:100%;max-width:520px;max-height:220px;object-fit:cover;border-radius:10px"></div><?php else:?><p class="muted">Belum ada foto gedung. Aplikasi akan menampilkan gambar bawaan.</p><?php endif;?><input type="file" name="hero_image_file" accept="image/jpeg,image/png,image/webp"><small class="muted">Pilih foto baru untuk mengganti gambar yang tampil di banner aplikasi.</small><?php if(!empty($campus['hero_image_url'])):?><label style="display:block;margin-top:8px"><input type="checkbox" name="remove_hero_image" value="1"> Hapus foto gedung dan gunakan gambar bawaan</label><?php endif;?></div><div><label>Tagline</label><input name="tagline" maxlength="220" value="<?=e($campus['tagline']??'')?>" placeholder="Tagline resmi kampus"></div><div><label>Alamat Kampus</label><input name="address" maxlength="500" value="<?=e($campus['address']??'')?>"></div><div><label>Telepon</label><input name="phone" maxlength="60" value="<?=e($campus['phone']??'')?>"></div><div><label>Email</label><input type="email" name="email" value="<?=e($campus['email']??'')?>"></div><div><label>Website</label><input name="website" maxlength="255" value="<?=e($campus['website']??'')?>"></div><div><label>Link PMB</label><input name="pmb_url" maxlength="255" value="<?=e($campus['pmb_url']??'')?>"></div><div style="flex-basis:100%"><label>Tentang Kampus</label><textarea name="about" rows="4" style="width:100%;padding:10px;border:1px solid #d0d5dd;border-radius:7px"><?=e($campus['about']??'')?></textarea></div><div style="flex-basis:100%"><label>Visi</label><textarea name="vision" rows="2" style="width:100%;padding:10px;border:1px solid #d0d5dd;border-radius:7px"><?=e($campus['vision']??'')?></textarea></div><div style="flex-basis:100%"><label>Misi</label><textarea name="mission" rows="3" style="width:100%;padding:10px;border:1px solid #d0d5dd;border-radius:7px"><?=e($campus['mission']??'')?></textarea></div><button>Simpan Informasi Kampus</button></form></div>
 <?php
-$webDefaults=['history'=>'','pmb_title'=>'Mulai Perjalanan Akademik Anda Bersama STIT Darul Ilmi','pmb_info'=>'','whatsapp'=>'','facebook'=>'','instagram'=>'','youtube'=>'','stats_json'=>'[]','why_cards'=>'[]','gallery_json'=>'[]','testimonials_json'=>'[]','about_image_url'=>''];
+$webDefaults=['history'=>'','pmb_title'=>'Mulai Perjalanan Akademik Anda Bersama STIT Darul Ilmi','pmb_info'=>'','whatsapp'=>'','facebook'=>'','instagram'=>'','youtube'=>'','stats_json'=>'[]','why_cards'=>'[]','gallery_json'=>'[]','testimonials_json'=>'[]','about_image_url'=>'','hero_slides_json'=>'[]'];
 $webSettings=$webDefaults;
 try{$webRows=$pdo->query('SELECT content_key,content_value FROM website_content')->fetchAll();foreach($webRows as $wr){if(array_key_exists($wr['content_key'],$webSettings))$webSettings[$wr['content_key']]=$wr['content_value'];}}catch(Throwable){}
 ?>
 <div class="panel"><h2>Konten Website Resmi</h2><p class="muted">Kelola sejarah, informasi PMB, statistik, keunggulan, galeri, testimoni, dan media sosial. Gunakan JSON yang valid untuk data berbentuk daftar. Jangan memasukkan angka statistik atau testimoni sebelum diverifikasi.</p>
 <form method="post" enctype="multipart/form-data" class="inline" style="align-items:stretch">
 <input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="save_website_content">
+<div style="flex-basis:100%;padding:16px;background:#eef8f0;border:1px solid #bcdcc5;border-radius:14px">
+<label style="font-weight:800">Slideshow Foto Halaman Depan</label>
+<p class="muted" style="margin:4px 0 12px">Tambahkan beberapa foto gedung dan lingkungan kampus. Foto akan berganti otomatis setiap 5 detik. Format JPG, PNG, WebP — maksimal 5 MB per foto.</p>
+<?php $heroSlidesAdmin=json_decode($webSettings['hero_slides_json']??'[]',true);if(!is_array($heroSlidesAdmin))$heroSlidesAdmin=[];?>
+<?php if($heroSlidesAdmin):?><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:12px;margin:12px 0"><?php foreach($heroSlidesAdmin as $slideIndex=>$slide):if(!is_array($slide)||empty($slide['url']))continue;?><label style="display:block;padding:8px;background:#fff;border:1px solid #d7e9dc;border-radius:10px"><img src="<?=e($slide['url'])?>" alt="Foto slideshow <?=e($slideIndex+1)?>" style="width:100%;height:100px;object-fit:cover;border-radius:7px"><span style="display:flex;align-items:center;gap:6px;margin-top:7px;font-size:12px"><input type="checkbox" name="remove_hero_slides[]" value="<?=e($slideIndex)?>"> Hapus foto <?=e($slideIndex+1)?></span></label><?php endforeach;?></div><?php else:?><p class="muted">Belum ada foto tambahan. Foto gedung utama yang lama tetap digunakan sebagai cadangan.</p><?php endif;?>
+<input type="file" name="hero_slide_files[]" accept="image/jpeg,image/png,image/webp" multiple>
+<small class="muted">Pilih satu atau beberapa foto sekaligus. Foto baru akan ditambahkan setelah foto yang sudah ada.</small>
+</div>
 <div style="flex-basis:100%;padding:14px;background:#f0f8f2;border:1px solid #cfe8d6;border-radius:12px">
 <label>Foto Kedua — Bagian “Mengenal Kampus” (JPG, PNG, WebP — maksimal 5 MB)</label>
 <?php if(!empty($webSettings['about_image_url'])):?><div style="margin:10px 0"><img src="<?=e($webSettings['about_image_url'])?>" alt="Foto kedua saat ini" style="width:100%;max-width:520px;max-height:220px;object-fit:cover;border-radius:12px"></div><?php elseif(!empty($campus['hero_image_url'])):?><div style="margin:10px 0"><img src="<?=e($campus['hero_image_url'])?>" alt="Foto hero yang saat ini menjadi fallback foto kedua" style="width:100%;max-width:520px;max-height:220px;object-fit:cover;border-radius:12px"></div><small class="muted">Saat ini masih menggunakan foto banner sebagai gambar cadangan.</small><?php else:?><p class="muted">Belum ada foto kedua. Bagian ini akan menampilkan ikon bawaan.</p><?php endif;?>
