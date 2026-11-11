@@ -895,7 +895,7 @@ html[data-theme="green"] .content,html[data-theme="green"] .main{background:#f3f
 #lecturerCreateForm .student-tabs .student-tab{position:relative!important;z-index:20!important;pointer-events:auto!important;touch-action:manipulation!important}
 #lecturerCreateForm .student-form-footer button{cursor:pointer!important}
 </style>
-</head><body><main class="login"><div class="mark-wrap"><img class="campus-logo" src="<?=e($campusLogoUrl)?>" alt="Logo STIT Darul Ilmi Tasikmalaya"></div><p style="color:#078653;font-weight:800;letter-spacing:.12em;font-size:11px;margin:20px 0 0">PORTAL AKADEMIK TERPADU</p><h1>Selamat Datang<br>Admin STIT Darul Ilmi</h1><p class="muted">Masuk untuk mengelola layanan akademik dan informasi kampus STIT Darul Ilmi Tasikmalaya.</p><?php if($flash):?><div class="alert"><?=e($flash['message'])?></div><?php endif;?><form method="post"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="login"><label>Username</label><input name="username" autocomplete="username" placeholder="Masukkan username" required><label>Password</label><input type="password" name="password" autocomplete="current-password" placeholder="Masukkan password" required><button type="submit">Masuk ke Dashboard　›</button></form><div class="login-foot muted">Gunakan akun admin yang dibuat melalui prosedur setup backend. Tidak ada akun bawaan.<br><a href="../../portal/public/?page=login" style="display:inline-block;margin-top:12px;color:#087a4b;font-weight:800">Login Mahasiswa / Dosen →</a></div></main></script>
+<style id="lecturer-name-select-style">.lecturer-name-select{border:0;background:transparent;padding:4px 0;color:#075b3d;font:inherit;font-weight:800;text-align:left;text-decoration:underline;text-decoration-color:#9bcbb0;text-underline-offset:3px;cursor:pointer}.lecturer-name-select:hover{color:#087a4b}</style></head><body><main class="login"><div class="mark-wrap"><img class="campus-logo" src="<?=e($campusLogoUrl)?>" alt="Logo STIT Darul Ilmi Tasikmalaya"></div><p style="color:#078653;font-weight:800;letter-spacing:.12em;font-size:11px;margin:20px 0 0">PORTAL AKADEMIK TERPADU</p><h1>Selamat Datang<br>Admin STIT Darul Ilmi</h1><p class="muted">Masuk untuk mengelola layanan akademik dan informasi kampus STIT Darul Ilmi Tasikmalaya.</p><?php if($flash):?><div class="alert"><?=e($flash['message'])?></div><?php endif;?><form method="post"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="login"><label>Username</label><input name="username" autocomplete="username" placeholder="Masukkan username" required><label>Password</label><input type="password" name="password" autocomplete="current-password" placeholder="Masukkan password" required><button type="submit">Masuk ke Dashboard　›</button></form><div class="login-foot muted">Gunakan akun admin yang dibuat melalui prosedur setup backend. Tidak ada akun bawaan.<br><a href="../../portal/public/?page=login" style="display:inline-block;margin-top:12px;color:#087a4b;font-weight:800">Login Mahasiswa / Dosen →</a></div></main></script>
 <script id="lecturer-navigation-fix">
 (function(){
   function openLecturerPage(event){
@@ -960,7 +960,21 @@ html[data-theme="green"] .content,html[data-theme="green"] .main{background:#f3f
  else initLecturerTabs();
 })();
 </script>
-</body></html><?php exit;
+<script id="lecturer-name-to-editor">
+window.selectLecturerForEditor=function(button){
+ var form=document.getElementById('lecturerCreateForm');
+ if(!form)return;
+ var nameField=form.querySelector('[name="full_name"]');
+ if(!nameField)return;
+ nameField.value=button.getAttribute('data-lecturer-name')||button.textContent.trim();
+ nameField.dispatchEvent(new Event('input',{bubbles:true}));
+ nameField.dispatchEvent(new Event('change',{bubbles:true}));
+ var firstTab=form.querySelector('.student-tab');
+ if(firstTab)firstTab.click();
+ form.scrollIntoView({behavior:'smooth',block:'start'});
+ window.setTimeout(function(){nameField.focus();nameField.select();},350);
+};
+</script></body></html><?php exit;
 }
 $datasets=[
  'programs'=>['title'=>'Program Studi','sql'=>'SELECT id,code,name,degree_level,is_active FROM study_programs ORDER BY name'],
@@ -1670,7 +1684,7 @@ $pendingCount=0;foreach($availableMigrations as $migrationName=>$migrationFile){
   <div class="student-form-heading"><div><span class="eyebrow">DATA TENAGA PENDIDIK</span><h2>Daftar Dosen Terdaftar</h2><p class="muted">Daftar dosen yang sudah didaftarkan dalam database akademik.</p></div><span class="tag"><?=count($rows)?> dosen</span></div>
   <?php if(!$rows):?><p class="muted">Belum ada dosen yang terdaftar.</p><?php else:?>
   <div style="overflow-x:auto"><table><thead><tr><th>No.</th><th>NIDN / Nomor Dosen</th><th>Nama Dosen</th><th>Email</th><th>Telepon</th></tr></thead><tbody>
-  <?php foreach($rows as $index=>$lecturerRow):?><tr><td><?=($index+1)?></td><td><?=e($lecturerRow['lecturer_number']??'—')?></td><td><strong><?=e($lecturerRow['full_name']??'—')?></strong></td><td><?=e($lecturerRow['email']??'—')?></td><td><?=e($lecturerRow['phone']??'—')?></td></tr><?php endforeach;?>
+  <?php foreach($rows as $index=>$lecturerRow):?><tr><td><?=($index+1)?></td><td><?=e($lecturerRow['lecturer_number']??'—')?></td><td><button type="button" class="lecturer-name-select" data-lecturer-name="<?=e($lecturerRow['full_name']??'')?>" onclick="window.selectLecturerForEditor(this)"><?=e($lecturerRow['full_name']??'—')?></button></td><td><?=e($lecturerRow['email']??'—')?></td><td><?=e($lecturerRow['phone']??'—')?></td></tr><?php endforeach;?>
   </tbody></table></div><?php endif;?>
 </div>
 <?php endif;?><?php if($page==='courses'&&in_array($u['role'],$academicRoles,true)): $programs=$pdo->query('SELECT id,name FROM study_programs WHERE is_active=1 ORDER BY name')->fetchAll();?><div class="panel"><h2>Tambah Mata Kuliah</h2><form class="inline" method="post"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="save_course"><div><label>Program Studi</label><select name="study_program_id" required><?php foreach($programs as $p):?><option value="<?=$p['id']?>"><?=e($p['name'])?></option><?php endforeach;?></select></div><div><label>Kode</label><input name="code" maxlength="30" required></div><div><label>Nama Mata Kuliah</label><input name="name" maxlength="180" required></div><div><label>SKS</label><input type="number" name="credits" min="1" max="12" required></div><div><label>Semester Rekomendasi</label><select name="recommended_semester"><option value="">Tidak ditentukan</option><?php for($sem=1;$sem<=8;$sem++):?><option value="<?=$sem?>">Semester <?=$sem?></option><?php endfor;?></select></div><button>Simpan Mata Kuliah</button></form></div><?php endif;?>
