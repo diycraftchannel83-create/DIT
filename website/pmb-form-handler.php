@@ -29,7 +29,7 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
    $files[$key]=['tmp'=>$up['tmp_name'],'name'=>basename((string)$up['name']),'mime'=>$mime,'size'=>(int)$up['size'],'ext'=>$ext];
   }
   if(!$pmbMessage){
-   $storage=dirname(__DIR__).'/backend/storage/pmb-private';
+   $docRoot=(string)($_SERVER['DOCUMENT_ROOT']??dirname(__DIR__));$storage=dirname($docRoot).'/stit-pmb-private';
    if(!is_dir($storage)&&!mkdir($storage,0750,true)&&!is_dir($storage))$pmbMessage='Folder penyimpanan dokumen tidak dapat dibuat.';
    else{
     $pmbRegistration='PMB-'.date('Y').'-'.strtoupper(bin2hex(random_bytes(4)));$saved=[];
