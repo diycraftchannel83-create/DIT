@@ -2557,49 +2557,38 @@ html[data-theme="green"] .student-edit-page .student-form-footer button#studentS
  }
 }
 
-/* ANDROID DRAWER FINAL LAYOUT: menu starts directly below title and scrolls above system bar */
+/* LAST-RESORT ANDROID DRAWER: pin menu list to viewport, independent of panel sizing */
 @media screen and (max-width:760px){
- body>#adminMobileDrawer[aria-hidden="false"]{
-  position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;height:100dvh!important;
-  z-index:2147483647!important;background:rgba(15,45,32,.24)!important;overflow:hidden!important;
+ body>#adminMobileDrawer[aria-hidden="false"] .admin-mobile-drawer-content,
+ #adminMobileDrawer[aria-hidden="false"] .admin-mobile-drawer-content{
+  position:fixed!important;display:block!important;
+  top:210px!important;left:0!important;right:auto!important;bottom:0!important;
+  width:min(88vw,390px)!important;height:auto!important;max-height:none!important;
+  min-height:0!important;overflow-x:hidden!important;overflow-y:auto!important;
+  padding:14px 16px calc(24px + env(safe-area-inset-bottom))!important;
+  margin:0!important;background:#fff!important;color:#174b35!important;
+  z-index:2147483647!important;visibility:visible!important;opacity:1!important;
+  box-sizing:border-box!important;
  }
- body>#adminMobileDrawer[aria-hidden="false"] .admin-mobile-drawer-panel{
-  position:absolute!important;top:0!important;bottom:0!important;left:0!important;
-  width:min(88vw,390px)!important;height:100%!important;max-height:none!important;
-  display:block!important;overflow:hidden!important;box-sizing:border-box!important;
-  padding:0!important;background:#fff!important;border-radius:0 18px 18px 0!important;
- }
- body>#adminMobileDrawer[aria-hidden="false"] .admin-mobile-drawer-head{
-  position:absolute!important;top:env(safe-area-inset-top)!important;left:0!important;right:0!important;
-  height:120px!important;min-height:120px!important;box-sizing:border-box!important;
-  display:flex!important;align-items:flex-end!important;justify-content:space-between!important;
-  padding:16px 16px 14px 18px!important;background:#fff!important;
-  border-bottom:1px solid #dcece1!important;z-index:4!important;
- }
- body>#adminMobileDrawer[aria-hidden="false"] .admin-mobile-drawer-content{
-  position:absolute!important;display:block!important;top:calc(120px + env(safe-area-inset-top))!important;
-  left:0!important;right:0!important;bottom:calc(8px + env(safe-area-inset-bottom))!important;
-  width:100%!important;height:auto!important;max-height:none!important;min-height:0!important;
-  box-sizing:border-box!important;overflow-x:hidden!important;overflow-y:auto!important;
-  padding:12px 16px 22px!important;margin:0!important;background:#fff!important;
-  visibility:visible!important;opacity:1!important;z-index:3!important;
-  -webkit-overflow-scrolling:touch!important;overscroll-behavior:contain!important;
+ body>#adminMobileDrawer[aria-hidden="false"] .admin-mobile-drawer-content .nav-dashboard,
+ body>#adminMobileDrawer[aria-hidden="false"] .admin-mobile-drawer-content .nav-group,
+ body>#adminMobileDrawer[aria-hidden="false"] .admin-mobile-drawer-content .nav-group-title,
+ body>#adminMobileDrawer[aria-hidden="false"] .admin-mobile-drawer-content .nav-group a{
+  visibility:visible!important;opacity:1!important;color:#175b3d!important;
  }
  body>#adminMobileDrawer[aria-hidden="false"] .admin-mobile-drawer-content .nav-dashboard,
  body>#adminMobileDrawer[aria-hidden="false"] .admin-mobile-drawer-content .nav-group a{
-  display:flex!important;align-items:center!important;min-height:48px!important;
-  height:auto!important;box-sizing:border-box!important;padding:12px!important;margin:5px 0!important;
-  border:1px solid #dcece1!important;border-radius:10px!important;background:#f1f8f3!important;
-  color:#175b3d!important;text-decoration:none!important;white-space:normal!important;
-  font-size:15px!important;line-height:1.35!important;visibility:visible!important;opacity:1!important;
+  display:flex!important;min-height:48px!important;align-items:center!important;
+  padding:12px!important;margin:5px 0!important;background:#f1f8f3!important;
+  border:1px solid #dcece1!important;border-radius:10px!important;
+  color:#175b3d!important;text-decoration:none!important;font-size:15px!important;
  }
  body>#adminMobileDrawer[aria-hidden="false"] .admin-mobile-drawer-content .nav-group{
-  display:block!important;flex:0 0 auto!important;margin:0 0 12px!important;padding:10px!important;
-  border:1px solid #dcece1!important;border-radius:12px!important;background:#fff!important;
+  display:block!important;margin:0 0 12px!important;padding:10px!important;
+  background:#fff!important;border:1px solid #dcece1!important;border-radius:12px!important;
  }
  body>#adminMobileDrawer[aria-hidden="false"] .admin-mobile-drawer-content .nav-group-title{
-  display:block!important;padding:8px 4px!important;margin:0 0 6px!important;
-  color:#087a4b!important;font-size:12px!important;font-weight:800!important;
+  display:block!important;padding:8px 4px!important;color:#087a4b!important;font-weight:800!important;
  }
 }
 </style>
