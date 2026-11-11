@@ -896,7 +896,7 @@ $datasets=[
  'years'=>['title'=>'Tahun Akademik','sql'=>'SELECT id,name,start_date,end_date,is_active FROM academic_years ORDER BY start_date DESC'],
  'semesters'=>['title'=>'Semester','sql'=>'SELECT s.id,y.name AS academic_year,s.name,s.start_date,s.end_date,s.is_active FROM semesters s JOIN academic_years y ON y.id=s.academic_year_id ORDER BY s.start_date DESC'],
  'students'=>['title'=>'Mahasiswa','sql'=>'SELECT s.id,s.nim,u.full_name,p.name AS program,s.entry_year,s.phone,s.birth_place,s.birth_date,s.gender,s.city,s.district,s.admission_pathway,s.status FROM students s JOIN users u ON u.id=s.user_id LEFT JOIN study_programs p ON p.id=s.study_program_id ORDER BY u.full_name LIMIT 200'],
- 'lecturers'=>['title'=>'Dosen','sql'=>'SELECT l.lecturer_number,u.full_name,u.email,l.phone,l.photo_url FROM lecturers l JOIN users u ON u.id=l.user_id ORDER BY u.full_name LIMIT 200'],
+ 'lecturers'=>['title'=>'Dosen','sql'=>'SELECT l.id,l.lecturer_number,u.full_name,u.email,l.phone FROM lecturers l JOIN users u ON u.id=l.user_id ORDER BY u.full_name LIMIT 200'],
  'courses'=>['title'=>'Mata Kuliah','sql'=>'SELECT c.code,c.name,c.credits,p.name AS program,c.recommended_semester FROM courses c JOIN study_programs p ON p.id=c.study_program_id ORDER BY p.name,c.recommended_semester,c.name LIMIT 300'],
  'classes'=>['title'=>'Kelas Kuliah','sql'=>'SELECT c.class_name,co.code,co.name AS course,s.name AS semester,u.full_name AS lecturer,c.capacity FROM course_classes c JOIN courses co ON co.id=c.course_id JOIN semesters s ON s.id=c.semester_id LEFT JOIN lecturers l ON l.id=c.lecturer_id LEFT JOIN users u ON u.id=l.user_id ORDER BY s.start_date DESC LIMIT 300'],
  'schedules'=>['title'=>'Jadwal Kuliah','sql'=>'SELECT cs.id,cc.class_name,c.code,c.name AS course,CASE cs.day_of_week WHEN 1 THEN \'Senin\' WHEN 2 THEN \'Selasa\' WHEN 3 THEN \'Rabu\' WHEN 4 THEN \'Kamis\' WHEN 5 THEN \'Jumat\' WHEN 6 THEN \'Sabtu\' ELSE \'Minggu\' END AS hari,cs.start_time,cs.end_time,cs.room FROM class_schedules cs JOIN course_classes cc ON cc.id=cs.course_class_id JOIN courses c ON c.id=cc.course_id ORDER BY cs.day_of_week,cs.start_time LIMIT 300'],
@@ -1223,7 +1223,18 @@ html[data-theme="green"] a:not(.nav a):not(.mobile-nav-item){color:#075b3d}
 html[data-theme="green"] .student-edit-action{background:#e5f4eb!important;color:#176b50!important}
 html[data-theme="green"] .student-form-footer button#studentNext,
 html[data-theme="green"] .student-form-footer button#studentSubmit{background:#087a4b!important;color:#fff!important}
-</style></head><body><div class="layout"><aside class="side"><div class="brand"><img src="<?=e($campusLogoUrl)?>" alt="Logo STIT Darul Ilmi"><span class="brand-copy">STIT DARUL ILMI<small>Academic Portal</small></span></div><nav class="nav" aria-label="Navigasi desktop"><a class="nav-dashboard <?=$page==='dashboard'?'active':''?>" href="?page=dashboard">Dashboard</a><?php foreach($visibleMenuGroups as $groupLabel=>$groupKeys): ?><div class="nav-group"><div class="nav-group-title"><?=e($groupLabel)?></div><?php foreach($groupKeys as $key): ?><a class="<?=$page===$key?'active':''?>" href="?page=<?=e($key)?>"><?=e($menus[$key])?></a><?php endforeach; ?></div><?php endforeach; ?></nav></aside>
+</style><style id="lecturer-menu-click-fix">
+/* Pastikan tautan Data Dosen selalu menerima klik pada desktop dan drawer Android. */
+nav.nav a[href="?page=lecturers"],
+#mobileMenuSheet a[href="?page=lecturers"]{
+  position:relative!important;
+  z-index:5!important;
+  pointer-events:auto!important;
+  cursor:pointer!important;
+  touch-action:manipulation!important;
+}
+</style>
+</head><body><div class="layout"><aside class="side"><div class="brand"><img src="<?=e($campusLogoUrl)?>" alt="Logo STIT Darul Ilmi"><span class="brand-copy">STIT DARUL ILMI<small>Academic Portal</small></span></div><nav class="nav" aria-label="Navigasi desktop"><a class="nav-dashboard <?=$page==='dashboard'?'active':''?>" href="?page=dashboard">Dashboard</a><?php foreach($visibleMenuGroups as $groupLabel=>$groupKeys): ?><div class="nav-group"><div class="nav-group-title"><?=e($groupLabel)?></div><?php foreach($groupKeys as $key): ?><a class="<?=$page===$key?'active':''?>" href="?page=<?=e($key)?>"><?=e($menus[$key])?></a><?php endforeach; ?></div><?php endforeach; ?></nav></aside>
 <nav class="mobile-bottom-nav" aria-label="Navigasi utama Android" style="--quick-count:<?=max(1,count($mobileQuick))?>">
 <?php foreach($mobileQuick as $item): ?><a class="mobile-nav-item <?=$page===$item['page']?'active':''?>" href="?page=<?=e($item['page'])?>"><span class="mobile-nav-icon" aria-hidden="true"><?=e($item['icon'])?></span><span><?=e($item['label'])?></span></a><?php endforeach; ?>
 
