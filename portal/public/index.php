@@ -255,6 +255,52 @@ input,select,textarea,.profile-edit input,.profile-edit textarea,.profile-edit s
 .ektm-card-bottom{display:none}.ektm-note{max-width:920px;margin:9px auto 0;color:#718477;font-size:12px}.ektm-wrap{break-inside:avoid}
 @media(max-width:600px){.ektm-heading{align-items:flex-start;flex-direction:column}.ektm-print{width:100%}.ektm-card{border-radius:12px;border-width:2px}.ektm-card-top{gap:8px;padding:2% 2.5%;min-height:29%}.ektm-card-top img{width:17%}.ektm-card-top strong{font-size:clamp(10px,2.5vw,15px)}.ektm-card-top span{font-size:clamp(7px,1.6vw,10px);margin-top:2px}.ektm-card-title{font-size:clamp(13px,3.5vw,20px);border-top-width:3px}.ektm-card-body{grid-template-columns:27% minmax(0,1fr);gap:3%;padding:2.4% 7% 3% 7%}.ektm-photo{border-width:3px}.ektm-student-name{font-size:clamp(12px,3vw,17px)}.ektm-nim{font-size:clamp(11px,2.6vw,15px);margin:3px 0 5px}.ektm-info dl{gap:3px}.ektm-info dl div{grid-template-columns:minmax(55px,28%) minmax(0,1fr);gap:4px;font-size:clamp(8px,1.9vw,11px)}.ektm-qr{right:2%;bottom:3%;gap:3px}.ektm-qr>div{width:clamp(30px,8vw,44px);height:clamp(30px,8vw,44px);padding:2px}.ektm-qr small{font-size:6px}.ektm-note{font-size:11px}}
 @media print{@page{size:A4 landscape;margin:12mm}html,body{background:#fff!important;padding:0!important;margin:0!important}.shell{max-width:none!important;width:100%!important;padding:0!important;margin:0!important}.shell>*:not(.ektm-wrap){display:none!important}.ektm-wrap{display:block!important;margin:0!important;padding:0!important;break-inside:avoid;page-break-inside:avoid}.ektm-heading,.ektm-note{display:none!important}.ektm-card{display:flex!important;max-width:100%!important;width:100%!important;aspect-ratio:1.46/1!important;margin:0 auto!important;box-shadow:none!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}.ektm-card-body{grid-template-columns:28% minmax(0,1fr)!important}.ektm-photo{width:100%!important}.ektm-qr{position:absolute!important;right:3%!important;bottom:5%!important}}
+
+/* ANDROID PORTAL AUDIT: prevent clipped content and keep every control reachable */
+@media(max-width:760px){
+ html,body{max-width:100%;overflow-x:hidden!important;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+ body{padding-bottom:calc(88px + env(safe-area-inset-bottom))!important}
+ .shell{width:100%!important;max-width:100%!important;min-width:0!important;padding-left:10px!important;padding-right:10px!important}
+ .top,.brand,.user,.hero,.grid,.stat,.panel,.student-identity{min-width:0!important;max-width:100%!important}
+ .top{align-items:center!important;gap:8px!important}
+ .brand{flex:1 1 auto!important;overflow-wrap:anywhere}
+ .user{flex:0 0 auto!important}
+ .hero{overflow:hidden!important}
+ .hero h1,.hero p{overflow-wrap:anywhere}
+ .grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .panel{overflow:hidden!important}
+ .table-wrap{display:block!important;width:100%!important;max-width:100%!important;overflow-x:auto!important;overscroll-behavior-x:contain!important;-webkit-overflow-scrolling:touch!important}
+ table{min-width:620px!important}
+ .profile-form-grid{grid-template-columns:minmax(0,1fr)!important}
+ .profile-edit input,.profile-edit select,.profile-edit textarea{width:100%!important;min-width:0!important;font-size:16px!important}
+ .profile-tabs{max-width:100%!important;scrollbar-width:thin}
+ .profile-tab{min-height:42px!important;touch-action:manipulation}
+ .profile-actions{position:sticky;bottom:calc(72px + env(safe-area-inset-bottom));z-index:5;background:rgba(0,31,23,.96);padding:10px!important;border:1px solid var(--line);border-radius:14px}
+ .mobile-bottom-nav{grid-template-columns:repeat(5,minmax(0,1fr))!important;padding-left:4px!important;padding-right:4px!important;padding-bottom:calc(7px + env(safe-area-inset-bottom))!important}
+ .mobile-bottom-nav a{min-width:0!important;min-height:54px!important;font-size:clamp(8px,2.4vw,10px)!important}
+ .mobile-bottom-nav a span:last-child{max-width:100%;overflow:hidden;text-overflow:ellipsis}
+ .ektm-wrap{min-width:0!important;max-width:100%!important;overflow:hidden!important}
+ .ektm-card{width:100%!important;max-width:100%!important}
+ .ektm-heading{gap:8px}
+ .ektm-print{min-height:44px!important}
+ .login-wrap{min-height:100svh!important;padding:14px!important}
+ .login{width:100%!important;max-width:460px!important;padding:22px!important}
+ input:not([type=checkbox]):not([type=radio]):not([type=hidden]),select,textarea{font-size:16px!important;max-width:100%!important}
+ button,a{touch-action:manipulation}
+}
+@media(max-width:380px){
+ .grid{grid-template-columns:minmax(0,1fr)!important}
+ .brand-copy small{font-size:9px!important}
+ .mobile-bottom-nav a{font-size:8px!important}
+ .ektm-info dl div{grid-template-columns:minmax(48px,28%) minmax(0,1fr)!important}
+}
+@media(orientation:landscape) and (max-height:520px) and (max-width:900px){
+ .login-wrap{min-height:100svh!important;align-items:start!important;overflow-y:auto!important}
+ .login{margin:12px auto!important}
+}
+@media(prefers-reduced-motion:reduce){
+ *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
 </style><script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script></head><body>
 <?php if (!$user): ?>
 <div class="login-wrap"><main class="login"><div class="logo-wrap"><img class="campus-logo" src="<?=h($campusLogoUrl)?>" alt="Logo STIT Darul Ilmi Tasikmalaya"></div><p class="muted" style="font-size:11px;font-weight:800;letter-spacing:.14em;margin:20px 0 0">PORTAL AKADEMIK TERPADU</p><h1>Login Mahasiswa & Dosen</h1><p class="muted">Gunakan akun akademik yang telah diberikan oleh Admin STIT Darul Ilmi Tasikmalaya.</p><?php if($flash):?><div class="alert"><?=h($flash['message'])?></div><?php endif;?><form method="post"><input type="hidden" name="_csrf" value="<?=h(csrfToken())?>"><input type="hidden" name="action" value="login"><label>Username</label><input name="username" autocomplete="username" required maxlength="100" placeholder="Masukkan username"><label>Password</label><input type="password" name="password" autocomplete="current-password" required maxlength="200" placeholder="Masukkan password"><button type="submit">Masuk ke Portal →</button></form><div class="foot">Khusus akun mahasiswa dan dosen. Admin menggunakan halaman Admin Web.</div><p class="foot"><a href="../../website/">Kembali ke Website Kampus</a></p></main></div>
