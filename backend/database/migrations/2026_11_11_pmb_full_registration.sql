@@ -3,6 +3,10 @@
 
 ALTER TABLE pmb_applicants
  ADD COLUMN national_id VARCHAR(32) NULL AFTER full_name,
+ ADD COLUMN whatsapp VARCHAR(30) NULL AFTER phone,
+ ADD COLUMN religion VARCHAR(40) NULL AFTER gender,
+ ADD COLUMN marital_status VARCHAR(30) NULL AFTER religion,
+ ADD COLUMN postal_code VARCHAR(10) NULL AFTER village,
  ADD COLUMN birth_place VARCHAR(100) NULL AFTER national_id,
  ADD COLUMN birth_date DATE NULL AFTER birth_place,
  ADD COLUMN gender ENUM('male','female') NULL AFTER birth_date,
