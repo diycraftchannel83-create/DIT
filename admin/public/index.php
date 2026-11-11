@@ -872,7 +872,7 @@ if($page==='pmb'&&isset($_GET['document'])){
     $path=$storage?realpath($storage.'/'.basename((string)$doc['storage_path'])):false;
     if(!$storage||!$path||!str_starts_with($path,$storage.DIRECTORY_SEPARATOR)||!is_file($path)){http_response_code(404);exit('Berkas tidak tersedia.');}
     $mime=in_array($doc['mime_type'],['application/pdf','image/jpeg','image/png'],true)?$doc['mime_type']:'application/octet-stream';
-    header('Content-Type: '.$mime);header('Content-Length: '.(string)filesize($path));header('Content-Disposition: inline; filename="'.str_replace('"','',basename((string)$doc['original_name'])).'"');header('X-Content-Type-Options: nosniff');header('Cache-Control: private, no-store');
+    $safeName=preg_replace('/[^A-Za-z0-9._-]/','_',basename((string)$doc['original_name']))?:'dokumen-pmb';header('Content-Type: '.$mime);header('Content-Length: '.(string)filesize($path));header('Content-Disposition: inline; filename="'.$safeName.'"');header('X-Content-Type-Options: nosniff');header('Cache-Control: private, no-store');
     readfile($path);exit;
 }
 ?><!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><script>try{document.documentElement.dataset.theme=localStorage.getItem('stit-admin-theme')||'green'}catch(e){document.documentElement.dataset.theme='green'}</script><title><?=e($menus[$page]??'Dashboard')?> - STIT Darul Ilmi</title><link rel="icon" href="<?=e($campusLogoUrl)?>"><style>
