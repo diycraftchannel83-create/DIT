@@ -2669,4 +2669,20 @@ html[data-theme="green"] .student-edit-page .student-form-footer button#studentS
  html body .side nav.nav .nav-group a{min-height:34px!important;font-size:11px!important}
 }
 </style>
+
+<style id="android-navigation-emergency-recovery">
+@media screen and (max-width:760px){
+ html body .layout aside.side{display:block!important;visibility:visible!important;opacity:1!important;width:100%!important;height:auto!important;max-height:none!important;min-height:0!important;overflow:visible!important;position:relative!important;transform:none!important;clip:auto!important}
+ html body .layout aside.side nav.nav{display:block!important;visibility:visible!important;opacity:1!important;width:100%!important;height:auto!important;max-height:none!important;overflow:visible!important;position:relative!important}
+ html body .layout aside.side nav.nav>a.nav-dashboard{display:flex!important;visibility:visible!important;opacity:1!important;width:100%!important}
+ html body .layout aside.side nav.nav>div.nav-group{display:block!important;visibility:visible!important;opacity:1!important;width:100%!important;height:auto!important;max-height:none!important;overflow:visible!important;position:relative!important;float:none!important;clear:both!important;box-sizing:border-box!important}
+ html body .layout aside.side nav.nav>div.nav-group>.nav-group-title{display:block!important;visibility:visible!important;opacity:1!important}
+ html body .layout aside.side nav.nav>div.nav-group>a{display:flex!important;visibility:visible!important;opacity:1!important;width:100%!important;height:auto!important;min-height:40px!important;position:relative!important;float:none!important;white-space:normal!important}
+ html body .layout aside.side nav.nav .nav-group{margin:0 0 10px!important;padding:10px!important;border:1px solid rgba(255,255,255,.22)!important;border-radius:12px!important;background:rgba(0,35,23,.18)!important}
+ html body .layout aside.side nav.nav .nav-group-title{color:#d8f3e2!important;font-size:11px!important;line-height:1.4!important;margin:0 0 8px!important}
+ html body .layout aside.side nav.nav .nav-group a{padding:9px 11px!important;color:#fff!important;border-radius:9px!important;text-decoration:none!important}
+ html body .layout aside.side nav.nav .nav-group a.active{background:#e7f5eb!important;color:#075b3d!important}
+ html body .mobile-bottom-nav,html body .admin-mobile-drawer,html body .admin-menu-trigger{display:none!important}
+}
+</style>
 </body></html>
