@@ -2,7 +2,7 @@
 -- Jalankan satu kali melalui Admin > Migrasi Database.
 
 ALTER TABLE pmb_applicants
- ADD COLUMN registration_fee_amount DECIMAL(12,2) NULL AFTER document_status,
+ ADD COLUMN registration_fee_amount DECIMAL(12,2) NOT NULL DEFAULT 200000 AFTER document_status,
  ADD COLUMN payment_status ENUM('unpaid','proof_submitted','verified','rejected','waived') NOT NULL DEFAULT 'unpaid' AFTER registration_fee_amount,
  ADD COLUMN payment_method ENUM('bank_transfer','cash','other') NULL AFTER payment_status,
  ADD COLUMN payment_reference VARCHAR(120) NULL AFTER payment_method,
