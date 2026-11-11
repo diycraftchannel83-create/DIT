@@ -2533,6 +2533,61 @@ html[data-theme="green"] .student-edit-page .student-form-footer button#studentS
 @media(prefers-reduced-motion:reduce){
  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+
+<style id="android-dashboard-responsive-v2">
+/* Unified mobile visual system for Admin Dashboard */
+:root{color-scheme:light}
+html[data-theme="green"],html[data-theme="green"] body{background:#f1f8f3!important;color:#174b35!important}
+@media(max-width:760px){
+ html,body{width:100%!important;max-width:100%!important;min-height:100%!important;overflow-x:hidden!important}
+ body{margin:0!important;padding:0 0 calc(76px + env(safe-area-inset-bottom))!important;background:#f1f8f3!important}
+ .layout{display:block!important;width:100%!important;min-height:100dvh!important;margin:0!important;padding:0!important}
+ .side{display:none!important}
+ .main{display:block!important;width:100%!important;max-width:100%!important;min-width:0!important;margin:0!important;padding:0!important}
+ .top{position:relative!important;top:auto!important;z-index:20!important;display:flex!important;align-items:center!important;justify-content:space-between!important;flex-wrap:nowrap!important;gap:10px!important;width:100%!important;height:auto!important;min-height:66px!important;max-height:none!important;margin:0!important;padding:calc(8px + env(safe-area-inset-top)) 14px 10px!important;box-sizing:border-box!important;background:#fff!important;color:#145d45!important;border-bottom:1px solid #d8e9de!important;box-shadow:0 2px 10px rgba(18,76,49,.05)!important}
+ .top>strong{display:block!important;flex:1 1 auto!important;min-width:0!important;overflow:hidden!important;color:#145d45!important;font-size:14px!important;font-weight:800!important;line-height:1.25!important;text-overflow:ellipsis!important;white-space:nowrap!important;opacity:1!important;visibility:visible!important}
+ .top-actions{display:flex!important;flex:0 0 auto!important;align-items:center!important;justify-content:flex-end!important;gap:8px!important;margin:0!important}
+ .top-actions form{display:block!important;margin:0!important}
+ .admin-menu-trigger{display:inline-flex!important;min-height:44px!important;padding:9px 14px!important;background:#087a4b!important;border:1px solid #087a4b!important;border-radius:12px!important;color:#fff!important;font-size:14px!important;box-shadow:0 3px 9px rgba(8,122,75,.15)!important}
+ .top .logout,.top-actions .logout{display:inline-flex!important;align-items:center!important;justify-content:center!important;min-height:44px!important;padding:9px 14px!important;border:1px solid #c5dfce!important;border-radius:12px!important;background:#e8f4eb!important;color:#145d45!important;font-size:13px!important;font-weight:700!important}
+ .content{display:block!important;width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important;margin:0!important;padding:22px 14px calc(100px + env(safe-area-inset-bottom))!important;overflow:visible!important}
+ .content h1{margin:4px 0 8px!important;color:#145d45!important;font-size:clamp(25px,7vw,34px)!important;line-height:1.18!important;letter-spacing:-.025em!important}
+ .content>p.muted{margin:0 0 20px!important;color:#61786b!important;font-size:15px!important;line-height:1.5!important}
+ .panel,.card,.student-create-panel,.student-edit-page{width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important;margin:0 0 18px!important;padding:16px!important;border:1px solid #d7e8dd!important;border-radius:20px!important;background:#fff!important;color:#174b35!important;box-shadow:0 8px 24px rgba(19,76,49,.045)!important}
+ .panel h2,.panel h3,.student-create-panel h2,.student-create-panel h3{color:#145d45!important;line-height:1.25!important}
+ .panel p,.panel label,.panel small,.muted{color:#62796d}
+ .cards,.grid,.stats,.dashboard-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important}
+ .card{margin:0!important;padding:14px!important}
+ .panel form:not(.inline),.panel form.inline{width:100%!important;max-width:100%!important;min-width:0!important;gap:12px!important}
+ .panel input:not([type=checkbox]):not([type=radio]):not([type=hidden]),.panel select,.panel textarea,.content input:not([type=checkbox]):not([type=radio]):not([type=hidden]),.content select,.content textarea{width:100%!important;max-width:100%!important;min-width:0!important;min-height:46px!important;box-sizing:border-box!important;border:1px solid #cbded2!important;border-radius:12px!important;background:#fff!important;color:#174b35!important;padding:11px 13px!important;font-size:16px!important}
+ .content button,.content .btn,.content input[type=submit],.content input[type=button]{min-height:44px!important;border-radius:12px!important;touch-action:manipulation}
+ .student-tabs{display:flex!important;flex-wrap:nowrap!important;gap:8px!important;width:100%!important;max-width:100%!important;overflow-x:auto!important;overflow-y:hidden!important;padding:4px 2px 12px!important;scrollbar-width:thin!important;scroll-snap-type:x proximity!important;-webkit-overflow-scrolling:touch!important}
+ .student-tabs .student-tab{flex:0 0 auto!important;min-width:max-content!important;max-width:none!important;min-height:46px!important;padding:11px 15px!important;white-space:nowrap!important;scroll-snap-align:start!important}
+ .student-tab-panel{width:100%!important;min-width:0!important;box-sizing:border-box!important}
+ .mobile-bottom-nav{position:fixed!important;left:0!important;right:0!important;bottom:0!important;z-index:1000!important;display:grid!important;grid-template-columns:repeat(var(--quick-count,4),minmax(0,1fr))!important;align-items:stretch!important;width:100%!important;min-height:66px!important;margin:0!important;padding:6px 5px calc(6px + env(safe-area-inset-bottom))!important;box-sizing:border-box!important;background:rgba(255,255,255,.98)!important;border-top:1px solid #d7e8dd!important;box-shadow:0 -5px 18px rgba(19,76,49,.07)!important;overflow-x:auto!important;overscroll-behavior-x:contain!important;-webkit-overflow-scrolling:touch!important}
+ .mobile-bottom-nav .mobile-nav-item{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:4px!important;min-width:0!important;min-height:54px!important;padding:5px 2px!important;border-radius:13px!important;color:#5d7568!important;font-size:10px!important;line-height:1.15!important;text-align:center!important;text-decoration:none!important;white-space:normal!important}
+ .mobile-bottom-nav .mobile-nav-item.active{background:#e5f4e9!important;color:#087a4b!important;font-weight:800!important}
+ .mobile-nav-icon{display:flex!important;align-items:center!important;justify-content:center!important;font-size:19px!important;line-height:1!important}
+ .mobile-bottom-nav~.main{padding-bottom:0!important}
+ .admin-mobile-drawer{position:fixed!important;inset:0!important;z-index:2147483647!important}
+ .admin-mobile-drawer.is-open{display:block!important}
+ .admin-mobile-drawer-panel{top:0!important;bottom:0!important;left:0!important;width:min(88vw,360px)!important;height:100dvh!important;max-height:100dvh!important;border-radius:0 20px 20px 0!important;padding-top:calc(12px + env(safe-area-inset-top))!important;padding-bottom:calc(12px + env(safe-area-inset-bottom))!important}
+ .admin-mobile-drawer-content{flex:1 1 0!important;min-height:0!important;overflow-y:auto!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;padding-bottom:20px!important}
+ .admin-mobile-drawer-content a{min-height:46px!important;font-size:14px!important}
+ .panel table,.table-wrap table,table.responsive-table{display:block!important;width:100%!important;max-width:100%!important;overflow-x:auto!important;-webkit-overflow-scrolling:touch!important}
+ .panel .table-wrap,.table-wrap{max-width:100%!important;overflow-x:auto!important;-webkit-overflow-scrolling:touch!important}
+}
+@media(max-width:390px){
+ .content{padding-left:11px!important;padding-right:11px!important}
+ .top{padding-left:11px!important;padding-right:11px!important}
+ .top .logout,.top-actions .logout{padding:8px 10px!important}
+ .cards,.grid,.stats,.dashboard-grid{grid-template-columns:minmax(0,1fr)!important}
+ .mobile-bottom-nav .mobile-nav-item{font-size:9px!important}
+}
+@media(min-width:761px){
+ .mobile-bottom-nav{display:none!important}
+ .admin-mobile-drawer,.admin-menu-trigger{display:none!important}
+}
 </style>
 
 </body></html>
