@@ -51,9 +51,23 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
    $files[$key]=['tmp'=>$up['tmp_name'],'name'=>substr(basename((string)$up['name']),0,255),'mime'=>$mime,'size'=>(int)$up['size'],'ext'=>$ext];
   }
   if(!$pmbMessage){
-   $docRoot=(string)($_SERVER['DOCUMENT_ROOT']??dirname(__DIR__));$storage=dirname($docRoot).'/stit-pmb-private';
-   if(!is_dir($storage)&&!mkdir($storage,0750,true)&&!is_dir($storage))$pmbMessage='Folder penyimpanan dokumen tidak dapat dibuat.';
-   else{
+   // Simpan berkas pada direktori privat proyek yang ikut ter-deploy, bukan
+   // di luar DOCUMENT_ROOT yang umumnya tidak writable pada shared hosting.
+   $storageCandidates=[
+    dirname(__DIR__).'/backend/storage/pmb-private',
+    __DIR__.'/backend/storage/pmb-private',
+    (string)($_SERVER['DOCUMENT_ROOT']??'').'/backend/storage/pmb-private'
+   ];
+   $storage='';
+   foreach($storageCandidates as $candidate){
+    if($candidate!==''&&(is_dir($candidate)||@mkdir($candidate,0750,true))&&is_writable($candidate)){
+     $storage=$candidate;break;
+    }
+   }
+   if($storage===''){
+    $pmbMessage='Penyimpanan dokumen belum siap di server. Admin perlu memastikan folder backend/storage/pmb-private tersedia dan memiliki izin tulis.';
+    error_log('[STIT PMB STORAGE] Tidak ada direktori penyimpanan privat yang writable. Periksa backend/storage/pmb-private.');
+   }else{
     $pmbRegistration='PMB-'.date('Y').'-'.strtoupper(bin2hex(random_bytes(4)));$saved=[];
     try{
      $pdo->beginTransaction();
@@ -78,7 +92,14 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
      $confirmationPath=$basePath.'/pmb-confirmation.php';
      // Gunakan direktori entry point yang benar; tetap berfungsi jika portal dipasang di subfolder.
      header('Location: '.$confirmationPath,true,303);exit;
-    }catch(Throwable $e){if($pdo->inTransaction())$pdo->rollBack();foreach($saved as $path)if(is_file($path))@unlink($path);error_log('[STIT PMB SUBMIT] '.$e->getMessage());$pmbMessage='Pendaftaran gagal disimpan. Silakan coba kembali.';$pmbRegistration='';}
+    }catch(Throwable $e){
+     if($pdo->inTransaction())$pdo->rollBack();
+     foreach($saved as $path)if(is_file($path))@unlink($path);
+     $errorRef='PMB-ERR-'.strtoupper(bin2hex(random_bytes(3)));
+     error_log('[STIT PMB SUBMIT]['.$errorRef.'] '.$e->getMessage().' in '.$e->getFile().':'.$e->getLine());
+     $pmbMessage='Pendaftaran gagal disimpan. Kode pemeriksaan: '.$errorRef.'. Silakan kirim kode ini kepada administrator.';
+     $pmbRegistration='';
+    }
    }
   }
  }
