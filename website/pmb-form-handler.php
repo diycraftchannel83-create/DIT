@@ -68,8 +68,6 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
     if(!in_array($mime,['image/jpeg','image/png'],true)){$pmbMessage='Pas foto harus berupa JPG atau PNG, bukan PDF.';break;}
     $dimensions=@getimagesize($up['tmp_name']);
     if(!$dimensions||empty($dimensions[0])||empty($dimensions[1])){$pmbMessage='File pas foto tidak dapat dibaca sebagai gambar.';break;}
-    $ratio=(float)$dimensions[0]/(float)$dimensions[1];
-    if($ratio<0.70||$ratio>0.80||$dimensions[1]<400){$pmbMessage='Pas foto harus posisi tegak dengan rasio 3:4 (contoh 300 × 400 piksel atau lebih besar).';break;}
    }
    if($ext===''){$pmbMessage='Format '.$label.' harus PDF, JPG, atau PNG.';break;}
    $files[$key]=['tmp'=>$up['tmp_name'],'name'=>substr(basename((string)$up['name']),0,255),'mime'=>$mime,'size'=>(int)$up['size'],'ext'=>$ext];
