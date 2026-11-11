@@ -1122,7 +1122,7 @@ $mobileIcon = static function(string $key) use ($mobileIconPaths): string {
 };
 ?>
 
-<main class="main"><header class="top"><strong><?=e($labels[$u['role']]??$u['role'])?></strong><div class="top-actions"><button type="button" class="admin-menu-trigger" id="adminMenuTrigger" aria-controls="adminMobileDrawer" aria-haspopup="dialog" aria-label="Buka menu navigasi" onclick="document.getElementById('adminMobileDrawer').showModal()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span>Menu</span></button><form method="post"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="logout"><button class="logout">Keluar</button></form></div></header><section class="content"><?php if($flash):?><div class="alert <?=$flash['type']==='error'?'error':''?>"><?=e($flash['message'])?></div><?php endif;?>
+<main class="main"><header class="top"><strong><?=e($labels[$u['role']]??$u['role'])?></strong><div class="top-actions"><button type="button" class="admin-menu-trigger" id="adminMenuTrigger" popovertarget="adminMobileDrawer" aria-controls="adminMobileDrawer" aria-haspopup="true" aria-label="Buka menu navigasi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span>Menu</span></button><form method="post"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="logout"><button class="logout">Keluar</button></form></div></header><section class="content"><?php if($flash):?><div class="alert <?=$flash['type']==='error'?'error':''?>"><?=e($flash['message'])?></div><?php endif;?>
 <?php if($page==='system'):?>
 <h1>Pengaturan Sistem</h1><p class="muted">Atur tampilan Dashboard SIAKAD sesuai kenyamanan Anda. Pilihan tema disimpan pada browser/perangkat ini.</p>
 <div class="theme-settings">
@@ -2389,9 +2389,9 @@ html[data-theme="green"] .student-edit-page .student-form-footer button#studentS
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',mountStudentEditor,{once:true}); else mountStudentEditor();
 })();
 </script>
-<dialog class="admin-mobile-dialog" id="adminMobileDrawer" aria-label="Menu navigasi admin" onclick="if(event.target===this)this.close()">
+<div class="admin-mobile-popover" id="adminMobileDrawer" popover="auto" aria-label="Menu navigasi admin">
   <section class="admin-mobile-drawer-panel">
-    <div class="admin-mobile-drawer-head"><strong>Menu Dashboard</strong><button type="button" aria-label="Tutup menu" onclick="document.getElementById('adminMobileDrawer').close()">×</button></div>
+    <div class="admin-mobile-drawer-head"><strong>Menu Dashboard</strong><button type="button" aria-label="Tutup menu" popovertarget="adminMobileDrawer" popovertargetaction="hide">×</button></div>
     <nav class="admin-mobile-drawer-content" aria-label="Navigasi dashboard">
       <a class="nav-dashboard <?=$page==='dashboard'?'active':''?>" href="?page=dashboard">Dashboard</a>
       <?php foreach($visibleMenuGroups as $groupLabel=>$groupKeys): ?>
@@ -2401,12 +2401,12 @@ html[data-theme="green"] .student-edit-page .student-form-footer button#studentS
       <?php endforeach; ?>
     </nav>
   </section>
-</dialog>
+</div>
 <style>
-.admin-mobile-dialog{display:none;position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;background:transparent;overflow:hidden}
-.admin-mobile-dialog[open]{display:block}
-.admin-mobile-dialog::backdrop{background:rgba(7,45,30,.52);backdrop-filter:blur(2px)}
-.admin-mobile-drawer-panel{position:absolute;inset:0 auto 0 0;width:min(88vw,370px);height:100%;max-height:100%;box-sizing:border-box;display:flex;flex-direction:column;overflow:hidden;padding:calc(14px + env(safe-area-inset-top)) 16px calc(14px + env(safe-area-inset-bottom));background:#fff;color:#174b35;border-radius:0 20px 20px 0;box-shadow:18px 0 48px rgba(7,55,35,.24)}
+.admin-mobile-popover{position:fixed;inset:0 auto 0 0;width:min(88vw,370px);height:100dvh;max-height:100dvh;margin:0;padding:0;border:0;overflow:hidden;background:transparent;color:#174b35}
+.admin-mobile-popover:popover-open{display:block}
+.admin-mobile-popover::backdrop{background:rgba(7,45,30,.52);backdrop-filter:blur(2px)}
+.admin-mobile-drawer-panel{position:absolute;inset:0 auto 0 0;width:100%;height:100%;max-height:100%;box-sizing:border-box;display:flex;flex-direction:column;overflow:hidden;padding:calc(14px + env(safe-area-inset-top)) 16px calc(14px + env(safe-area-inset-bottom));background:#fff;color:#174b35;border-radius:0 20px 20px 0;box-shadow:18px 0 48px rgba(7,55,35,.24)}
 .admin-mobile-drawer-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex:0 0 auto;padding:10px 2px 14px;border-bottom:1px solid #dcece1;color:#075b3d}
 .admin-mobile-drawer-head strong{font-size:17px}
 .admin-mobile-drawer-head button{width:40px;height:40px;min-height:40px;margin:0;padding:0;border:1px solid #cfe5d6;border-radius:10px;background:#eaf6ee;color:#075b3d;font-size:27px;line-height:1}
@@ -2416,7 +2416,7 @@ html[data-theme="green"] .student-edit-page .student-form-footer button#studentS
 .admin-mobile-drawer-content .nav-group-title{display:block;margin:0 0 8px;color:#087a4b;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
 .admin-mobile-drawer-content .nav-group a{margin:5px 0}
 .admin-mobile-drawer-content a.active{background:#e1f3e7;border-color:#9bcfae;color:#05613e;font-weight:800}
-@media(min-width:761px){.admin-mobile-dialog{display:none!important}}
+@media(min-width:761px){.admin-mobile-popover{display:none!important}}
 </style>
 <style>
 .admin-menu-backdrop,.admin-mobile-drawer{display:none!important}
