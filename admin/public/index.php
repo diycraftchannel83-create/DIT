@@ -2599,4 +2599,74 @@ html[data-theme="green"] .student-edit-page .student-form-footer button#studentS
  html body .admin-menu-trigger{display:none!important}
 }
 </style>
+
+<style id="android-sidebar-layout-fix">
+@media screen and (max-width:760px){
+ html body .layout{display:block!important;width:100%!important;overflow:visible!important}
+ html body .layout>.side,html body .side{
+  display:block!important;visibility:visible!important;opacity:1!important;
+  position:relative!important;inset:auto!important;transform:none!important;
+  width:100%!important;max-width:100%!important;height:auto!important;
+  max-height:42dvh!important;overflow-x:hidden!important;overflow-y:auto!important;
+  box-sizing:border-box!important;padding:10px 12px 12px!important;
+  background:linear-gradient(155deg,#03452f 0%,#087a4b 100%)!important;
+  border-radius:0 0 16px 16px!important;box-shadow:0 5px 16px rgba(3,69,47,.14)!important;
+  scrollbar-width:thin!important;-webkit-overflow-scrolling:touch!important;
+ }
+ html body .side .brand{
+  display:flex!important;align-items:center!important;gap:10px!important;
+  padding:2px 4px 10px!important;margin:0 0 8px!important;
+  border-bottom:1px solid rgba(255,255,255,.18)!important;
+  color:#fff!important;font-size:13px!important;line-height:1.25!important;
+ }
+ html body .side .brand img{display:block!important;width:42px!important;height:42px!important;flex:0 0 42px!important}
+ html body .side .brand-copy{display:block!important;min-width:0!important;color:#fff!important}
+ html body .side .brand small{display:block!important;margin-top:3px!important;color:#c5e4d2!important;font-size:10px!important}
+ html body .side nav.nav{
+  display:block!important;visibility:visible!important;opacity:1!important;
+  width:100%!important;height:auto!important;max-height:none!important;
+  overflow:visible!important;padding:0!important;margin:0!important;
+ }
+ html body .side nav.nav .nav-dashboard{
+  display:flex!important;align-items:center!important;width:100%!important;
+  min-height:40px!important;margin:0 0 8px!important;padding:9px 12px!important;
+  border:1px solid rgba(255,255,255,.22)!important;border-radius:10px!important;
+  background:rgba(255,255,255,.13)!important;color:#fff!important;
+  font-size:13px!important;font-weight:750!important;text-decoration:none!important;
+ }
+ html body .side nav.nav .nav-group{
+  display:block!important;width:100%!important;min-width:0!important;
+  margin:0 0 8px!important;padding:9px 10px 10px!important;
+  border:1px solid rgba(255,255,255,.18)!important;border-radius:11px!important;
+  background:rgba(0,35,23,.18)!important;box-sizing:border-box!important;
+ }
+ html body .side nav.nav .nav-group-title{
+  display:block!important;margin:0 0 7px!important;padding:0 2px!important;
+  color:#c9edda!important;font-size:10px!important;font-weight:850!important;
+  line-height:1.3!important;letter-spacing:.1em!important;text-transform:uppercase!important;
+ }
+ html body .side nav.nav .nav-group a{
+  display:flex!important;align-items:center!important;justify-content:flex-start!important;
+  width:100%!important;min-width:0!important;min-height:36px!important;
+  margin:0!important;padding:7px 9px!important;box-sizing:border-box!important;
+  border:1px solid transparent!important;border-radius:8px!important;
+  background:transparent!important;color:#f0fff6!important;
+  font-size:12px!important;font-weight:550!important;line-height:1.25!important;
+  text-decoration:none!important;white-space:normal!important;overflow-wrap:anywhere!important;
+ }
+ html body .side nav.nav .nav-group a.active{
+  background:#e7f5eb!important;border-color:#c4e5ce!important;color:#075b3d!important;
+  font-weight:800!important;box-shadow:inset 3px 0 #b9e66b!important;
+ }
+ html body .side nav.nav .nav-group a:hover{background:rgba(255,255,255,.13)!important}
+ html body .mobile-bottom-nav,html body .admin-mobile-drawer,
+ html body .admin-menu-trigger{display:none!important}
+ html body .main{display:block!important;width:100%!important;min-width:0!important}
+}
+@media screen and (max-width:390px){
+ html body .side{max-height:40dvh!important;padding:8px 10px 10px!important}
+ html body .side nav.nav .nav-group{padding:8px!important}
+ html body .side nav.nav .nav-group a{min-height:34px!important;font-size:11px!important}
+}
+</style>
 </body></html>
