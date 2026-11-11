@@ -51,7 +51,11 @@ foreach ($runtimeDirs as $label => $path) {
     }
 }
 
-$ok = $versionOk && $missing === [];
+$pdoMysqlOk = extension_loaded('pdo')
+    && extension_loaded('pdo_mysql')
+    && in_array('mysql', PDO::getAvailableDrivers(), true);
+
+$ok = $versionOk && $missing === [] && $pdoMysqlOk;
 foreach ($dirResults as $status) {
     if ($status === 'NOT WRITABLE') {
         $ok = false;
