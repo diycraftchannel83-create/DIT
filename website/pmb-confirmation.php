@@ -14,6 +14,57 @@ if(!is_array($confirmation)||empty($confirmation['registration'])||empty($confir
  if(!$applicant){http_response_code(404);$confirmation=null;}
 }
 function pmb_h($value):string{return htmlspecialchars((string)$value,ENT_QUOTES,'UTF-8');}
+function pmb_pdf_text(string $value):string{
+ $value=iconv('UTF-8','ASCII//TRANSLIT//IGNORE',$value)?:$value;
+ return str_replace(['\\\\','(',')',"\\r","\\n"],['\\\\\\\\','\\\\(','\\\\)',' ',' '],$value);
+}
+function pmb_make_pdf(array $lines):string{
+ $stream="BT\n/F1 11 Tf\n50 790 Td\n";
+ foreach($lines as $index=>$line){
+  if($index>0)$stream.="0 -24 Td\n";
+  $stream.='('.pmb_pdf_text((string)$line).") Tj\n";
+ }
+ $stream.="ET";
+ $objects=[];
+ $objects[]='<< /Type /Catalog /Pages 2 0 R >>';
+ $objects[]='<< /Type /Pages /Kids [3 0 R] /Count 1 >>';
+ $objects[]='<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>';
+ $objects[]='<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>';
+ $objects[]='<< /Length '.strlen($stream)." >>\nstream\n".$stream."\nendstream";
+ $pdf="%PDF-1.4\n";$offsets=[0];
+ foreach($objects as $i=>$obj){$offsets[]=strlen($pdf);$pdf.=($i+1)." 0 obj\n".$obj."\nendobj\n";}
+ $xref=strlen($pdf);$pdf.="xref\n0 ".(count($objects)+1)."\n0000000000 65535 f \n";
+ for($i=1;$i<count($offsets);$i++)$pdf.=sprintf('%010d 00000 n ',$offsets[$i])."\n";
+ $pdf.="trailer\n<< /Size ".(count($objects)+1)." /Root 1 0 R >>\nstartxref\n".$xref."\n%%EOF";
+ return $pdf;
+}
+if($applicant && (($_GET['download']??'')==='pdf')){
+ $lines=[
+  'STIT DARUL ILMI TASIKMALAYA',
+  'SEKOLAH TINGGI ILMU TARBIYAH',
+  'BUKTI PENDAFTARAN MAHASISWA BARU',
+  '-----------------------------------------------',
+  'Nomor Registrasi: '.$applicant['registration_number'],
+  'Nama Lengkap: '.$applicant['full_name'],
+  'Email: '.$applicant['email'],
+  'Telepon: '.$applicant['phone'],
+  'Program Studi: '.($applicant['program']??'-'),
+  'Tanggal Pendaftaran: '.date('d-m-Y H:i',strtotime((string)$applicant['created_at'])),
+  'Status Pendaftaran: '.str_replace('_',' ',$applicant['status']),
+  'Status Dokumen: '.str_replace('_',' ',$applicant['document_status']),
+  'Biaya Pendaftaran: Rp'.number_format((float)($applicant['registration_fee_amount']??200000),0,',','.'),
+  'Status Pembayaran: '.str_replace('_',' ',$applicant['payment_status']??'unpaid'),
+  '',
+  'Simpan nomor registrasi untuk memantau proses seleksi.',
+  'Bukti ini bukan surat kelulusan atau bukti pembayaran.'
+ ];
+ $pdf=pmb_make_pdf($lines);
+ header('Content-Type: application/pdf');
+ header('Content-Disposition: attachment; filename="Bukti-Pendaftaran-'.preg_replace('/[^A-Za-z0-9_-]/','',$applicant['registration_number']).'.pdf"');
+ header('Content-Length: '.strlen($pdf));
+ echo $pdf;exit;
+}
+
 ?>
 <!doctype html>
 <html lang="id">
@@ -44,7 +95,7 @@ function pmb_h($value):string{return htmlspecialchars((string)$value,ENT_QUOTES,
 </div>
 <section class="steps"><h2>Langkah selanjutnya</h2><ol><li>Simpan nomor registrasi sebagai bukti pendaftaran.</li><li>Hubungi admin PMB untuk memperoleh petunjuk pembayaran resmi sebesar Rp<?=number_format((float)($applicant['registration_fee_amount']??200000),0,',','.')?>.</li><li>Tunggu admin memeriksa kelengkapan dokumen dan pembayaran.</li><li>Pantau hasil seleksi melalui menu Cek Status Pendaftaran.</li></ol></section>
 <p style="font-size:13px;color:#64756b;margin-top:18px">Simpan atau cetak halaman ini sebagai bukti pendaftaran. Untuk menyimpan sebagai PDF, pilih tombol Cetak / Simpan PDF lalu pilih tujuan “Save as PDF” pada dialog cetak browser.</p>
-<div class="actions"><button class="btn" type="button" onclick="window.print()">Cetak / Simpan PDF</button><a class="btn secondary" href="pmb.php">Kembali ke Halaman PMB</a></div>
+<div class="actions"><a class="btn" href="pmb-confirmation.php?download=pdf">Unduh Bukti PDF</a><button class="btn secondary" type="button" onclick="window.print()">Cetak Bukti</button><a class="btn secondary" href="pmb.php">Kembali ke Halaman PMB</a></div>
 <p class="note">Bukti ini merupakan konfirmasi penerimaan data pendaftaran, bukan surat kelulusan seleksi atau bukti pembayaran.</p>
 </section>
 <?php endif;?>
