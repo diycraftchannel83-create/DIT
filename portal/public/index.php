@@ -301,6 +301,48 @@ input,select,textarea,.profile-edit input,.profile-edit textarea,.profile-edit s
 @media(prefers-reduced-motion:reduce){
  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+
+/* EKTM PRINT: one centered card at 50% A4 scale; hide all portal navigation */
+@media print{
+ @page{size:A4 portrait;margin:0}
+ html,body{width:210mm!important;height:297mm!important;min-height:297mm!important;margin:0!important;padding:0!important;background:#fff!important;overflow:hidden!important}
+ body *{visibility:hidden!important}
+ .ektm-wrap,.ektm-wrap *{visibility:visible!important}
+ .ektm-wrap{
+  position:fixed!important;left:50%!important;top:50%!important;
+  transform:translate(-50%,-50%)!important;
+  display:block!important;width:105mm!important;max-width:105mm!important;
+  height:auto!important;margin:0!important;padding:0!important;overflow:visible!important;
+  break-inside:avoid!important;page-break-inside:avoid!important;
+ }
+ .ektm-heading,.ektm-note,.mobile-bottom-nav,.top,.hero,.student-identity,
+ .panel,.stat,.shell>*:not(.ektm-wrap){display:none!important;visibility:hidden!important}
+ .ektm-card{
+  display:flex!important;position:relative!important;box-sizing:border-box!important;
+  width:105mm!important;max-width:105mm!important;height:72mm!important;min-height:72mm!important;
+  aspect-ratio:auto!important;margin:0!important;padding:0!important;overflow:hidden!important;
+  border:0.8mm solid #b6c99a!important;border-radius:4mm!important;
+  box-shadow:none!important;isolation:isolate!important;
+  -webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;
+  break-inside:avoid!important;page-break-inside:avoid!important;
+ }
+ .ektm-card-top{flex:0 0 29%!important;min-height:29%!important;padding:2.5% 3%!important;gap:3mm!important}
+ .ektm-card-top img{width:18mm!important;height:18mm!important;max-width:18mm!important;object-fit:contain!important}
+ .ektm-card-top strong{font-size:9pt!important;line-height:1.15!important}
+ .ektm-card-top span{font-size:5.5pt!important;line-height:1.2!important}
+ .ektm-card-title{flex:0 0 auto!important;padding:1.5mm 2mm!important;border-top:1mm solid #c6b56a!important;border-bottom:.4mm solid rgba(227,204,119,.8)!important;font-size:11pt!important;line-height:1.2!important}
+ .ektm-card-body{flex:1 1 auto!important;min-height:0!important;grid-template-columns:27mm minmax(0,1fr)!important;gap:4mm!important;padding:3mm 8mm 3mm 8mm!important}
+ .ektm-photo{width:27mm!important;height:34mm!important;aspect-ratio:auto!important;border:1mm solid #d6c783!important;border-radius:2mm!important;overflow:hidden!important}
+ .ektm-photo img{width:100%!important;height:100%!important;object-fit:cover!important}
+ .ektm-info{min-width:0!important}
+ .ektm-student-name{font-size:10pt!important;line-height:1.15!important}
+ .ektm-nim{font-size:8pt!important;margin:1mm 0 2mm!important}
+ .ektm-info dl{gap:1.2mm!important}
+ .ektm-info dl div{grid-template-columns:23mm minmax(0,1fr)!important;gap:1mm!important;font-size:6.5pt!important;line-height:1.2!important}
+ .ektm-qr{right:3mm!important;bottom:3mm!important}
+ .ektm-qr>div{width:15mm!important;height:15mm!important;padding:.5mm!important;border:.4mm solid #d9c77d!important}
+ .ektm-card-bottom{display:none!important}
+}
 </style><script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script></head><body>
 <?php if (!$user): ?>
 <div class="login-wrap"><main class="login"><div class="logo-wrap"><img class="campus-logo" src="<?=h($campusLogoUrl)?>" alt="Logo STIT Darul Ilmi Tasikmalaya"></div><p class="muted" style="font-size:11px;font-weight:800;letter-spacing:.14em;margin:20px 0 0">PORTAL AKADEMIK TERPADU</p><h1>Login Mahasiswa & Dosen</h1><p class="muted">Gunakan akun akademik yang telah diberikan oleh Admin STIT Darul Ilmi Tasikmalaya.</p><?php if($flash):?><div class="alert"><?=h($flash['message'])?></div><?php endif;?><form method="post"><input type="hidden" name="_csrf" value="<?=h(csrfToken())?>"><input type="hidden" name="action" value="login"><label>Username</label><input name="username" autocomplete="username" required maxlength="100" placeholder="Masukkan username"><label>Password</label><input type="password" name="password" autocomplete="current-password" required maxlength="200" placeholder="Masukkan password"><button type="submit">Masuk ke Portal →</button></form><div class="foot">Khusus akun mahasiswa dan dosen. Admin menggunakan halaman Admin Web.</div><p class="foot"><a href="../../website/">Kembali ke Website Kampus</a></p></main></div>
