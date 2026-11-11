@@ -2440,4 +2440,5 @@ html[data-theme="green"] .student-edit-page .student-form-footer button#studentS
  drawer.addEventListener('click',function(event){if(event.target.closest('a'))closeMenu();});
  document.addEventListener('keydown',function(event){if(event.key==='Escape'&&!drawer.hidden)closeMenu();});
 })();
+</script>
 </body></html>
