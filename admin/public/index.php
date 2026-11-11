@@ -1122,7 +1122,7 @@ $mobileIcon = static function(string $key) use ($mobileIconPaths): string {
 };
 ?>
 
-<main class="main"><header class="top"><strong><?=e($labels[$u['role']]??$u['role'])?></strong><div class="top-actions"><button type="button" class="admin-menu-trigger" id="adminMenuTrigger" aria-controls="adminMobileDrawer" aria-expanded="false" aria-label="Buka menu navigasi" onclick="var d=document.getElementById('adminMobileDrawer'),b=document.getElementById('adminMenuBackdrop');if(d&&b){d.classList.add('is-open');b.classList.add('is-open');d.setAttribute('aria-hidden','false');b.setAttribute('aria-hidden','false');this.setAttribute('aria-expanded','true');document.body.style.overflow='hidden';}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span>Menu</span></button><form method="post"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="logout"><button class="logout">Keluar</button></form></div></header><section class="content"><?php if($flash):?><div class="alert <?=$flash['type']==='error'?'error':''?>"><?=e($flash['message'])?></div><?php endif;?>
+<main class="main"><header class="top"><strong><?=e($labels[$u['role']]??$u['role'])?></strong><div class="top-actions"><button type="button" class="admin-menu-trigger" id="adminMenuTrigger" aria-controls="adminMobileDrawer" aria-haspopup="dialog" aria-label="Buka menu navigasi" onclick="document.getElementById('adminMobileDrawer').showModal()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span>Menu</span></button><form method="post"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="logout"><button class="logout">Keluar</button></form></div></header><section class="content"><?php if($flash):?><div class="alert <?=$flash['type']==='error'?'error':''?>"><?=e($flash['message'])?></div><?php endif;?>
 <?php if($page==='system'):?>
 <h1>Pengaturan Sistem</h1><p class="muted">Atur tampilan Dashboard SIAKAD sesuai kenyamanan Anda. Pilihan tema disimpan pada browser/perangkat ini.</p>
 <div class="theme-settings">
@@ -2389,18 +2389,35 @@ html[data-theme="green"] .student-edit-page .student-form-footer button#studentS
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',mountStudentEditor,{once:true}); else mountStudentEditor();
 })();
 </script>
-<div class="admin-menu-backdrop" id="adminMenuBackdrop" aria-hidden="true" onclick="var d=document.getElementById('adminMobileDrawer'),t=document.getElementById('adminMenuTrigger');this.classList.remove('is-open');if(d)d.classList.remove('is-open');if(d)d.setAttribute('aria-hidden','true');if(t)t.setAttribute('aria-expanded','false');document.body.style.overflow='';"></div>
-<aside class="admin-mobile-drawer" id="adminMobileDrawer" aria-label="Menu navigasi admin" aria-hidden="true">
-  <div class="admin-mobile-drawer-head"><strong>Menu Dashboard</strong><button type="button" aria-label="Tutup menu" onclick="var d=document.getElementById('adminMobileDrawer'),b=document.getElementById('adminMenuBackdrop'),t=document.getElementById('adminMenuTrigger');if(d)d.classList.remove('is-open');if(b)b.classList.remove('is-open');if(d)d.setAttribute('aria-hidden','true');if(t)t.setAttribute('aria-expanded','false');document.body.style.overflow='';">×</button></div>
-  <nav class="admin-mobile-drawer-content" aria-label="Navigasi dashboard">
-    <a class="nav-dashboard <?=$page==='dashboard'?'active':''?>" href="?page=dashboard">Dashboard</a>
-    <?php foreach($visibleMenuGroups as $groupLabel=>$groupKeys): ?>
-      <section class="nav-group"><div class="nav-group-title"><?=e($groupLabel)?></div>
-      <?php foreach($groupKeys as $key): ?><a class="<?=$page===$key?'active':''?>" href="?page=<?=e($key)?>"><?=e($menus[$key])?></a><?php endforeach; ?>
-      </section>
-    <?php endforeach; ?>
-  </nav>
-</aside>
+<dialog class="admin-mobile-dialog" id="adminMobileDrawer" aria-label="Menu navigasi admin" onclick="if(event.target===this)this.close()">
+  <section class="admin-mobile-drawer-panel">
+    <div class="admin-mobile-drawer-head"><strong>Menu Dashboard</strong><button type="button" aria-label="Tutup menu" onclick="document.getElementById('adminMobileDrawer').close()">×</button></div>
+    <nav class="admin-mobile-drawer-content" aria-label="Navigasi dashboard">
+      <a class="nav-dashboard <?=$page==='dashboard'?'active':''?>" href="?page=dashboard">Dashboard</a>
+      <?php foreach($visibleMenuGroups as $groupLabel=>$groupKeys): ?>
+        <section class="nav-group"><div class="nav-group-title"><?=e($groupLabel)?></div>
+        <?php foreach($groupKeys as $key): ?><a class="<?=$page===$key?'active':''?>" href="?page=<?=e($key)?>"><?=e($menus[$key])?></a><?php endforeach; ?>
+        </section>
+      <?php endforeach; ?>
+    </nav>
+  </section>
+</dialog>
+<style>
+.admin-mobile-dialog{display:none;position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;background:transparent;overflow:hidden}
+.admin-mobile-dialog[open]{display:block}
+.admin-mobile-dialog::backdrop{background:rgba(7,45,30,.52);backdrop-filter:blur(2px)}
+.admin-mobile-drawer-panel{position:absolute;inset:0 auto 0 0;width:min(88vw,370px);height:100%;max-height:100%;box-sizing:border-box;display:flex;flex-direction:column;overflow:hidden;padding:calc(14px + env(safe-area-inset-top)) 16px calc(14px + env(safe-area-inset-bottom));background:#fff;color:#174b35;border-radius:0 20px 20px 0;box-shadow:18px 0 48px rgba(7,55,35,.24)}
+.admin-mobile-drawer-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex:0 0 auto;padding:10px 2px 14px;border-bottom:1px solid #dcece1;color:#075b3d}
+.admin-mobile-drawer-head strong{font-size:17px}
+.admin-mobile-drawer-head button{width:40px;height:40px;min-height:40px;margin:0;padding:0;border:1px solid #cfe5d6;border-radius:10px;background:#eaf6ee;color:#075b3d;font-size:27px;line-height:1}
+.admin-mobile-drawer-content{display:flex;flex:1 1 auto;flex-direction:column;align-items:stretch;gap:8px;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:14px 0}
+.admin-mobile-drawer-content .nav-dashboard,.admin-mobile-drawer-content .nav-group a{display:flex;align-items:center;min-height:46px;height:auto;box-sizing:border-box;padding:11px 13px;border:1px solid #dcece1;border-radius:11px;background:#f5faf6;color:#175b3d;text-decoration:none;white-space:normal;font-size:14px;line-height:1.35}
+.admin-mobile-drawer-content .nav-group{display:block;flex:0 0 auto;margin:0;padding:10px;border:1px solid #e0eee5;border-radius:13px;background:#fff}
+.admin-mobile-drawer-content .nav-group-title{display:block;margin:0 0 8px;color:#087a4b;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.admin-mobile-drawer-content .nav-group a{margin:5px 0}
+.admin-mobile-drawer-content a.active{background:#e1f3e7;border-color:#9bcfae;color:#05613e;font-weight:800}
+@media(min-width:761px){.admin-mobile-dialog{display:none!important}}
+</style>
 <style>
 .admin-menu-backdrop,.admin-mobile-drawer{display:none!important}
 .admin-menu-backdrop.is-open{display:block!important}
