@@ -16,6 +16,7 @@ on:
       - 'portal/**/*.php'
       - 'backend/**/*.php'
       - 'website/**/*.php'
+      - '*.php'
   workflow_dispatch:
 
 jobs:
