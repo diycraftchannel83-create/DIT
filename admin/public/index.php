@@ -1122,7 +1122,7 @@ $mobileIcon = static function(string $key) use ($mobileIconPaths): string {
 };
 ?>
 
-<main class="main"><header class="top"><strong><?=e($labels[$u['role']]??$u['role'])?></strong><div class="top-actions"><button type="button" class="admin-menu-trigger" id="adminMenuTrigger" aria-controls="adminMobileDrawer" aria-expanded="false" aria-label="Buka menu navigasi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span>Menu</span></button><form method="post"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="logout"><button class="logout">Keluar</button></form></div></header><section class="content"><?php if($flash):?><div class="alert <?=$flash['type']==='error'?'error':''?>"><?=e($flash['message'])?></div><?php endif;?>
+<main class="main"><header class="top"><strong><?=e($labels[$u['role']]??$u['role'])?></strong><div class="top-actions"><button type="button" class="admin-menu-trigger" id="adminMenuTrigger" aria-controls="adminMobileDrawer" aria-expanded="false" aria-label="Buka menu navigasi" onclick="var d=document.getElementById('adminMobileDrawer'),b=document.getElementById('adminMenuBackdrop');if(d&&b){d.classList.add('is-open');b.classList.add('is-open');this.setAttribute('aria-expanded','true');document.body.style.overflow='hidden';}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span>Menu</span></button><form method="post"><input type="hidden" name="_csrf" value="<?=e(csrf())?>"><input type="hidden" name="action" value="logout"><button class="logout">Keluar</button></form></div></header><section class="content"><?php if($flash):?><div class="alert <?=$flash['type']==='error'?'error':''?>"><?=e($flash['message'])?></div><?php endif;?>
 <?php if($page==='system'):?>
 <h1>Pengaturan Sistem</h1><p class="muted">Atur tampilan Dashboard SIAKAD sesuai kenyamanan Anda. Pilihan tema disimpan pada browser/perangkat ini.</p>
 <div class="theme-settings">
@@ -2389,9 +2389,9 @@ html[data-theme="green"] .student-edit-page .student-form-footer button#studentS
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',mountStudentEditor,{once:true}); else mountStudentEditor();
 })();
 </script>
-<div class="admin-menu-backdrop" id="adminMenuBackdrop" hidden onclick="this.hidden=true;document.getElementById('adminMobileDrawer').hidden=true;document.body.style.overflow='';"></div>
-<aside class="admin-mobile-drawer" id="adminMobileDrawer" aria-label="Menu navigasi admin" hidden>
-  <div class="admin-mobile-drawer-head"><strong>Menu Dashboard</strong><button type="button" aria-label="Tutup menu" onclick="document.getElementById('adminMenuBackdrop').hidden=true;document.getElementById('adminMobileDrawer').hidden=true;document.body.style.overflow='';">×</button></div>
+<div class="admin-menu-backdrop" id="adminMenuBackdrop" aria-hidden="true" onclick="var d=document.getElementById('adminMobileDrawer'),t=document.getElementById('adminMenuTrigger');this.classList.remove('is-open');if(d)d.classList.remove('is-open');if(d)d.setAttribute('aria-hidden','true');if(t)t.setAttribute('aria-expanded','false');document.body.style.overflow='';"></div>
+<aside class="admin-mobile-drawer" id="adminMobileDrawer" aria-label="Menu navigasi admin" aria-hidden="true">
+  <div class="admin-mobile-drawer-head"><strong>Menu Dashboard</strong><button type="button" aria-label="Tutup menu" onclick="var d=document.getElementById('adminMobileDrawer'),b=document.getElementById('adminMenuBackdrop'),t=document.getElementById('adminMenuTrigger');if(d)d.classList.remove('is-open');if(b)b.classList.remove('is-open');if(d)d.setAttribute('aria-hidden','true');if(t)t.setAttribute('aria-expanded','false');document.body.style.overflow='';">×</button></div>
   <nav class="admin-mobile-drawer-content" aria-label="Navigasi dashboard">
     <a class="nav-dashboard <?=$page==='dashboard'?'active':''?>" href="?page=dashboard">Dashboard</a>
     <?php foreach($visibleMenuGroups as $groupLabel=>$groupKeys): ?>
@@ -2402,14 +2402,15 @@ html[data-theme="green"] .student-edit-page .student-form-footer button#studentS
   </nav>
 </aside>
 <style>
-.admin-menu-backdrop[hidden],.admin-mobile-drawer[hidden]{display:none!important}
+.admin-menu-backdrop,.admin-mobile-drawer{display:none!important}
+.admin-menu-backdrop.is-open{display:block!important}
+.admin-mobile-drawer.is-open{display:flex!important}
 .admin-menu-trigger{display:none;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:9px 13px;margin:0;border:1px solid #bcd9c7;border-radius:12px;background:#e7f4eb;color:#145b40;font:700 13px system-ui,sans-serif;cursor:pointer}
 .admin-menu-trigger svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
 @media(max-width:760px){
  .admin-menu-trigger{display:inline-flex!important}
  .admin-menu-backdrop{position:fixed!important;inset:0!important;z-index:2147483000!important;background:rgba(7,45,30,.48)!important}
  .admin-mobile-drawer{position:fixed!important;z-index:2147483001!important;top:0!important;bottom:0!important;left:0!important;width:min(88vw,370px)!important;max-width:88vw!important;height:100vh!important;height:100dvh!important;box-sizing:border-box!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;padding:calc(14px + env(safe-area-inset-top)) 16px calc(14px + env(safe-area-inset-bottom))!important;background:#fff!important;color:#174b35!important;border:0!important;border-radius:0 20px 20px 0!important;box-shadow:18px 0 48px rgba(7,55,35,.24)!important}
- .admin-mobile-drawer[hidden]{display:none!important}
  .admin-mobile-drawer-head{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;flex:0 0 auto!important;padding:10px 2px 14px!important;border-bottom:1px solid #dcece1!important;color:#075b3d!important}
  .admin-mobile-drawer-head strong{font-size:17px!important}
  .admin-mobile-drawer-head button{width:40px!important;height:40px!important;min-height:40px!important;margin:0!important;padding:0!important;border:1px solid #cfe5d6!important;border-radius:10px!important;background:#eaf6ee!important;color:#075b3d!important;font-size:27px!important;line-height:1!important}
@@ -2424,16 +2425,14 @@ html[data-theme="green"] .student-edit-page .student-form-footer button#studentS
 </style>
 <script>
 (function(){
- var button=document.getElementById('adminMenuTrigger');
- if(!button)return;
- button.onclick=function(){
-   var backdrop=document.getElementById('adminMenuBackdrop');
-   var drawer=document.getElementById('adminMobileDrawer');
-   if(!backdrop||!drawer)return;
-   backdrop.hidden=false;
-   drawer.hidden=false;
-   document.body.style.overflow='hidden';
- };
+ document.addEventListener('keydown',function(event){
+  if(event.key==='Escape'){
+   var d=document.getElementById('adminMobileDrawer'),b=document.getElementById('adminMenuBackdrop'),t=document.getElementById('adminMenuTrigger');
+   if(d)d.classList.remove('is-open');if(b)b.classList.remove('is-open');
+   if(d)d.setAttribute('aria-hidden','true');if(t)t.setAttribute('aria-expanded','false');
+   document.body.style.overflow='';
+  }
+ });
 })();
 </script>
 </body></html>
