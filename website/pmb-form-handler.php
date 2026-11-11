@@ -90,9 +90,25 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
     $pmbMessage='Penyimpanan dokumen belum siap di server. Admin perlu memastikan folder backend/storage/pmb-private tersedia dan memiliki izin tulis.';
     error_log('[STIT PMB STORAGE] Tidak ada direktori penyimpanan privat yang writable. Periksa backend/storage/pmb-private.');
    }else{
-    $pmbRegistration='PMB-'.date('Y').'-'.strtoupper(bin2hex(random_bytes(4)));$saved=[];
+    $pmbRegistration='';$saved=[];
     try{
+     // Nomor PMB memakai counter global yang berlanjut lintas tahun.
+     // Inisialisasi dari ID pendaftar terakhir agar nomor baru tidak mengulang
+     // hitungan lama; row counter dikunci saat transaksi untuk mencegah nomor ganda.
+     $pdo->exec("CREATE TABLE IF NOT EXISTS pmb_registration_sequence (
+      sequence_id TINYINT UNSIGNED NOT NULL PRIMARY KEY,
+      last_number BIGINT UNSIGNED NOT NULL DEFAULT 0
+     ) ENGINE=InnoDB");
+     $pdo->exec("INSERT IGNORE INTO pmb_registration_sequence(sequence_id,last_number)
+      SELECT 1,COALESCE(MAX(id),0) FROM pmb_applicants");
      $pdo->beginTransaction();
+     $sequenceRow=$pdo->query("SELECT last_number FROM pmb_registration_sequence WHERE sequence_id=1 FOR UPDATE")->fetch();
+     if(!$sequenceRow)throw new RuntimeException('Counter nomor registrasi PMB tidak tersedia.');
+     $nextRegistrationNumber=(int)$sequenceRow['last_number']+1;
+     if($nextRegistrationNumber>99999999)throw new RuntimeException('Nomor registrasi PMB delapan digit telah habis.');
+     $sequenceUpdate=$pdo->prepare("UPDATE pmb_registration_sequence SET last_number=:number WHERE sequence_id=1");
+     $sequenceUpdate->execute(['number'=>$nextRegistrationNumber]);
+     $pmbRegistration='PMB-STIT-DIT-'.date('Y').'-'.str_pad((string)$nextRegistrationNumber,8,'0',STR_PAD_LEFT);
      $sql="INSERT INTO pmb_applicants(registration_number,full_name,email,phone,whatsapp,study_program_id,status,registration_fee_amount,payment_status,national_id,birth_place,birth_date,gender,religion,marital_status,address,province,city,district,village,postal_code,previous_school,school_major,graduation_year,diploma_number,father_name,father_occupation,father_phone,mother_name,mother_occupation,mother_phone,guardian_name,guardian_phone,emergency_contact_name,emergency_contact_phone,entry_year,admission_pathway,document_status) VALUES(:reg,:name,:email,:phone,:whatsapp,:program,'registered',200000,'unpaid',:nik,:birth_place,:birth_date,:gender,:religion,:marital_status,:address,:province,:city,:district,:village,:postal_code,:school,:major,:grad,:diploma,:father,:father_job,:father_phone,:mother,:mother_job,:mother_phone,:guardian,:guardian_phone,:emergency_name,:emergency_phone,:entry_year,:pathway,'pending')";
      $q=$pdo->prepare($sql);$q->execute(['reg'=>$pmbRegistration,'name'=>$f['full_name'],'email'=>$f['email'],'phone'=>$f['phone'],'whatsapp'=>$f['whatsapp']?:null,'program'=>$f['study_program_id'],'nik'=>$f['national_id']?:'TEST'.strtoupper(bin2hex(random_bytes(6))),'birth_place'=>$f['birth_place']?:'Data Uji','birth_date'=>$f['birth_date']?:'2000-01-01','gender'=>$f['gender']?:'male','religion'=>$f['religion']?:null,'marital_status'=>$f['marital_status']?:null,'address'=>$f['address'],'province'=>$f['province'],'city'=>$f['city'],'district'=>$f['district'],'village'=>$f['village'],'postal_code'=>$f['postal_code']?:null,'school'=>$f['previous_school'],'major'=>$f['school_major'],'grad'=>$f['graduation_year'],'diploma'=>$f['diploma_number']?:null,'father'=>$f['father_name'],'father_job'=>$f['father_occupation']?:null,'father_phone'=>$f['father_phone'],'mother'=>$f['mother_name'],'mother_job'=>$f['mother_occupation']?:null,'mother_phone'=>$f['mother_phone'],'guardian'=>$f['guardian_name']?:null,'guardian_phone'=>$f['guardian_phone']?:null,'emergency_name'=>$f['emergency_contact_name']?:null,'emergency_phone'=>$f['emergency_contact_phone']?:null,'entry_year'=>$f['entry_year'],'pathway'=>$f['admission_pathway']?:'Reguler']);
      $appId=(int)$pdo->lastInsertId();
