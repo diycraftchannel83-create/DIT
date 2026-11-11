@@ -68,7 +68,7 @@ echo "Required extensions:\n";
 foreach ($required as $extension => $label) {
     echo " - " . $label . ': ' . (extension_loaded($extension) ? 'PASS' : 'MISSING') . "\n";
 }
-echo "PDO MySQL driver: " . (in_array('mysql', PDO::getAvailableDrivers(), true) ? 'PASS' : 'MISSING') . "\n";
+echo "PDO MySQL driver: " . ($pdoMysqlOk ? 'PASS' : 'MISSING') . "\n";
 echo "Runtime directories:\n";
 foreach ($dirResults as $label => $status) {
     echo " - " . $label . ': ' . $status . "\n";
