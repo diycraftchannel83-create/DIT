@@ -215,6 +215,15 @@ function migrationAlreadyPresent(PDO $pdo, string $name): bool {
         '2026_11_09_expand_student_profile.sql'=>['students'=>['national_id','birth_place','birth_date','gender','religion','marital_status','province','city','district','village','postal_code','father_name','mother_name','guardian_name','guardian_phone','emergency_contact_name','emergency_contact_phone','admission_pathway','registration_date','photo_url']],
         '2026_11_09_lecturer_profile_photo.sql'=>['lecturers'=>['photo_url']],
     ];
+    if($name==='2026_11_11_pmb_full_registration.sql'){
+        $q=$pdo->prepare("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=DATABASE() AND table_name='pmb_documents'");
+        $q->execute();if((int)$q->fetchColumn()===0)return false;
+        foreach(['national_id','whatsapp','religion','marital_status','postal_code','document_status','selection_score','result_notes'] as $column){
+            $c=$pdo->prepare("SELECT COUNT(*) FROM information_schema.columns WHERE table_schema=DATABASE() AND table_name='pmb_applicants' AND column_name=:column");
+            $c->execute(['column'=>$column]);if((int)$c->fetchColumn()===0)return false;
+        }
+        return true;
+    }
     if($name==='2026_11_09_admin_login_attempts.sql' || $name==='2026_11_09_user_program_scopes.sql' || $name==='2026_11_09_website_content.sql') {
         $table=['2026_11_09_admin_login_attempts.sql'=>'admin_login_attempts','2026_11_09_user_program_scopes.sql'=>'user_program_scopes','2026_11_09_website_content.sql'=>'website_content'][$name];
         $q=$pdo->prepare('SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=DATABASE() AND table_name=:table');
