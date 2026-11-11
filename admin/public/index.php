@@ -2534,213 +2534,155 @@ html[data-theme="green"] .student-edit-page .student-form-footer button#studentS
  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
 
-<style id="android-dashboard-responsive-v3">
-/* Android uses the same role-aware website navigation; no separate mobile drawer/bottom menu. */
-@media(max-width:760px){
- html,body{width:100%!important;max-width:100%!important;overflow-x:hidden!important}
- body{padding:0!important;background:#f1f8f3!important}
- .layout{display:block!important;width:100%!important;min-height:100dvh!important}
- .side{display:block!important;position:relative!important;top:auto!important;left:auto!important;width:100%!important;max-width:100%!important;height:auto!important;max-height:none!important;overflow:visible!important;padding:10px 12px 8px!important;background:linear-gradient(180deg,#03452f,#075b3d)!important;box-shadow:0 4px 16px rgba(3,69,47,.13)!important}
- .brand{display:flex!important;align-items:center!important;gap:9px!important;padding:2px 4px 10px!important;font-size:13px!important}
- .brand img{width:36px!important;height:36px!important;flex:0 0 36px!important}
- .brand small{font-size:10px!important;margin-top:2px!important}
- .nav{display:flex!important;align-items:stretch!important;gap:6px!important;width:100%!important;max-width:100%!important;overflow-x:auto!important;overflow-y:hidden!important;padding:2px 1px 7px!important;scrollbar-width:thin!important;overscroll-behavior-x:contain!important;-webkit-overflow-scrolling:touch!important}
- .nav-dashboard,.nav-group{display:contents!important}
- .nav-group-title{display:none!important}
- .nav a,.nav .nav-group a{display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 auto!important;min-height:39px!important;margin:0!important;padding:9px 12px!important;border:1px solid rgba(255,255,255,.2)!important;border-radius:10px!important;background:rgba(255,255,255,.09)!important;color:#e7f5eb!important;font-size:12px!important;font-weight:650!important;white-space:nowrap!important;text-decoration:none!important;box-shadow:none!important}
- .nav a.active,.nav a:hover{background:#fff!important;color:#075b3d!important;box-shadow:inset 0 -3px #b9e66b!important}
- .main{display:block!important;width:100%!important;min-width:0!important;margin:0!important}
- .top{position:relative!important;top:auto!important;z-index:5!important;display:flex!important;min-height:58px!important;height:auto!important;padding:8px 14px!important;background:#fff!important;color:#145d45!important;border-bottom:1px solid #d8e9de!important}
- .top>strong{color:#145d45!important;font-size:14px!important}
- .top-actions{display:flex!important;align-items:center!important;gap:8px!important}
- .admin-menu-trigger{display:none!important}
- .top .logout,.top-actions .logout{display:inline-flex!important;align-items:center!important;justify-content:center!important;min-height:40px!important;padding:8px 13px!important;border:1px solid #c5dfce!important;border-radius:10px!important;background:#e8f4eb!important;color:#145d45!important}
- .content{width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important;padding:20px 14px 36px!important;margin:0!important}
- .content h1{font-size:clamp(23px,6vw,30px)!important;line-height:1.2!important;color:#145d45!important}
- .content>p.muted{font-size:14px!important;line-height:1.5!important}
- .panel,.card,.student-create-panel,.student-edit-page{max-width:100%!important;min-width:0!important;box-sizing:border-box!important;background:#fff!important;color:#174b35!important;border:1px solid #d7e8dd!important;border-radius:16px!important;box-shadow:0 5px 18px rgba(19,76,49,.05)!important}
- .cards,.grid,.stats,.dashboard-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
- .panel input:not([type=checkbox]):not([type=radio]):not([type=hidden]),.panel select,.panel textarea,.content input:not([type=checkbox]):not([type=radio]):not([type=hidden]),.content select,.content textarea{max-width:100%!important;min-width:0!important;min-height:44px!important;box-sizing:border-box!important;font-size:16px!important}
- .student-tabs{display:flex!important;flex-wrap:nowrap!important;max-width:100%!important;overflow-x:auto!important;overscroll-behavior-x:contain!important;-webkit-overflow-scrolling:touch!important}
- .student-tabs .student-tab{flex:0 0 auto!important;white-space:nowrap!important}
- .mobile-bottom-nav{display:none!important}
- .admin-mobile-drawer{display:none!important}
- .panel table,.table-wrap table{display:block!important;max-width:100%!important;overflow-x:auto!important;-webkit-overflow-scrolling:touch!important}
-}
-@media(max-width:390px){
- .content{padding-left:10px!important;padding-right:10px!important}
- .nav a,.nav .nav-group a{padding:8px 10px!important;font-size:11px!important}
- .cards,.grid,.stats,.dashboard-grid{grid-template-columns:minmax(0,1fr)!important}
-}
-@media(min-width:761px){.mobile-bottom-nav,.admin-mobile-drawer,.admin-menu-trigger{display:none!important}}
-</style>
 
-
-<style id="force-website-sidebar-on-android">
-@media screen and (max-width:760px){
- html body .layout{display:block!important}
- html body .layout>.side,html body .side{
-  display:block!important;visibility:visible!important;opacity:1!important;
-  position:relative!important;inset:auto!important;transform:none!important;
-  width:100%!important;height:auto!important;max-height:none!important;
-  overflow:visible!important;clip:auto!important;clip-path:none!important;
-  flex:none!important;z-index:30!important;
- }
- html body .side .brand{display:flex!important;visibility:visible!important}
- html body .side nav.nav{
-  display:flex!important;visibility:visible!important;opacity:1!important;
-  width:100%!important;height:auto!important;max-height:none!important;
-  overflow-x:auto!important;overflow-y:hidden!important;
- }
- html body .side nav.nav a{
-  display:inline-flex!important;visibility:visible!important;opacity:1!important;
- }
- html body .mobile-bottom-nav,html body .admin-mobile-drawer,
- html body .admin-menu-trigger{display:none!important}
+<style id="admin-responsive-navigation-final">
+/* Responsive admin shell: desktop sidebar remains unchanged; Android gets a compact collapsible website menu. */
+.android-nav-toggle{display:none}
+@media (max-width:760px){
+  html,body{width:100%;max-width:100%;overflow-x:hidden!important}
+  body{padding:0!important;background:#f3faf5!important}
+  .layout{display:block!important;min-height:100dvh!important;width:100%!important}
+  .layout>.side{
+    display:block!important;position:relative!important;inset:auto!important;transform:none!important;
+    width:100%!important;height:auto!important;max-height:none!important;min-height:0!important;
+    overflow:visible!important;box-sizing:border-box!important;padding:10px 14px!important;
+    border:0!important;border-radius:0 0 16px 16px!important;
+    background:linear-gradient(145deg,#075b3d 0%,#087a4b 70%,#0b8955 100%)!important;
+    box-shadow:0 5px 18px rgba(3,69,47,.13)!important;z-index:20!important
+  }
+  .side .brand{
+    display:flex!important;align-items:center!important;gap:11px!important;
+    min-height:54px!important;margin:0!important;padding:0 0 9px!important;
+    border:0!important;border-bottom:1px solid rgba(255,255,255,.18)!important;
+    color:#fff!important;font-size:14px!important
+  }
+  .side .brand img{display:block!important;width:42px!important;height:42px!important;flex:0 0 42px!important}
+  .side .brand-copy{display:block!important;flex:1 1 auto!important;min-width:0!important;color:#fff!important;line-height:1.25!important}
+  .side .brand small{display:block!important;margin-top:3px!important;color:#d0e9dc!important;font-size:11px!important}
+  .side .android-nav-toggle{
+    display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;
+    flex:0 0 auto!important;min-width:84px!important;min-height:40px!important;padding:8px 13px!important;
+    border:1px solid rgba(255,255,255,.32)!important;border-radius:11px!important;
+    background:rgba(255,255,255,.13)!important;color:#fff!important;
+    font:700 13px/1 system-ui,sans-serif!important;box-shadow:none!important;cursor:pointer!important
+  }
+  .side .android-nav-toggle:focus-visible{outline:3px solid #c8ed8c!important;outline-offset:2px!important}
+  .side nav.nav{display:none!important;width:100%!important;margin:0!important;padding:12px 0 2px!important}
+  .side.nav-expanded{max-height:64dvh!important;overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important}
+  .side.nav-expanded nav.nav{display:block!important}
+  .side nav.nav .nav-dashboard{
+    display:flex!important;align-items:center!important;width:100%!important;min-height:44px!important;
+    margin:0 0 10px!important;padding:11px 13px!important;box-sizing:border-box!important;
+    border:1px solid rgba(255,255,255,.24)!important;border-radius:11px!important;
+    background:rgba(255,255,255,.12)!important;color:#fff!important;font-size:14px!important;font-weight:750!important
+  }
+  .side nav.nav .nav-group{
+    display:block!important;width:100%!important;min-width:0!important;box-sizing:border-box!important;
+    margin:0 0 10px!important;padding:11px!important;
+    border:1px solid rgba(255,255,255,.19)!important;border-radius:13px!important;
+    background:rgba(0,42,27,.17)!important
+  }
+  .side nav.nav .nav-group-title{
+    display:block!important;margin:0 0 7px!important;padding:0 3px!important;
+    color:#d6eee0!important;font-size:10px!important;font-weight:850!important;
+    line-height:1.4!important;letter-spacing:.12em!important
+  }
+  .side nav.nav .nav-group a{
+    display:flex!important;align-items:center!important;width:100%!important;min-height:40px!important;
+    box-sizing:border-box!important;margin:2px 0!important;padding:9px 11px!important;
+    border:1px solid transparent!important;border-radius:9px!important;
+    background:transparent!important;color:#f2fbf5!important;
+    font-size:13px!important;font-weight:550!important;line-height:1.3!important;
+    text-decoration:none!important;white-space:normal!important;overflow-wrap:anywhere!important
+  }
+  .side nav.nav .nav-group a.active{
+    border-color:#c8e6d1!important;background:#eaf6ee!important;color:#075b3d!important;
+    font-weight:800!important;box-shadow:inset 3px 0 #b9e66b!important
+  }
+  .side nav.nav a:focus-visible{outline:2px solid #d7f2a5!important;outline-offset:2px!important}
+  .main{display:block!important;width:100%!important;min-width:0!important}
+  .top{
+    position:relative!important;top:auto!important;z-index:5!important;
+    display:flex!important;align-items:center!important;justify-content:space-between!important;
+    min-height:54px!important;height:auto!important;padding:8px 14px!important;
+    background:#fff!important;border-bottom:1px solid #dcebe1!important;box-shadow:none!important
+  }
+  .top>strong{color:#145d45!important;font-size:13px!important}
+  .top-actions{display:flex!important;align-items:center!important;gap:8px!important}
+  .top-actions form{margin:0!important}
+  .top .logout,.top-actions .logout{min-height:38px!important;padding:8px 13px!important;border:1px solid #c8dfcf!important;border-radius:10px!important;background:#eaf5ed!important;color:#145d45!important}
+  .content{width:100%!important;max-width:100%!important;min-width:0!important;margin:0 auto!important;padding:20px 14px 32px!important;box-sizing:border-box!important}
+  .content h1{margin:0 0 8px!important;color:#145d45!important;font-size:clamp(23px,6vw,30px)!important;line-height:1.2!important}
+  .content>p.muted{margin:0 0 18px!important;color:#64796d!important;line-height:1.5!important}
+  .panel,.card,.student-create-panel{min-width:0!important;max-width:100%!important;box-sizing:border-box!important;border:1px solid #dcebe1!important;border-radius:16px!important;background:#fff!important;box-shadow:0 5px 18px rgba(3,69,47,.05)!important}
+  .panel{overflow-x:auto!important}
+  .student-tabs{max-width:100%!important;overflow-x:auto!important;flex-wrap:nowrap!important;-webkit-overflow-scrolling:touch!important}
+  .student-tabs .student-tab{flex:0 0 auto!important;white-space:nowrap!important}
+  .mobile-bottom-nav,.admin-mobile-drawer,.admin-menu-trigger{display:none!important}
 }
+@media (max-width:390px){
+  .layout>.side{padding:9px 11px!important}
+  .side .brand img{width:38px!important;height:38px!important;flex-basis:38px!important}
+  .side .android-nav-toggle{min-width:76px!important;padding:8px 10px!important}
+  .content{padding-right:11px!important;padding-left:11px!important}
+}
+@media (min-width:761px){.android-nav-toggle{display:none!important}}
+@media (prefers-reduced-motion:no-preference){
+  .side nav.nav{transition:opacity .16s ease}
+}
+html[data-theme="black"] .side nav.nav .nav-group{background:rgba(0,0,0,.2)!important}
 </style>
-
-<style id="android-sidebar-layout-fix">
-@media screen and (max-width:760px){
- html body .layout{display:block!important;width:100%!important;overflow:visible!important}
- html body .layout>.side,html body .side{
-  display:block!important;visibility:visible!important;opacity:1!important;
-  position:relative!important;inset:auto!important;transform:none!important;
-  width:100%!important;max-width:100%!important;height:auto!important;
-  max-height:42dvh!important;overflow-x:hidden!important;overflow-y:auto!important;
-  box-sizing:border-box!important;padding:10px 12px 12px!important;
-  background:linear-gradient(155deg,#03452f 0%,#087a4b 100%)!important;
-  border-radius:0 0 16px 16px!important;box-shadow:0 5px 16px rgba(3,69,47,.14)!important;
-  scrollbar-width:thin!important;-webkit-overflow-scrolling:touch!important;
- }
- html body .side .brand{
-  display:flex!important;align-items:center!important;gap:10px!important;
-  padding:2px 4px 10px!important;margin:0 0 8px!important;
-  border-bottom:1px solid rgba(255,255,255,.18)!important;
-  color:#fff!important;font-size:13px!important;line-height:1.25!important;
- }
- html body .side .brand img{display:block!important;width:42px!important;height:42px!important;flex:0 0 42px!important}
- html body .side .brand-copy{display:block!important;min-width:0!important;color:#fff!important}
- html body .side .brand small{display:block!important;margin-top:3px!important;color:#c5e4d2!important;font-size:10px!important}
- html body .side nav.nav{
-  display:block!important;visibility:visible!important;opacity:1!important;
-  width:100%!important;height:auto!important;max-height:none!important;
-  overflow:visible!important;padding:0!important;margin:0!important;
- }
- html body .side nav.nav .nav-dashboard{
-  display:flex!important;align-items:center!important;width:100%!important;
-  min-height:40px!important;margin:0 0 8px!important;padding:9px 12px!important;
-  border:1px solid rgba(255,255,255,.22)!important;border-radius:10px!important;
-  background:rgba(255,255,255,.13)!important;color:#fff!important;
-  font-size:13px!important;font-weight:750!important;text-decoration:none!important;
- }
- html body .side nav.nav .nav-group{
-  display:block!important;width:100%!important;min-width:0!important;
-  margin:0 0 8px!important;padding:9px 10px 10px!important;
-  border:1px solid rgba(255,255,255,.18)!important;border-radius:11px!important;
-  background:rgba(0,35,23,.18)!important;box-sizing:border-box!important;
- }
- html body .side nav.nav .nav-group-title{
-  display:block!important;margin:0 0 7px!important;padding:0 2px!important;
-  color:#c9edda!important;font-size:10px!important;font-weight:850!important;
-  line-height:1.3!important;letter-spacing:.1em!important;text-transform:uppercase!important;
- }
- html body .side nav.nav .nav-group a{
-  display:flex!important;align-items:center!important;justify-content:flex-start!important;
-  width:100%!important;min-width:0!important;min-height:36px!important;
-  margin:0!important;padding:7px 9px!important;box-sizing:border-box!important;
-  border:1px solid transparent!important;border-radius:8px!important;
-  background:transparent!important;color:#f0fff6!important;
-  font-size:12px!important;font-weight:550!important;line-height:1.25!important;
-  text-decoration:none!important;white-space:normal!important;overflow-wrap:anywhere!important;
- }
- html body .side nav.nav .nav-group a.active{
-  background:#e7f5eb!important;border-color:#c4e5ce!important;color:#075b3d!important;
-  font-weight:800!important;box-shadow:inset 3px 0 #b9e66b!important;
- }
- html body .side nav.nav .nav-group a:hover{background:rgba(255,255,255,.13)!important}
- html body .mobile-bottom-nav,html body .admin-mobile-drawer,
- html body .admin-menu-trigger{display:none!important}
- html body .main{display:block!important;width:100%!important;min-width:0!important}
-}
-@media screen and (max-width:390px){
- html body .side{max-height:40dvh!important;padding:8px 10px 10px!important}
- html body .side nav.nav .nav-group{padding:8px!important}
- html body .side nav.nav .nav-group a{min-height:34px!important;font-size:11px!important}
-}
-</style>
-
-<style id="android-navigation-emergency-recovery">
-@media screen and (max-width:760px){
- html body .layout aside.side{display:block!important;visibility:visible!important;opacity:1!important;width:100%!important;height:auto!important;max-height:none!important;min-height:0!important;overflow:visible!important;position:relative!important;transform:none!important;clip:auto!important}
- html body .layout aside.side nav.nav{display:block!important;visibility:visible!important;opacity:1!important;width:100%!important;height:auto!important;max-height:none!important;overflow:visible!important;position:relative!important}
- html body .layout aside.side nav.nav>a.nav-dashboard{display:flex!important;visibility:visible!important;opacity:1!important;width:100%!important}
- html body .layout aside.side nav.nav>div.nav-group{display:block!important;visibility:visible!important;opacity:1!important;width:100%!important;height:auto!important;max-height:none!important;overflow:visible!important;position:relative!important;float:none!important;clear:both!important;box-sizing:border-box!important}
- html body .layout aside.side nav.nav>div.nav-group>.nav-group-title{display:block!important;visibility:visible!important;opacity:1!important}
- html body .layout aside.side nav.nav>div.nav-group>a{display:flex!important;visibility:visible!important;opacity:1!important;width:100%!important;height:auto!important;min-height:40px!important;position:relative!important;float:none!important;white-space:normal!important}
- html body .layout aside.side nav.nav .nav-group{margin:0 0 10px!important;padding:10px!important;border:1px solid rgba(255,255,255,.22)!important;border-radius:12px!important;background:rgba(0,35,23,.18)!important}
- html body .layout aside.side nav.nav .nav-group-title{color:#d8f3e2!important;font-size:11px!important;line-height:1.4!important;margin:0 0 8px!important}
- html body .layout aside.side nav.nav .nav-group a{padding:9px 11px!important;color:#fff!important;border-radius:9px!important;text-decoration:none!important}
- html body .layout aside.side nav.nav .nav-group a.active{background:#e7f5eb!important;color:#075b3d!important}
- html body .mobile-bottom-nav,html body .admin-mobile-drawer,html body .admin-menu-trigger{display:none!important}
-}
-</style>
-
-<style id="android-sidebar-collapsible">
-@media(max-width:760px){
- html body .layout>.side,html body .side{
-  display:block!important;height:auto!important;max-height:none!important;overflow:visible!important;
-  padding:9px 12px!important;border-radius:0 0 14px 14px!important;
- }
- html body .side .brand{display:flex!important;align-items:center!important;gap:9px!important;padding:2px 2px 8px!important;margin:0!important;border:0!important}
- html body .side .brand img{width:38px!important;height:38px!important;flex:0 0 38px!important}
- html body .side .brand-copy{flex:1 1 auto!important;min-width:0!important;font-size:13px!important}
- html body .side .brand small{font-size:10px!important}
- html body .side .android-nav-toggle{
-  display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:7px!important;
-  flex:0 0 auto!important;min-height:38px!important;padding:8px 13px!important;
-  border:1px solid rgba(255,255,255,.32)!important;border-radius:10px!important;
-  background:rgba(255,255,255,.14)!important;color:#fff!important;font-size:12px!important;font-weight:800!important;
- }
- html body .side nav.nav{display:none!important}
- html body .side.nav-expanded nav.nav{display:block!important;margin-top:8px!important}
- html body .side.nav-expanded{max-height:55dvh!important;overflow-y:auto!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important}
- html body .side nav.nav .nav-dashboard{display:flex!important;width:100%!important;min-height:40px!important;margin:0 0 8px!important}
- html body .side nav.nav .nav-group{display:block!important;width:100%!important;margin:0 0 8px!important}
- html body .side nav.nav .nav-group-title{display:block!important}
- html body .side nav.nav .nav-group a{display:flex!important;width:100%!important;min-height:38px!important}
- html body .mobile-bottom-nav,html body .admin-mobile-drawer,html body .admin-menu-trigger{display:none!important}
-}
-</style>
-<script id="android-sidebar-collapsible-script">
+<script id="admin-responsive-navigation-final-script">
 (function(){
- function setup(){
-  var side=document.querySelector('aside.side');
-  var brand=side&&side.querySelector('.brand');
-  var nav=side&&side.querySelector('nav.nav');
-  if(!side||!brand||!nav||brand.querySelector('.android-nav-toggle'))return;
-  var btn=document.createElement('button');
-  btn.type='button';btn.className='android-nav-toggle';
-  btn.setAttribute('aria-expanded','false');
-  btn.setAttribute('aria-controls','adminWebsiteNavigation');
-  btn.innerHTML='<span aria-hidden="true">☰</span><span>Menu</span>';
-  nav.id='adminWebsiteNavigation';
-  brand.appendChild(btn);
-  btn.addEventListener('click',function(){
-   var open=side.classList.toggle('nav-expanded');
-   btn.setAttribute('aria-expanded',open?'true':'false');
-   btn.lastElementChild.textContent=open?'Tutup':'Menu';
-  });
-  nav.addEventListener('click',function(e){
-   if(e.target.closest('a')) {
-    side.classList.remove('nav-expanded');
-    btn.setAttribute('aria-expanded','false');
-    btn.lastElementChild.textContent='Menu';
-   }
-  });
- }
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup,{once:true});
- else setup();
+  function init(){
+    var side=document.querySelector('aside.side');
+    var brand=side&&side.querySelector('.brand');
+    var nav=side&&side.querySelector('nav.nav');
+    if(!side||!brand||!nav)return;
+    var button=brand.querySelector('.android-nav-toggle');
+    if(!button){
+      button=document.createElement('button');
+      button.type='button';
+      button.className='android-nav-toggle';
+      button.setAttribute('aria-expanded','false');
+      button.innerHTML='<span aria-hidden="true">☰</span><span>Menu</span>';
+      brand.appendChild(button);
+    }
+    nav.id='adminWebsiteNavigation';
+    button.setAttribute('aria-controls',nav.id);
+    function close(){
+      side.classList.remove('nav-expanded');
+      button.setAttribute('aria-expanded','false');
+      button.lastElementChild.textContent='Menu';
+    }
+    function toggle(){
+      var open=!side.classList.contains('nav-expanded');
+      side.classList.toggle('nav-expanded',open);
+      button.setAttribute('aria-expanded',open?'true':'false');
+      button.lastElementChild.textContent=open?'Tutup':'Menu';
+    }
+    if(button.dataset.bound!=='1'){
+      button.dataset.bound='1';
+      button.addEventListener('click',toggle);
+      nav.addEventListener('click',function(event){
+        if(event.target.closest('a'))close();
+      });
+      document.addEventListener('keydown',function(event){
+        if(event.key==='Escape')close();
+      });
+      document.addEventListener('click',function(event){
+        if(window.matchMedia('(max-width: 760px)').matches &&
+           side.classList.contains('nav-expanded') &&
+           !side.contains(event.target))close();
+      });
+      window.addEventListener('resize',function(){
+        if(!window.matchMedia('(max-width: 760px)').matches)close();
+      });
+    }
+    close();
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});
+  else init();
 })();
 </script>
 </body></html>
