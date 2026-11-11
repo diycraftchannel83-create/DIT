@@ -1,0 +1,49 @@
+<?php
+declare(strict_types=1);
+require __DIR__.'/pmb-form-handler.php';
+$confirmation=$_SESSION['pmb_confirmation']??null;
+if(!is_array($confirmation)||empty($confirmation['registration'])||empty($confirmation['email'])){
+ http_response_code(403);
+ $confirmation=null;
+}else{
+ $q=$pdo->prepare("SELECT a.registration_number,a.full_name,a.email,a.phone,a.status,a.document_status,a.payment_status,a.registration_fee_amount,a.created_at,p.name AS program FROM pmb_applicants a LEFT JOIN study_programs p ON p.id=a.study_program_id WHERE a.registration_number=:reg AND a.email=:email LIMIT 1");
+ $q->execute(['reg'=>$confirmation['registration'],'email'=>$confirmation['email']]);
+ $applicant=$q->fetch();
+ if(!$applicant){http_response_code(404);$confirmation=null;}
+}
+function pmb_h($value):string{return htmlspecialchars((string)$value,ENT_QUOTES,'UTF-8');}
+?>
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Konfirmasi Pendaftaran PMB - STIT Darul Ilmi</title>
+<style>
+*{box-sizing:border-box}body{margin:0;padding:24px;background:#f3f8f4;color:#173b2b;font:15px/1.6 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{max-width:760px;margin:28px auto}.receipt{background:#fff;border:1px solid #dcebe0;border-radius:20px;padding:30px;box-shadow:0 14px 40px #123a2410}.head{text-align:center;border-bottom:1px dashed #b8d7c1;padding-bottom:22px}.mark{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:#e5f6eb;color:#087a4b;font-size:32px;margin:0 auto 12px}.head h1{font-size:24px;color:#075b3d;margin:0}.head p{margin:4px 0;color:#65766b}.success{display:inline-block;margin-top:14px;padding:6px 12px;border-radius:30px;background:#e5f6eb;color:#087a4b;font-weight:800;font-size:13px}.number{margin:22px 0;padding:18px;background:#f1f8f3;border:1px solid #d8ecde;border-radius:14px;text-align:center}.number small{display:block;color:#64756b;font-weight:700;letter-spacing:.1em}.number strong{font-size:25px;color:#075b3d;letter-spacing:.04em;overflow-wrap:anywhere}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:18px 0}.item{padding:12px;border:1px solid #e6efe8;border-radius:12px;min-width:0}.item small{display:block;color:#718176;margin-bottom:4px}.item strong{overflow-wrap:anywhere}.steps{background:#fff9e9;border:1px solid #f0e3bd;border-radius:14px;padding:16px 18px;margin-top:20px}.steps h2{font-size:16px;margin:0 0 8px;color:#725313}.steps ol{margin:0;padding-left:20px}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.btn{border:0;border-radius:11px;padding:12px 17px;background:#087a4b;color:#fff;font:700 14px system-ui;text-decoration:none;cursor:pointer}.btn.secondary{background:#eaf4ed;color:#075b3d}.note{font-size:12px;color:#718176;text-align:center;margin-top:18px}@media(max-width:560px){body{padding:12px}.wrap{margin:8px auto}.receipt{padding:20px}.grid{grid-template-columns:1fr}.number strong{font-size:21px}}@media print{body{padding:0;background:#fff}.wrap{margin:0;max-width:none}.receipt{border:0;box-shadow:none;border-radius:0;padding:12mm}.actions,.note{display:none}.steps{break-inside:avoid}}
+</style>
+</head><body><main class="wrap">
+<?php if(!$confirmation):?>
+<section class="receipt"><h1>Konfirmasi tidak tersedia</h1><p>Sesi konfirmasi tidak ditemukan atau telah berakhir. Silakan cek status menggunakan nomor registrasi dan email pada halaman PMB.</p><a class="btn" href="pmb.php">Kembali ke PMB</a></section>
+<?php else:?>
+<section class="receipt">
+<header class="head"><div class="mark">✓</div><h1>Pendaftaran Berhasil Dikirim</h1><p>STIT Darul Ilmi Tasikmalaya</p><span class="success">Data pendaftaran telah tersimpan</span></header>
+<div class="number"><small>NOMOR REGISTRASI PMB</small><strong><?=pmb_h($applicant['registration_number'])?></strong></div>
+<h2 style="font-size:17px;color:#075b3d">Bukti Pendaftaran Calon Mahasiswa</h2>
+<div class="grid">
+<div class="item"><small>Nama lengkap</small><strong><?=pmb_h($applicant['full_name'])?></strong></div>
+<div class="item"><small>Email</small><strong><?=pmb_h($applicant['email'])?></strong></div>
+<div class="item"><small>Nomor telepon</small><strong><?=pmb_h($applicant['phone'])?></strong></div>
+<div class="item"><small>Program studi</small><strong><?=pmb_h($applicant['program']??'—')?></strong></div>
+<div class="item"><small>Tanggal pendaftaran</small><strong><?=pmb_h(date('d-m-Y H:i',strtotime((string)$applicant['created_at'])))?></strong></div>
+<div class="item"><small>Status pendaftaran</small><strong>Menunggu pemeriksaan</strong></div>
+<div class="item"><small>Status dokumen</small><strong>Menunggu verifikasi</strong></div>
+<div class="item"><small>Biaya pendaftaran</small><strong>Rp<?=number_format((float)($applicant['registration_fee_amount']??200000),0,',','.')?></strong></div>
+<div class="item"><small>Status pembayaran</small><strong>Belum bayar</strong></div>
+</div>
+<section class="steps"><h2>Langkah selanjutnya</h2><ol><li>Simpan nomor registrasi sebagai bukti pendaftaran.</li><li>Hubungi admin PMB untuk memperoleh petunjuk pembayaran resmi sebesar Rp<?=number_format((float)($applicant['registration_fee_amount']??200000),0,',','.')?>.</li><li>Tunggu admin memeriksa kelengkapan dokumen dan pembayaran.</li><li>Pantau hasil seleksi melalui menu Cek Status Pendaftaran.</li></ol></section>
+<p style="font-size:13px;color:#64756b;margin-top:18px">Simpan atau cetak halaman ini sebagai bukti pendaftaran. Untuk menyimpan sebagai PDF, pilih tombol Cetak / Simpan PDF lalu pilih tujuan “Save as PDF” pada dialog cetak browser.</p>
+<div class="actions"><button class="btn" type="button" onclick="window.print()">Cetak / Simpan PDF</button><a class="btn secondary" href="pmb.php">Kembali ke Halaman PMB</a></div>
+<p class="note">Bukti ini merupakan konfirmasi penerimaan data pendaftaran, bukan surat kelulusan seleksi atau bukti pembayaran.</p>
+</section>
+<?php endif;?>
+</main></body></html>
