@@ -2575,4 +2575,28 @@ html[data-theme="green"] .student-edit-page .student-form-footer button#studentS
 @media(min-width:761px){.mobile-bottom-nav,.admin-mobile-drawer,.admin-menu-trigger{display:none!important}}
 </style>
 
+
+<style id="force-website-sidebar-on-android">
+@media screen and (max-width:760px){
+ html body .layout{display:block!important}
+ html body .layout>.side,html body .side{
+  display:block!important;visibility:visible!important;opacity:1!important;
+  position:relative!important;inset:auto!important;transform:none!important;
+  width:100%!important;height:auto!important;max-height:none!important;
+  overflow:visible!important;clip:auto!important;clip-path:none!important;
+  flex:none!important;z-index:30!important;
+ }
+ html body .side .brand{display:flex!important;visibility:visible!important}
+ html body .side nav.nav{
+  display:flex!important;visibility:visible!important;opacity:1!important;
+  width:100%!important;height:auto!important;max-height:none!important;
+  overflow-x:auto!important;overflow-y:hidden!important;
+ }
+ html body .side nav.nav a{
+  display:inline-flex!important;visibility:visible!important;opacity:1!important;
+ }
+ html body .mobile-bottom-nav,html body .admin-mobile-drawer,
+ html body .admin-menu-trigger{display:none!important}
+}
+</style>
 </body></html>
