@@ -19,18 +19,38 @@ function pmb_pdf_text(string $value):string{
  return str_replace(['\\\\','(',')',"\\r","\\n"],['\\\\\\\\','\\\\(','\\\\)',' ',' '],$value);
 }
 function pmb_make_pdf(array $lines):string{
- $stream="BT\n/F1 11 Tf\n50 790 Td\n";
+ // Official PMB receipt letterhead and content layout (A4 portrait).
+ $stream="q\n0.02 0.34 0.20 RG\n2 w\n42 748 m 553 748 l S\n42 744 m 553 744 l S\nQ\n";
+ $stream.="BT\n/F2 10 Tf\n0.02 0.34 0.20 rg\n";
+ $stream.="205 808 Td\n(".pmb_pdf_text('SEKOLAH TINGGI ILMU TARBIYAH').") Tj\n";
+ $stream.="/F2 16 Tf\n-45 -22 Td\n(".pmb_pdf_text('STIT DARUL ILMI TASIKMALAYA').") Tj\n";
+ $stream.="/F1 8 Tf\n-4 -16 Td\n(".pmb_pdf_text('SK Menteri Agama Republik Indonesia No. 536 Tahun 2026').") Tj\n";
+ $stream.="/F1 8 Tf\n-24 -13 Td\n(".pmb_pdf_text('Jl. Cirahayu, Desa Sindangraja, Kecamatan Jamanis, Kabupaten Tasikmalaya').") Tj\n";
+ $stream.="ET\n";
+ // Compact institutional monogram at the left of the letterhead.
+ $stream.="q\n0.02 0.34 0.20 RG\n1.5 w\n54 770 88 58 re S\nQ\n";
+ $stream.="BT\n/F2 13 Tf\n0.02 0.34 0.20 rg\n75 794 Td\n(STIT) Tj\n/F1 7 Tf\n-14 -13 Td\n(DARUL ILMI) Tj\nET\n";
+ $stream.="BT\n/F2 13 Tf\n0.02 0.34 0.20 rg\n150 710 Td\n(".pmb_pdf_text('BUKTI PENDAFTARAN MAHASISWA BARU').") Tj\nET\n";
+ $stream.="q\n0.02 0.34 0.20 RG\n0.8 w\n52 696 m 543 696 l S\nQ\n";
+ $y=670;
  foreach($lines as $index=>$line){
-  if($index>0)$stream.="0 -24 Td\n";
-  $stream.='('.pmb_pdf_text((string)$line).") Tj\n";
+  $line=(string)$line;
+  if($line===''){ $y-=12; continue; }
+  $wrapped=wordwrap($line,82,"\n",true);
+  foreach(explode("\n",$wrapped) as $part){
+   $stream.="BT\n/F1 10 Tf\n0 0 0 rg\n54 ".$y." Td\n(".pmb_pdf_text($part).") Tj\nET\n";
+   $y-=19;
+  }
  }
- $stream.="ET";
+ $stream.="q\n0.02 0.34 0.20 RG\n0.8 w\n52 92 m 543 92 l S\nQ\n";
+ $stream.="BT\n/F1 8 Tf\n0.25 0.30 0.27 rg\n54 72 Td\n(".pmb_pdf_text('Simpan nomor registrasi untuk memantau proses seleksi.').") Tj\n0 -13 Td\n(".pmb_pdf_text('Bukti ini bukan surat kelulusan atau bukti pembayaran.').") Tj\nET";
  $objects=[];
  $objects[]='<< /Type /Catalog /Pages 2 0 R >>';
  $objects[]='<< /Type /Pages /Kids [3 0 R] /Count 1 >>';
- $objects[]='<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>';
+ $objects[]='<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R /F2 6 0 R >> >> /Contents 5 0 R >>';
  $objects[]='<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>';
  $objects[]='<< /Length '.strlen($stream)." >>\nstream\n".$stream."\nendstream";
+ $objects[]='<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>';
  $pdf="%PDF-1.4\n";$offsets=[0];
  foreach($objects as $i=>$obj){$offsets[]=strlen($pdf);$pdf.=($i+1)." 0 obj\n".$obj."\nendobj\n";}
  $xref=strlen($pdf);$pdf.="xref\n0 ".(count($objects)+1)."\n0000000000 65535 f \n";
@@ -40,10 +60,6 @@ function pmb_make_pdf(array $lines):string{
 }
 if($applicant && (($_GET['download']??'')==='pdf')){
  $lines=[
-  'STIT DARUL ILMI TASIKMALAYA',
-  'SEKOLAH TINGGI ILMU TARBIYAH',
-  'BUKTI PENDAFTARAN MAHASISWA BARU',
-  '-----------------------------------------------',
   'Nomor Registrasi: '.$applicant['registration_number'],
   'Nama Lengkap: '.$applicant['full_name'],
   'Email: '.$applicant['email'],
