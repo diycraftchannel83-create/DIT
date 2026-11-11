@@ -1592,11 +1592,10 @@ $pendingCount=0;foreach($availableMigrations as $migrationName=>$migrationFile){
 </script>
 <?php endif;?>
 <div class="panel"><h2>Daftar <?=e($ds['title'])?> <span class="tag"><?=count($rows)?> data</span></h2><?php if(!$rows):?><p class="muted">Belum ada data untuk ditampilkan.</p><?php else:?><table><thead><tr><?php foreach(array_keys($rows[0]) as $col):if(($page==='accounts'||$page==='students')&&$col==='id')continue;?><th><?=e(str_replace('_',' ',$col))?></th><?php endforeach;?><?php if($page==='students'&&in_array($u['role'],$academicRoles,true)):?><th>Aksi</th><?php endif;?></tr></thead><tbody><?php foreach($rows as $row):?><tr><?php foreach($row as $column=>$value):if(($page==='accounts'||$page==='students')&&$column==='id')continue;?><td><?php if($page==='students'&&$column==='full_name'):?><a class="student-name-link" href="?page=students&amp;edit=<?=(int)$row['id']?>#studentEditModal" aria-label="Lihat dan edit data <?=e($value)?>"><?=e($value)?></a><?php elseif($page==='accounts'&&$column==='username'):$accountJson=['id'=>(int)$row['id'],'username'=>$row['username'],'full_name'=>$row['full_name'],'email'=>$row['email'],'role'=>$row['role'],'role_label'=>['super_admin'=>'Super Admin','admin_akademik'=>'Admin Akademik','admin_keuangan'=>'Admin Keuangan','ketua_prodi'=>'Ketua Program Studi','ketua_stit'=>'Ketua STIT','dosen'=>'Dosen','mahasiswa'=>'Mahasiswa'][$row['role']]??$row['role'],'status'=>$row['status'],'program_studi'=>$row['program_studi'],'created_at'=>$row['created_at']??null,'last_login_at'=>$row['last_login_at']];?><button type="button" class="account-link" onclick="return window.openAccountDetail(this)" data-account-json="<?=e(json_encode($accountJson,JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP))?>"><?=e($value)?></button><?php else:?><?=e($value===null?'—':$value)?><?php endif;?></td><?php endforeach;?><?php if($page==='students'&&in_array($u['role'],$academicRoles,true)):?><td class="student-action-cell"><a class="student-edit-action" href="?page=students&amp;edit=<?=(int)$row['id']?>#studentEditModal"><span aria-hidden="true">✎</span> Edit Data</a></td><?php endif;?></tr><?php endforeach;?></tbody></table><?php endif;?></div><?php endif;?></section></main></div>
-<input type="checkbox" id="adminMenuToggle" class="admin-menu-toggle" aria-label="Tampilkan menu navigasi">
-<div class="admin-mobile-drawer" id="adminMobileDrawer">
+<div class="admin-mobile-drawer" id="adminMobileDrawer" aria-hidden="true">
   <button type="button" class="admin-mobile-backdrop" aria-label="Tutup menu"></button>
   <section class="admin-mobile-drawer-panel" aria-label="Menu navigasi admin">
-    <div class="admin-mobile-drawer-head"><strong>Menu Dashboard</strong><button type="button" class="admin-mobile-close" aria-label="Tutup menu" title="Tutup menu" onclick="var toggle=document.getElementById('adminMenuToggle');var drawer=document.getElementById('adminMobileDrawer');if(toggle){toggle.checked=false;}if(drawer){drawer.style.setProperty('display','none','important');}return false;">×</button></div>
+    <div class="admin-mobile-drawer-head"><strong>Menu Dashboard</strong><button type="button" class="admin-mobile-close" aria-label="Tutup menu" title="Tutup menu">×</button></div>
     <nav class="admin-mobile-drawer-content" aria-label="Navigasi dashboard">
       <a class="nav-dashboard <?=$page==='dashboard'?'active':''?>" href="?page=dashboard">Dashboard</a>
       <?php foreach($visibleMenuGroups as $groupLabel=>$groupKeys): ?>
@@ -1608,9 +1607,8 @@ $pendingCount=0;foreach($availableMigrations as $migrationName=>$migrationFile){
   </section>
 </div>
 <style>
-.admin-menu-toggle{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}
 .admin-mobile-drawer{display:none!important;position:fixed!important;inset:0!important;z-index:2147483647!important;width:100vw!important;height:100vh!important;height:100dvh!important;margin:0!important;padding:0!important;border:0!important;overflow:hidden!important}
-.admin-menu-toggle:checked ~ .admin-mobile-drawer{display:block!important}
+.admin-mobile-drawer.is-open{display:block!important}
 .admin-mobile-backdrop{position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;appearance:none!important;-webkit-appearance:none!important;background:rgba(7,45,30,.55)!important;backdrop-filter:blur(2px)!important;cursor:pointer!important}
 .admin-mobile-drawer-panel{position:absolute!important;inset:0 auto 0 0!important;width:min(88vw,370px)!important;height:100%!important;max-height:100%!important;box-sizing:border-box!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;padding:calc(14px + env(safe-area-inset-top)) 16px calc(14px + env(safe-area-inset-bottom))!important;background:#fff!important;color:#174b35!important;border-radius:0 20px 20px 0!important;box-shadow:18px 0 48px rgba(7,55,35,.24)!important}
 .admin-mobile-drawer-head{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;flex:0 0 auto!important;padding:10px 2px 14px!important;border-bottom:1px solid #dcece1!important;color:#075b3d!important}
@@ -1622,44 +1620,47 @@ $pendingCount=0;foreach($availableMigrations as $migrationName=>$migrationFile){
 .admin-mobile-drawer-content .nav-group-title{display:block!important;margin:0 0 8px!important;color:#087a4b!important;font-size:11px!important;font-weight:800!important;letter-spacing:.06em!important;text-transform:uppercase!important}
 .admin-mobile-drawer-content .nav-group a{margin:5px 0!important}
 .admin-mobile-drawer-content a.active{background:#e1f3e7!important;border-color:#9bcfae!important;color:#05613e!important;font-weight:800!important}
-@media(min-width:761px){.admin-menu-toggle:checked ~ .admin-mobile-drawer{display:none!important}}
+@media(min-width:761px){.admin-mobile-drawer.is-open{display:none!important}}
 </style>
 <script>
 (function(){
  function initAdminDrawer(){
-  var toggle=document.getElementById('adminMenuToggle');
   var drawer=document.getElementById('adminMobileDrawer');
-  if(!toggle||!drawer)return;
-  /* Keep the overlay attached to body so Android WebView cannot clip it. */
-  if(drawer.parentNode!==document.body)document.body.appendChild(drawer);
   var trigger=document.getElementById('adminMenuTrigger');
-  function render(){
-   var open=!!toggle.checked;
+  if(!drawer||!trigger||drawer.dataset.drawerReady==='1')return;
+  drawer.dataset.drawerReady='1';
+  /* Render the overlay at body level to avoid clipping by dashboard containers. */
+  if(drawer.parentNode!==document.body)document.body.appendChild(drawer);
+  function setOpen(open){
+   drawer.classList.toggle('is-open',!!open);
    drawer.setAttribute('aria-hidden',open?'false':'true');
-   drawer.style.setProperty('display',open?'block':'none','important');
-   if(trigger)trigger.setAttribute('aria-expanded',open?'true':'false');
+   trigger.setAttribute('aria-expanded',open?'true':'false');
    document.body.style.overflow=open?'hidden':'';
   }
-  if(trigger)trigger.addEventListener('click',function(event){
+  trigger.addEventListener('click',function(event){
    event.preventDefault();
-   toggle.checked=!toggle.checked;
-   render();
+   event.stopPropagation();
+   setOpen(!drawer.classList.contains('is-open'));
   });
-  toggle.addEventListener('change',render);
-  drawer.querySelectorAll('.admin-mobile-backdrop').forEach(function(backdrop){
-   backdrop.addEventListener('click',function(){toggle.checked=false;render();});
+  drawer.addEventListener('click',function(event){
+   if(event.target.closest('.admin-mobile-backdrop,.admin-mobile-close')){
+    event.preventDefault();
+    setOpen(false);
+   }
   });
-  var close=drawer.querySelector('.admin-mobile-close');
-  if(close)close.addEventListener('click',function(){toggle.checked=false;render();});
+  drawer.querySelectorAll('.admin-mobile-drawer-content a').forEach(function(link){
+   link.addEventListener('click',function(){setOpen(false);});
+  });
   document.addEventListener('keydown',function(event){
-   if(event.key==='Escape'&&toggle.checked){toggle.checked=false;render();}
+   if(event.key==='Escape'&&drawer.classList.contains('is-open'))setOpen(false);
   });
-  render();
+  window.addEventListener('pageshow',function(){setOpen(false);});
+  setOpen(false);
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initAdminDrawer,{once:true});
  else initAdminDrawer();
 })();
-</script>
+</script>>
 <script>
 ;
 </script><script>
