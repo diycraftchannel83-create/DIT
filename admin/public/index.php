@@ -218,7 +218,7 @@ function migrationAlreadyPresent(PDO $pdo, string $name): bool {
     if($name==='2026_11_11_pmb_full_registration.sql'){
         $q=$pdo->prepare("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=DATABASE() AND table_name='pmb_documents'");
         $q->execute();if((int)$q->fetchColumn()===0)return false;
-        foreach(['national_id','whatsapp','religion','marital_status','postal_code','document_status','selection_score','result_notes'] as $column){
+        foreach(['national_id','whatsapp','religion','marital_status','postal_code','emergency_contact_name','emergency_contact_phone','document_status','selection_score','result_notes'] as $column){
             $c=$pdo->prepare("SELECT COUNT(*) FROM information_schema.columns WHERE table_schema=DATABASE() AND table_name='pmb_applicants' AND column_name=:column");
             $c->execute(['column'=>$column]);if((int)$c->fetchColumn()===0)return false;
         }
