@@ -8,6 +8,13 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Temporary route-loading diagnostic; returns no configuration or database data.
+Route::get('/route-probe-2026', function () {
+    return response('LARAVEL_WEB_ROUTES_LOADED', 200)
+        ->header('Content-Type', 'text/plain; charset=UTF-8')
+        ->header('Cache-Control', 'no-store, no-cache, must-revalidate');
+})->name('diagnostic.route-probe');
+
 Route::match(['GET', 'POST'], '/academic-inspect-check-2026', function (Request $request) {
     $token = (string) env('ACADEMIC_MAINTENANCE_TOKEN', '');
 
