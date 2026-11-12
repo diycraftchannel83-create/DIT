@@ -7,28 +7,62 @@ declare(strict_types=1);
  */
 $backend = dirname(__DIR__, 2) . '/backend';
 $configFile = $backend . '/config/database.local.php';
-if (!is_file($configFile)) {
+
+if (!is_file($configFile) || !is_readable($configFile)) {
+    error_log('[STIT ADMIN] Database configuration file is missing or unreadable: ' . $configFile);
     http_response_code(503);
-    exit('Backend belum dikonfigurasi. Buat backend/config/database.local.php terlebih dahulu.');
+    exit('Backend belum dikonfigurasi. Periksa backend/config/database.local.php.');
 }
-$cfg = require $configFile;
-$dsn = sprintf('mysql:host=%s;dbname=%s;charset=%s', $cfg['host'], $cfg['database'], $cfg['charset'] ?? 'utf8mb4');
+
 try {
-    $pdo = new PDO($dsn, $cfg['username'], $cfg['password'], [
+    $cfg = require $configFile;
+    if (!is_array($cfg)) {
+        throw new RuntimeException('Database configuration must return an array.');
+    }
+    foreach (['host', 'database', 'username', 'password'] as $key) {
+        if (!array_key_exists($key, $cfg) || !is_scalar($cfg[$key])) {
+            throw new RuntimeException('Invalid database configuration key: ' . $key);
+        }
+    }
+    $host = trim((string)$cfg['host']);
+    $database = trim((string)$cfg['database']);
+    $username = (string)$cfg['username'];
+    $password = (string)$cfg['password'];
+    $charset = trim((string)($cfg['charset'] ?? 'utf8mb4'));
+    if ($host === '' || $database === '' || $username === '' || !preg_match('/^[A-Za-z0-9_]+$/', $charset)) {
+        throw new RuntimeException('Database configuration contains an empty or invalid value.');
+    }
+    $dsn = sprintf('mysql:host=%s;dbname=%s;charset=%s', $host, $database, $charset);
+    $pdo = new PDO($dsn, $username, $password, [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         PDO::ATTR_EMULATE_PREPARES => false,
+        PDO::ATTR_TIMEOUT => 10,
     ]);
 } catch (Throwable $e) {
-    error_log('[STIT ADMIN DB] ' . $e->getMessage());
+    error_log('[STIT ADMIN BOOTSTRAP] ' . get_class($e) . ': ' . $e->getMessage());
     http_response_code(503);
-    exit('Koneksi database gagal. Periksa konfigurasi server.');
+    exit('Layanan admin belum dapat terhubung ke database. Periksa konfigurasi database dan error log hosting.');
 }
 
+/* Session storage may be unavailable on shared hosting; fail clearly, not silently. */
 $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+if (!$isHttps && isset($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
+    $isHttps = strtolower((string)$_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https';
+}
 session_name('STITADMIN');
-session_set_cookie_params(['lifetime'=>0,'path'=>'/','secure'=>$isHttps,'httponly'=>true,'samesite'=>'Lax']);
-if (session_status() !== PHP_SESSION_ACTIVE) session_start();
+session_set_cookie_params([
+    'lifetime' => 0,
+    'path' => '/',
+    'secure' => $isHttps,
+    'httponly' => true,
+    'samesite' => 'Lax',
+]);
+if (session_status() !== PHP_SESSION_ACTIVE && !session_start()) {
+    error_log('[STIT ADMIN] Failed to start PHP session. Check session.save_path permissions.');
+    http_response_code(503);
+    exit('Sesi login tidak dapat dimulai. Periksa pengaturan sesi PHP pada hosting.');
+}
 
 function e(mixed $v): string { return htmlspecialchars((string)$v, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); }
 function go(string $page='dashboard'): never { header('Location: ?page=' . rawurlencode($page)); exit; }
