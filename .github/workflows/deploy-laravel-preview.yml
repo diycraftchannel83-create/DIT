@@ -102,7 +102,6 @@ jobs:
           test -f laravel-preview/vendor/autoload.php
           php -l laravel-preview/public/index.php
           php -l laravel-preview/routes/web.php
-          php artisan_dummy=1
           cd laravel-preview
           php artisan route:list --path=academic-inspect-check-2026 --except-vendor | grep -q academic-inspect-check-2026
           cd ..
