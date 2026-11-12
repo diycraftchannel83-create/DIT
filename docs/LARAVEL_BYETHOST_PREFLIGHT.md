@@ -13,10 +13,10 @@ Status: preflight staging. Perubahan ini tidak mengganti website aktif dan tidak
 
 ## Arsitektur staging yang disepakati
 
-1. Buat subdomain staging di panel ByetHost.
-2. Atur document root subdomain langsung ke `laravel-app/public` (bukan `laravel-app`).
-3. Website utama tetap memakai document root dan deployment lama.
-4. Simpan `.env` dan kode internal Laravel di luar document root publik.
+1. Gunakan domain utama yang sama; tidak perlu membuat subdomain.
+2. Uji Laravel di jalur terpisah `/laravel-preview/public/` sehingga website utama tetap di root domain.
+3. Folder runtime/internal Laravel tetap terpisah dari folder publik legacy; jangan mengubah document root utama pada tahap uji.
+4. Simpan `.env` dan kredensial di hosting secara manual, jangan commit atau mengunggahnya dari GitHub Actions.
 5. Laravel pertama kali hanya membaca database lama. Tidak ada operasi tulis atau migrasi skema selama tahap kompatibilitas.
 6. Android dan REST API lama tidak dialihkan sampai endpoint pengganti lulus pengujian.
 
@@ -41,15 +41,15 @@ Workflow FTP lama tetap mengirim aplikasi PHP aktif ke `/htdocs/`, tetapi sekara
 
 Belum ada workflow deployment Laravel otomatis. Itu baru dibuat setelah lokasi root subdomain staging dan target FTP dikonfirmasi agar tidak menimpa website utama.
 
-## Gerbang sebelum membuat skeleton Laravel
+## Status preflight dan gerbang berikutnya
 
-Lanjutkan hanya setelah:
-- PHP >= 8.3 dan semua ekstensi Laravel 13 tersedia.
-- PDO MySQL tersedia.
-- Document root subdomain benar-benar dapat diarahkan ke folder `public`.
-- HTTPS aktif.
-- `storage/` dan `bootstrap/cache/` dapat ditulis.
-- Cara membangun/memasang Composer dependencies telah dipastikan.
+- PHP 8.4.27 dan seluruh ekstensi wajib: PASS berdasarkan hasil uji hosting yang dikirim pengguna.
+- PDO MySQL driver: PASS.
+- `storage/` dan `bootstrap/cache/`: belum tersedia karena skeleton belum dipasang.
+- Tidak menggunakan subdomain; staging akan memakai jalur folder terpisah pada domain utama.
+- Workflow `Laravel 13 Build Preflight` disiapkan untuk membuat proyek bersih melalui Composer di GitHub Actions, memvalidasi dependency, dan menjalankan Artisan tanpa menyentuh hosting atau database produksi.
+
+Sebelum deploy staging, HTTPS domain utama dan target FTP terisolasi tetap harus diverifikasi. `.env` harus dibuat manual di hosting dan tidak boleh dikirim ke GitHub.
 
 Referensi: [Laravel 13 deployment requirements](https://laravel.com/docs/13.x/deployment).
 
