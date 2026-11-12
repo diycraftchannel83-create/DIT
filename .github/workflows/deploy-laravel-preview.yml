@@ -101,7 +101,8 @@ jobs:
           echo "::add-mask::$TOKEN"
           echo "LARAVEL_EXTRACT_TOKEN=$TOKEN" >> "$GITHUB_ENV"
           mkdir -p dist
-          cat > dist/.deploy-extract.php <<'PHP'
+          mkdir -p dist/public
+          cat > dist/public/.deploy-extract.php <<'PHP'
           <?php
           declare(strict_types=1);
           header('Content-Type: text/plain; charset=utf-8');
@@ -115,13 +116,14 @@ jobs:
               http_response_code(500);
               exit("ZipArchive unavailable\n");
           }
-          $archive = __DIR__ . '/laravel-preview.zip';
+          $target = dirname(__DIR__);
+          $archive = $target . '/laravel-preview.zip';
           $zip = new ZipArchive();
           if ($zip->open($archive) !== true) {
               http_response_code(500);
               exit("Archive unavailable\n");
           }
-          $root = realpath(__DIR__);
+          $root = realpath($target);
           for ($i = 0; $i < $zip->numFiles; $i++) {
               $name = $zip->getNameIndex($i);
               if ($name === false || str_starts_with($name, '/') || preg_match('~(^|/)\.\.(?:/|$)~', $name)) {
@@ -130,9 +132,9 @@ jobs:
                   exit("Unsafe archive path\n");
               }
           }
-          $ok = $zip->extractTo(__DIR__);
+          $ok = $zip->extractTo($target);
           $zip->close();
-          if (!$ok || !is_file(__DIR__ . '/public/index.php') || !is_file(__DIR__ . '/vendor/autoload.php')) {
+          if (!$ok || !is_file($target . '/public/index.php') || !is_file($target . '/vendor/autoload.php')) {
               http_response_code(500);
               exit("Extraction verification failed\n");
           }
@@ -142,7 +144,7 @@ jobs:
           PHP
           python3 - <<'PY'
           import os
-          p = "dist/.deploy-extract.php"
+          p = "dist/public/.deploy-extract.php"
           s = open(p, encoding="utf-8").read()
           s = s.replace("__TOKEN__", os.environ["LARAVEL_EXTRACT_TOKEN"])
           open(p, "w", encoding="utf-8").write(s)
@@ -169,7 +171,7 @@ jobs:
           curl --fail --silent --show-error --max-time 240 \
             --request POST \
             --data-urlencode "token=$EXTRACT_TOKEN" \
-            "https://siakadstitdit.byethost24.com/laravel-preview/.deploy-extract.php"
+            "https://siakadstitdit.byethost24.com/laravel-preview/public/.deploy-extract.php"
           echo "Laravel archive extraction completed."
 
       - name: Deployment summary
