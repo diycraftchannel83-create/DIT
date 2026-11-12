@@ -53,6 +53,8 @@ jobs:
               --exclude-glob .git/** \
               --exclude-glob .github \
               --exclude-glob .github/** \
+              --exclude-glob laravel-app \
+              --exclude-glob laravel-app/** \
               --exclude-glob .env \
               --exclude-glob .env.* \
               --exclude-glob database.local.php \
@@ -78,6 +80,7 @@ jobs:
           rsync -av "$RUNNER_TEMP/byethost-htdocs/" ./ \
             --exclude='.git/' \
             --exclude='.github/' \
+            --exclude='laravel-app/' \
             --exclude='database.local.php' \
             --exclude='.env' \
             --exclude='.env.*' \
