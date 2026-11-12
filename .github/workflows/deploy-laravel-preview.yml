@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       confirm_staging_deploy:
-        description: "I confirm deployment ONLY to /htdocs/laravel-preview/ (not the live website root)"
+        description: "I confirm deployment ONLY to /htdocs/website/laravel-preview/ (not the live website root)"
         required: true
         type: boolean
         default: false
@@ -159,7 +159,7 @@ jobs:
           password: ${{ secrets.BYETHOST_FTP_PASSWORD }}
           protocol: ftp
           port: 21
-          server-dir: /htdocs/laravel-preview/
+          server-dir: /htdocs/website/laravel-preview/
           local-dir: ./dist/
           dangerous-clean-slate: false
 
@@ -194,7 +194,7 @@ jobs:
         run: |
           {
             echo "## Laravel preview deployment"
-            echo "- Target: /htdocs/laravel-preview/"
+            echo "- Target: /htdocs/website/laravel-preview/"
             echo "- Transfer method: one ZIP archive, server-side extraction"
             echo "- Temporary extraction endpoint removes itself after success"
             echo "- Production website root and database were not changed"
