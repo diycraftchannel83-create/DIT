@@ -92,66 +92,7 @@ jobs:
           ls -lh dist/laravel-preview.zip
           sha256sum dist/laravel-preview.zip
 
-      - name: Create one-time protected extraction endpoint
-        run: |
-          set -euo pipefail
-          TOKEN="$(php -r 'echo bin2hex(random_bytes(32));')"
-          echo "::add-mask::$TOKEN"
-          echo "LARAVEL_EXTRACT_TOKEN=$TOKEN" >> "$GITHUB_ENV"
-          export LARAVEL_EXTRACT_TOKEN="$TOKEN"
-          mkdir -p dist
-          mkdir -p dist/public
-          cat > dist/public/.deploy-extract.php <<'PHP'
-          <?php
-          declare(strict_types=1);
-          header('Content-Type: text/plain; charset=utf-8');
-          $expected = '__TOKEN__';
-          $provided = (string)($_POST['token'] ?? '');
-          if (!hash_equals($expected, $provided)) {
-              http_response_code(403);
-              exit("Forbidden\n");
-          }
-          if (!class_exists(ZipArchive::class)) {
-              http_response_code(500);
-              exit("ZipArchive unavailable\n");
-          }
-          $target = dirname(__DIR__);
-          $archive = $target . '/laravel-preview.zip';
-          $zip = new ZipArchive();
-          if ($zip->open($archive) !== true) {
-              http_response_code(500);
-              exit("Archive unavailable\n");
-          }
-          $root = realpath($target);
-          for ($i = 0; $i < $zip->numFiles; $i++) {
-              $name = $zip->getNameIndex($i);
-              if ($name === false || str_starts_with($name, '/') || preg_match('~(^|/)\.\.(?:/|$)~', $name)) {
-                  $zip->close();
-                  http_response_code(400);
-                  exit("Unsafe archive path\n");
-              }
-          }
-          $ok = $zip->extractTo($target);
-          $zip->close();
-          if (!$ok || !is_file($target . '/public/index.php') || !is_file($target . '/vendor/autoload.php')) {
-              http_response_code(500);
-              exit("Extraction verification failed\n");
-          }
-          @unlink($archive);
-          file_put_contents(__DIR__ . '/.deploy-extract.done', "OK " . gmdate('c'));
-          @unlink(__FILE__);
-          echo "Laravel preview extracted and verified.\n";
-          PHP
-          python3 - <<'PY'
-          import os
-          p = "dist/public/.deploy-extract.php"
-          s = open(p, encoding="utf-8").read()
-          s = s.replace("__TOKEN__", os.environ["LARAVEL_EXTRACT_TOKEN"])
-          open(p, "w", encoding="utf-8").write(s)
-          PY
-          php -l dist/public/.deploy-extract.php
-
-      - name: Upload compressed archive and one-time extractor
+      - name: Upload ZIP only for manual extraction in ByetHost File Manager
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.BYETHOST_FTP_SERVER }}
@@ -163,39 +104,13 @@ jobs:
           local-dir: ./dist/
           dangerous-clean-slate: false
 
-      - name: Extract archive on ByetHost and remove temporary endpoint
-        env:
-          EXTRACT_TOKEN: ${{ env.LARAVEL_EXTRACT_TOKEN }}
-        run: |
-          set -euo pipefail
-          BASE_URL="https://siakadstitdit.byethost24.com/laravel-preview/public"
-          # The host may close the POST connection after PHP completes.
-          # Verify a marker written only after successful extraction and checks.
-          curl --silent --show-error --max-time 300 \
-            --request POST \
-            --data-urlencode "token=$EXTRACT_TOKEN" \
-            "$BASE_URL/.deploy-extract.php" || true
-          VERIFIED=0
-          for attempt in 1 2 3 4 5 6; do
-            if curl --fail --silent --show-error --max-time 30 "$BASE_URL/.deploy-extract.done" | grep -q '^OK '; then
-              VERIFIED=1
-              break
-            fi
-            sleep 5
-          done
-          if [ "$VERIFIED" -ne 1 ]; then
-            echo "Extraction was not verified. Check ByetHost PHP/ZipArchive and file permissions."
-            exit 1
-          fi
-          echo "Laravel archive extraction verified by success marker."
-
       - name: Deployment summary
         if: success()
         run: |
           {
             echo "## Laravel preview deployment"
             echo "- Target: /htdocs/website/laravel-preview/"
-            echo "- Transfer method: one ZIP archive, server-side extraction"
-            echo "- Temporary extraction endpoint removes itself after success"
+            echo "- Transfer method: one ZIP archive; extract manually in ByetHost File Manager"
+            echo "- No public PHP extractor or HTTPS callback is used"
             echo "- Production website root and database were not changed"
           } >> "$GITHUB_STEP_SUMMARY"
