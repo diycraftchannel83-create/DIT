@@ -34,6 +34,9 @@ jobs:
           composer create-project laravel/laravel:^13.0 laravel-preview --no-interaction --prefer-dist
           # Overlay the reviewed, version-controlled Laravel integration source.
           cp -a laravel-app/app/. laravel-preview/app/
+          # Overlay the reviewed web routes for the preview.
+          mkdir -p laravel-preview/routes
+          cp -a laravel-app/routes/. laravel-preview/routes/
           cd laravel-preview
           composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction
           cp .env.example .env
@@ -60,9 +63,12 @@ jobs:
           ACADEMIC_DB_PASSWORD=
           ACADEMIC_DB_CHARSET=utf8mb4
           ACADEMIC_DB_COLLATION=utf8mb4_unicode_ci
+          ACADEMIC_MAINTENANCE_TOKEN=
           ENVVARS
           php artisan config:clear
           php artisan route:list
+          php artisan route:list --path=academic-inspect-check-2026 --except-vendor | grep -q academic-inspect-check-2026
+          php -l routes/web.php
           test -d storage/framework
           test -d bootstrap/cache
 
@@ -89,26 +95,21 @@ jobs:
           </IfModule>
           HTACCESS
 
-      - name: Verify PHP ZipArchive and Laravel package
+      - name: Verify Laravel build and prepare minimal route patch
         run: |
           set -euo pipefail
-          php -r 'if (!class_exists("ZipArchive")) { fwrite(STDERR, "ZipArchive missing\n"); exit(1); }'
           test -f laravel-preview/public/index.php
           test -f laravel-preview/vendor/autoload.php
-          test -f laravel-preview/.env
           php -l laravel-preview/public/index.php
-
-      - name: Package Laravel as one compressed archive
-        run: |
-          set -euo pipefail
-          mkdir -p dist
+          php -l laravel-preview/routes/web.php
           cd laravel-preview
-          zip -qr ../dist/laravel-preview.zip . -x '*/tests/*' '*/.git/*' '*/.github/*' '*/README.md'
+          php artisan route:list --path=academic-inspect-check-2026 --except-vendor | grep -q academic-inspect-check-2026
           cd ..
-          ls -lh dist/laravel-preview.zip
-          sha256sum dist/laravel-preview.zip
+          mkdir -p dist/patch
+          cp laravel-preview/routes/web.php dist/patch/web.php
+          sha256sum dist/patch/web.php
 
-      - name: Upload ZIP only for manual extraction in ByetHost File Manager
+      - name: Upload only the reviewed route file (no ZIP, no deletes)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.BYETHOST_FTP_SERVER }}
@@ -116,8 +117,8 @@ jobs:
           password: ${{ secrets.BYETHOST_FTP_PASSWORD }}
           protocol: ftp
           port: 21
-          server-dir: /htdocs/website/laravel-preview/
-          local-dir: ./dist/
+          server-dir: /htdocs/website/laravel-preview/routes/
+          local-dir: ./dist/patch/
           dangerous-clean-slate: false
 
       - name: Deployment summary
@@ -126,7 +127,8 @@ jobs:
           {
             echo "## Laravel preview deployment"
             echo "- Target: /htdocs/website/laravel-preview/"
-            echo "- Transfer method: one ZIP archive; extract manually in ByetHost File Manager"
-            echo "- No public PHP extractor or HTTPS callback is used"
+            echo "- Transfer method: direct FTP of the reviewed routes/web.php only"
+            echo "- No ZIP, manual extraction, remote deletion, or public PHP extractor is used"
+            echo "- Existing .env, application files, vendor files, and production website are untouched"
             echo "- Production website root and database were not changed"
           } >> "$GITHUB_STEP_SUMMARY"
