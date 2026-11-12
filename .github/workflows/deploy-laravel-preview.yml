@@ -122,6 +122,36 @@ jobs:
           local-dir: ./dist/patch/
           dangerous-clean-slate: false
 
+      - name: Prepare one-shot public PHP diagnostic
+        run: |
+          set -euo pipefail
+          mkdir -p dist/public-probe
+          cat > dist/public-probe/public-php-probe-20261112.php <<'PHP'
+          <?php
+          declare(strict_types=1);
+          header('Content-Type: text/plain; charset=UTF-8');
+          header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+          echo "PUBLIC_PHP_EXECUTION_OK\\n";
+          if (@unlink(__FILE__)) {
+              echo "PROBE_SELF_DELETE_OK\\n";
+          } else {
+              echo "PROBE_SELF_DELETE_FAILED\\n";
+          }
+          PHP
+          php -l dist/public-probe/public-php-probe-20261112.php
+
+      - name: Upload one-shot diagnostic to Laravel public directory
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.BYETHOST_FTP_SERVER }}
+          username: ${{ secrets.BYETHOST_FTP_USERNAME }}
+          password: ${{ secrets.BYETHOST_FTP_PASSWORD }}
+          protocol: ftp
+          port: 21
+          server-dir: /htdocs/website/laravel-preview/public/
+          local-dir: ./dist/public-probe/
+          dangerous-clean-slate: false
+
       - name: Deployment summary
         if: success()
         run: |
