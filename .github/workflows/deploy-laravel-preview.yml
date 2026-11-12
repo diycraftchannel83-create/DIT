@@ -22,7 +22,7 @@ jobs:
         with:
           php-version: '8.4'
           tools: composer:v2
-          extensions: ctype, curl, dom, fileinfo, filter, hash, mbstring, openssl, pcre, pdo, session, tokenizer, xml, pdo_mysql
+          extensions: ctype, curl, dom, fileinfo, filter, hash, mbstring, openssl, pcre, pdo, session, tokenizer, xml, pdo_mysql, zip
           coverage: none
 
       - name: Build fresh Laravel 13 application
@@ -73,16 +73,83 @@ jobs:
           </IfModule>
           HTACCESS
 
-      - name: Verify package contents and runtime permissions
+      - name: Verify PHP ZipArchive and Laravel package
         run: |
+          set -euo pipefail
+          php -r 'if (!class_exists("ZipArchive")) { fwrite(STDERR, "ZipArchive missing\n"); exit(1); }'
           test -f laravel-preview/public/index.php
           test -f laravel-preview/vendor/autoload.php
           test -f laravel-preview/.env
-          test -f laravel-preview/.htaccess
-          test -f laravel-preview/public/.htaccess
           php -l laravel-preview/public/index.php
 
-      - name: Deploy ONLY to isolated Laravel preview folder
+      - name: Package Laravel as one compressed archive
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          cd laravel-preview
+          zip -qr ../dist/laravel-preview.zip . -x '*/tests/*' '*/.git/*' '*/.github/*' '*/README.md'
+          cd ..
+          ls -lh dist/laravel-preview.zip
+          sha256sum dist/laravel-preview.zip
+
+      - name: Create one-time protected extraction endpoint
+        env:
+          DEPLOY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          TOKEN="$(php -r 'echo bin2hex(random_bytes(32));')"
+          echo "::add-mask::$TOKEN"
+          echo "LARAVEL_EXTRACT_TOKEN=$TOKEN" >> "$GITHUB_ENV"
+          mkdir -p dist
+          cat > dist/.deploy-extract.php <<'PHP'
+          <?php
+          declare(strict_types=1);
+          header('Content-Type: text/plain; charset=utf-8');
+          $expected = '__TOKEN__';
+          $provided = (string)($_POST['token'] ?? '');
+          if (!hash_equals($expected, $provided)) {
+              http_response_code(403);
+              exit("Forbidden\n");
+          }
+          if (!class_exists(ZipArchive::class)) {
+              http_response_code(500);
+              exit("ZipArchive unavailable\n");
+          }
+          $archive = __DIR__ . '/laravel-preview.zip';
+          $zip = new ZipArchive();
+          if ($zip->open($archive) !== true) {
+              http_response_code(500);
+              exit("Archive unavailable\n");
+          }
+          $root = realpath(__DIR__);
+          for ($i = 0; $i < $zip->numFiles; $i++) {
+              $name = $zip->getNameIndex($i);
+              if ($name === false || str_starts_with($name, '/') || preg_match('~(^|/)\.\.(?:/|$)~', $name)) {
+                  $zip->close();
+                  http_response_code(400);
+                  exit("Unsafe archive path\n");
+              }
+          }
+          $ok = $zip->extractTo(__DIR__);
+          $zip->close();
+          if (!$ok || !is_file(__DIR__ . '/public/index.php') || !is_file(__DIR__ . '/vendor/autoload.php')) {
+              http_response_code(500);
+              exit("Extraction verification failed\n");
+          }
+          @unlink($archive);
+          @unlink(__FILE__);
+          echo "Laravel preview extracted and verified.\n";
+          PHP
+          python3 - <<'PY'
+          import os
+          p = "dist/.deploy-extract.php"
+          s = open(p, encoding="utf-8").read()
+          s = s.replace("__TOKEN__", os.environ["LARAVEL_EXTRACT_TOKEN"])
+          open(p, "w", encoding="utf-8").write(s)
+          PY
+          php -l dist/.deploy-extract.php
+
+      - name: Upload compressed archive and one-time extractor
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.BYETHOST_FTP_SERVER }}
@@ -91,17 +158,19 @@ jobs:
           protocol: ftp
           port: 21
           server-dir: /htdocs/laravel-preview/
-          local-dir: ./laravel-preview/
+          local-dir: ./dist/
           dangerous-clean-slate: false
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/tests/**
-            **/phpunit.xml
-            **/README.md
-            **/.editorconfig
-            **/.gitattributes
-            **/.github/**
+
+      - name: Extract archive on ByetHost and remove temporary endpoint
+        env:
+          EXTRACT_TOKEN: ${{ env.LARAVEL_EXTRACT_TOKEN }}
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --max-time 240 \
+            --request POST \
+            --data-urlencode "token=$EXTRACT_TOKEN" \
+            "https://siakadstitdit.byethost24.com/laravel-preview/.deploy-extract.php"
+          echo "Laravel archive extraction completed."
 
       - name: Deployment summary
         if: success()
@@ -109,8 +178,7 @@ jobs:
           {
             echo "## Laravel preview deployment"
             echo "- Target: /htdocs/laravel-preview/"
-            echo "- Public URL: https://siakadstitdit.byethost24.com/laravel-preview/public/"
-            echo "- Production website root was not targeted"
-            echo "- No production database credentials were configured"
-            echo "- APP_DEBUG=false; session/cache use files"
+            echo "- Transfer method: one ZIP archive, server-side extraction"
+            echo "- Temporary extraction endpoint removes itself after success"
+            echo "- Production website root and database were not changed"
           } >> "$GITHUB_STEP_SUMMARY"
