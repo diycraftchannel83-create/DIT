@@ -94,12 +94,12 @@ jobs:
 
       - name: Create one-time protected extraction endpoint
         env:
-          DEPLOY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           TOKEN="$(php -r 'echo bin2hex(random_bytes(32));')"
           echo "::add-mask::$TOKEN"
           echo "LARAVEL_EXTRACT_TOKEN=$TOKEN" >> "$GITHUB_ENV"
+          export LARAVEL_EXTRACT_TOKEN="$TOKEN"
           mkdir -p dist
           mkdir -p dist/public
           cat > dist/public/.deploy-extract.php <<'PHP'
