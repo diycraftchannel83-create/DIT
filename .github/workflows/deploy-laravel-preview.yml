@@ -149,7 +149,7 @@ jobs:
           s = s.replace("__TOKEN__", os.environ["LARAVEL_EXTRACT_TOKEN"])
           open(p, "w", encoding="utf-8").write(s)
           PY
-          php -l dist/.deploy-extract.php
+          php -l dist/public/.deploy-extract.php
 
       - name: Upload compressed archive and one-time extractor
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
