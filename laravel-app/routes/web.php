@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\\Http\\Request;
-use Illuminate\\Support\\Facades\\Artisan;
-use Illuminate\\Support\\Facades\\Route;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
@@ -34,7 +34,7 @@ Route::match(['GET', 'POST'], '/academic-inspect-check-2026', function (Request 
         return response(
             '<pre>' . htmlspecialchars($output, ENT_QUOTES, 'UTF-8') . '</pre>'
         );
-    } catch (\\Throwable $exception) {
+    } catch (\Throwable $exception) {
         report($exception);
 
         return response('Pemeriksaan gagal. Periksa storage/logs/laravel.log.', 500);
