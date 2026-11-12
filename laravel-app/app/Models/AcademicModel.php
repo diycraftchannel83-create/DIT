@@ -10,5 +10,5 @@ abstract class AcademicModel extends Model
 
     public $timestamps = false;
 
-    protected $guarded = [];
+    protected $guarded = ['*'];
 }
