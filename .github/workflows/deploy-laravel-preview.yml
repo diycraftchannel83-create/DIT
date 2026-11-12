@@ -91,6 +91,7 @@ jobs:
           protocol: ftp
           port: 21
           server-dir: /htdocs/laravel-preview/
+          local-dir: ./laravel-preview/
           dangerous-clean-slate: false
           exclude: |
             **/.git*
