@@ -1,0 +1,62 @@
+name: Laravel 13 Build Preflight
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/laravel13-build-check.yml'
+      - 'docs/LARAVEL_BYETHOST_PREFLIGHT.md'
+
+permissions:
+  contents: read
+
+jobs:
+  build-check:
+    name: Build and verify Laravel 13 on GitHub Actions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP 8.4 and Composer
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          tools: composer:v2
+          extensions: ctype, curl, dom, fileinfo, filter, hash, mbstring, openssl, pcre, pdo, session, tokenizer, xml, pdo_mysql
+          coverage: none
+
+      - name: Verify toolchain
+        run: |
+          php --version
+          composer --version
+          php -m
+
+      - name: Create clean Laravel 13 project
+        run: composer create-project laravel/laravel:^13.0 laravel-build --no-interaction --prefer-dist
+
+      - name: Validate Composer dependencies
+        working-directory: laravel-build
+        run: composer validate --strict
+
+      - name: Verify Laravel application boots
+        working-directory: laravel-build
+        run: |
+          php artisan --version
+          php artisan route:list
+          test -d storage/framework
+          test -d bootstrap/cache
+          test -w storage
+          test -w bootstrap/cache
+
+      - name: Publish build summary
+        if: always()
+        run: |
+          {
+            echo "## Laravel 13 build preflight"
+            echo "- PHP / Composer: checked in GitHub Actions"
+            echo "- Laravel 13 project creation: completed if preceding step passed"
+            echo "- Composer validation and Artisan boot: checked if preceding steps passed"
+            echo "- No ByetHost files or production database were changed"
+          } >> "$GITHUB_STEP_SUMMARY"
