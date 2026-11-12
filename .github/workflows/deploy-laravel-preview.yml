@@ -68,6 +68,7 @@ jobs:
           php artisan config:clear
           php artisan route:list
           php artisan route:list --path=academic-inspect-check-2026 --except-vendor | grep -q academic-inspect-check-2026
+          php artisan route:list --path=route-probe-2026 --except-vendor | grep -q route-probe-2026
           php -l routes/web.php
           test -d storage/framework
           test -d bootstrap/cache
