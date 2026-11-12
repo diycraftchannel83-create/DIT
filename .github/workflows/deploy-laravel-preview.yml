@@ -152,6 +152,24 @@ jobs:
           local-dir: ./dist/public-probe/
           dangerous-clean-slate: false
 
+      - name: Prepare harmless static public-directory diagnostic
+        run: |
+          set -euo pipefail
+          mkdir -p dist/public-static-probe
+          printf '%s\\n' 'PUBLIC_STATIC_FILE_REACHED_OK' > dist/public-static-probe/public-static-probe-20261112.txt
+
+      - name: Upload static diagnostic to Laravel public directory
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.BYETHOST_FTP_SERVER }}
+          username: ${{ secrets.BYETHOST_FTP_USERNAME }}
+          password: ${{ secrets.BYETHOST_FTP_PASSWORD }}
+          protocol: ftp
+          port: 21
+          server-dir: /htdocs/website/laravel-preview/public/
+          local-dir: ./dist/public-static-probe/
+          dangerous-clean-slate: false
+
       - name: Deployment summary
         if: success()
         run: |
