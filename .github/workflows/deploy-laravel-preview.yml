@@ -17,6 +17,9 @@ jobs:
     if: inputs.confirm_staging_deploy == true
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository source
+        uses: actions/checkout@v4
+
       - name: Setup PHP 8.4 and Composer
         uses: shivammathur/setup-php@v2
         with:
@@ -29,6 +32,8 @@ jobs:
         run: |
           set -euo pipefail
           composer create-project laravel/laravel:^13.0 laravel-preview --no-interaction --prefer-dist
+          # Overlay the reviewed, version-controlled Laravel integration source.
+          cp -a laravel-app/app/. laravel-preview/app/
           cd laravel-preview
           composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction
           cp .env.example .env
@@ -45,6 +50,17 @@ jobs:
           sed -i 's/^DB_DATABASE=.*/DB_DATABASE=/' .env
           sed -i 's/^DB_USERNAME=.*/DB_USERNAME=/' .env
           sed -i 's/^DB_PASSWORD=.*/DB_PASSWORD=/' .env
+          cat >> .env <<'ENVVARS'
+
+          # Existing SIAKAD database bridge (intentionally unconfigured in source).
+          ACADEMIC_DB_HOST=
+          ACADEMIC_DB_PORT=3306
+          ACADEMIC_DB_DATABASE=
+          ACADEMIC_DB_USERNAME=
+          ACADEMIC_DB_PASSWORD=
+          ACADEMIC_DB_CHARSET=utf8mb4
+          ACADEMIC_DB_COLLATION=utf8mb4_unicode_ci
+          ENVVARS
           php artisan config:clear
           php artisan route:list
           test -d storage/framework
