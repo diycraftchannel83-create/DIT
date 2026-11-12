@@ -28,6 +28,7 @@ jobs:
             **/.git*/**
             .github/**
             app/**
+            laravel-app/**
             gradle/**
             **/*.gradle
             **/*.gradle.kts
@@ -36,6 +37,8 @@ jobs:
             README.md
             docs/**
             **/database.local.php
+            **/.env
+            **/.env.*
             website/cek-konfigurasi.php
             website/cek-db.php
             website/tes-query.php
