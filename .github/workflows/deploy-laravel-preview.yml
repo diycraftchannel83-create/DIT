@@ -1,0 +1,115 @@
+name: Deploy Laravel Preview to ByetHost
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_staging_deploy:
+        description: "I confirm deployment ONLY to /htdocs/laravel-preview/ (not the live website root)"
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-deploy:
+    if: inputs.confirm_staging_deploy == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup PHP 8.4 and Composer
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          tools: composer:v2
+          extensions: ctype, curl, dom, fileinfo, filter, hash, mbstring, openssl, pcre, pdo, session, tokenizer, xml, pdo_mysql
+          coverage: none
+
+      - name: Build fresh Laravel 13 application
+        run: |
+          set -euo pipefail
+          composer create-project laravel/laravel:^13.0 laravel-preview --no-interaction --prefer-dist
+          cd laravel-preview
+          composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction
+          cp .env.example .env
+          php artisan key:generate --force
+          sed -i 's/^APP_ENV=.*/APP_ENV=staging/' .env
+          sed -i 's/^APP_DEBUG=.*/APP_DEBUG=false/' .env
+          sed -i 's#^APP_URL=.*#APP_URL=https://siakadstitdit.byethost24.com/laravel-preview/public#' .env
+          sed -i 's/^SESSION_DRIVER=.*/SESSION_DRIVER=file/' .env
+          sed -i 's/^CACHE_STORE=.*/CACHE_STORE=file/' .env
+          sed -i 's/^QUEUE_CONNECTION=.*/QUEUE_CONNECTION=sync/' .env
+          sed -i 's/^DB_CONNECTION=.*/DB_CONNECTION=mysql/' .env
+          sed -i 's/^DB_HOST=.*/DB_HOST=127.0.0.1/' .env
+          sed -i 's/^DB_PORT=.*/DB_PORT=3306/' .env
+          sed -i 's/^DB_DATABASE=.*/DB_DATABASE=/' .env
+          sed -i 's/^DB_USERNAME=.*/DB_USERNAME=/' .env
+          sed -i 's/^DB_PASSWORD=.*/DB_PASSWORD=/' .env
+          php artisan config:clear
+          php artisan route:list
+          test -d storage/framework
+          test -d bootstrap/cache
+
+      - name: Protect Laravel project files outside public directory
+        run: |
+          cat > laravel-preview/.htaccess <<'HTACCESS'
+          Options -Indexes
+          <IfModule mod_authz_core.c>
+              Require all denied
+          </IfModule>
+          <IfModule !mod_authz_core.c>
+              Order allow,deny
+              Deny from all
+          </IfModule>
+          HTACCESS
+          cat >> laravel-preview/public/.htaccess <<'HTACCESS'
+
+          <IfModule mod_authz_core.c>
+              Require all granted
+          </IfModule>
+          <IfModule !mod_authz_core.c>
+              Order allow,deny
+              Allow from all
+          </IfModule>
+          HTACCESS
+
+      - name: Verify package contents and runtime permissions
+        run: |
+          test -f laravel-preview/public/index.php
+          test -f laravel-preview/vendor/autoload.php
+          test -f laravel-preview/.env
+          test -f laravel-preview/.htaccess
+          test -f laravel-preview/public/.htaccess
+          php -l laravel-preview/public/index.php
+
+      - name: Deploy ONLY to isolated Laravel preview folder
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.BYETHOST_FTP_SERVER }}
+          username: ${{ secrets.BYETHOST_FTP_USERNAME }}
+          password: ${{ secrets.BYETHOST_FTP_PASSWORD }}
+          protocol: ftp
+          port: 21
+          server-dir: /htdocs/laravel-preview/
+          dangerous-clean-slate: false
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/tests/**
+            **/phpunit.xml
+            **/README.md
+            **/.editorconfig
+            **/.gitattributes
+            **/.github/**
+
+      - name: Deployment summary
+        if: success()
+        run: |
+          {
+            echo "## Laravel preview deployment"
+            echo "- Target: /htdocs/laravel-preview/"
+            echo "- Public URL: https://siakadstitdit.byethost24.com/laravel-preview/public/"
+            echo "- Production website root was not targeted"
+            echo "- No production database credentials were configured"
+            echo "- APP_DEBUG=false; session/cache use files"
+          } >> "$GITHUB_STEP_SUMMARY"
