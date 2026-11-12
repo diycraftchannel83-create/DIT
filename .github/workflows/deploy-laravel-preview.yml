@@ -93,7 +93,6 @@ jobs:
           sha256sum dist/laravel-preview.zip
 
       - name: Create one-time protected extraction endpoint
-        env:
         run: |
           set -euo pipefail
           TOKEN="$(php -r 'echo bin2hex(random_bytes(32));')"
