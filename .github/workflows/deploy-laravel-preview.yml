@@ -138,6 +138,7 @@ jobs:
               exit("Extraction verification failed\n");
           }
           @unlink($archive);
+          file_put_contents(__DIR__ . '/.deploy-extract.done', "OK " . gmdate('c'));
           @unlink(__FILE__);
           echo "Laravel preview extracted and verified.\n";
           PHP
@@ -167,11 +168,26 @@ jobs:
           EXTRACT_TOKEN: ${{ env.LARAVEL_EXTRACT_TOKEN }}
         run: |
           set -euo pipefail
-          curl --fail --silent --show-error --max-time 240 \
+          BASE_URL="https://siakadstitdit.byethost24.com/laravel-preview/public"
+          # The host may close the POST connection after PHP completes.
+          # Verify a marker written only after successful extraction and checks.
+          curl --silent --show-error --max-time 300 \
             --request POST \
             --data-urlencode "token=$EXTRACT_TOKEN" \
-            "https://siakadstitdit.byethost24.com/laravel-preview/public/.deploy-extract.php"
-          echo "Laravel archive extraction completed."
+            "$BASE_URL/.deploy-extract.php" || true
+          VERIFIED=0
+          for attempt in 1 2 3 4 5 6; do
+            if curl --fail --silent --show-error --max-time 30 "$BASE_URL/.deploy-extract.done" | grep -q '^OK '; then
+              VERIFIED=1
+              break
+            fi
+            sleep 5
+          done
+          if [ "$VERIFIED" -ne 1 ]; then
+            echo "Extraction was not verified. Check ByetHost PHP/ZipArchive and file permissions."
+            exit 1
+          fi
+          echo "Laravel archive extraction verified by success marker."
 
       - name: Deployment summary
         if: success()
