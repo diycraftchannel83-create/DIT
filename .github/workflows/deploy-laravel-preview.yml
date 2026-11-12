@@ -138,6 +138,7 @@ jobs:
               exit("Extraction verification failed\n");
           }
           @unlink($archive);
+          file_put_contents(__DIR__ . '/.deploy-extract.done', "OK " . gmdate('c'));
           @unlink(__FILE__);
           echo "Laravel preview extracted and verified.\n";
           PHP
