@@ -62,3 +62,10 @@ Referensi: [Laravel 13 deployment requirements](https://laravel.com/docs/13.x/de
 - Baru rencanakan perpindahan modul melalui feature flag dan backup-restore teruji.
 
 Tidak ada migrasi data atau perubahan route produksi pada tahap ini.
+
+
+## Deployment staging Laravel 13 (manual approval)
+
+Workflow `Deploy Laravel Preview to ByetHost` membangun skeleton Laravel 13 beserta vendor melalui Composer, membuat APP_KEY staging, mematikan debug, memakai session/cache file, dan mengunggah hanya ke `/htdocs/laravel-preview/`. Workflow meminta konfirmasi manual dan tidak menargetkan root website. Database tidak dikonfigurasi dengan kredensial produksi. URL uji setelah deployment: `https://siakadstitdit.byethost24.com/laravel-preview/public/`.
+
+Folder project dilindungi dengan `.htaccess` deny-all, sementara folder `public` diberi akses web. Deployment tidak menggunakan clean-slate agar tidak menghapus konten hosting. Pastikan hosting mendukung aturan Apache tersebut; bila tidak, hentikan pengujian dan jangan pindahkan document root utama.
