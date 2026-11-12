@@ -73,16 +73,18 @@ jobs:
           test -d storage/framework
           test -d bootstrap/cache
 
-      - name: Protect Laravel project files outside public directory
+      - name: Protect Laravel project files while allowing public directory
         run: |
+          set -euo pipefail
           cat > laravel-preview/.htaccess <<'HTACCESS'
           Options -Indexes
-          <IfModule mod_authz_core.c>
-              Require all denied
-          </IfModule>
-          <IfModule !mod_authz_core.c>
-              Order allow,deny
-              Deny from all
+          <IfModule mod_rewrite.c>
+              RewriteEngine On
+              # Allow requests to enter Laravel's public directory; its own .htaccess
+              # handles the front controller and access rules.
+              RewriteRule ^public(?:/|$) - [L]
+              # Deny direct web access to the rest of the Laravel project.
+              RewriteRule ^ - [F,L]
           </IfModule>
           HTACCESS
           cat >> laravel-preview/public/.htaccess <<'HTACCESS'
@@ -109,6 +111,9 @@ jobs:
           mkdir -p dist/patch
           cp laravel-preview/routes/web.php dist/patch/web.php
           sha256sum dist/patch/web.php
+          mkdir -p dist/root-access
+          cp laravel-preview/.htaccess dist/root-access/.htaccess
+          grep -q 'RewriteRule \^public' dist/root-access/.htaccess
 
       - name: Upload only the reviewed route file (no ZIP, no deletes)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -120,6 +125,18 @@ jobs:
           port: 21
           server-dir: /htdocs/website/laravel-preview/routes/
           local-dir: ./dist/patch/
+          dangerous-clean-slate: false
+
+      - name: Upload protected Laravel root access rules
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.BYETHOST_FTP_SERVER }}
+          username: ${{ secrets.BYETHOST_FTP_USERNAME }}
+          password: ${{ secrets.BYETHOST_FTP_PASSWORD }}
+          protocol: ftp
+          port: 21
+          server-dir: /htdocs/website/laravel-preview/
+          local-dir: ./dist/root-access/
           dangerous-clean-slate: false
 
       - name: Prepare one-shot public PHP diagnostic
