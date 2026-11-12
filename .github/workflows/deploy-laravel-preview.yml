@@ -34,6 +34,9 @@ jobs:
           composer create-project laravel/laravel:^13.0 laravel-preview --no-interaction --prefer-dist
           # Overlay the reviewed, version-controlled Laravel integration source.
           cp -a laravel-app/app/. laravel-preview/app/
+          # Overlay the reviewed web routes for the preview.
+          mkdir -p laravel-preview/routes
+          cp -a laravel-app/routes/. laravel-preview/routes/
           cd laravel-preview
           composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction
           cp .env.example .env
@@ -60,9 +63,12 @@ jobs:
           ACADEMIC_DB_PASSWORD=
           ACADEMIC_DB_CHARSET=utf8mb4
           ACADEMIC_DB_COLLATION=utf8mb4_unicode_ci
+          ACADEMIC_MAINTENANCE_TOKEN=
           ENVVARS
           php artisan config:clear
           php artisan route:list
+          php artisan route:list --path=academic-inspect-check-2026 --except-vendor | grep -q academic-inspect-check-2026
+          php -l routes/web.php
           test -d storage/framework
           test -d bootstrap/cache
 
